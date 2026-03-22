@@ -1,0 +1,2 @@
+-dontwarn kotlin.**
+-dontwarn kotlinx.**

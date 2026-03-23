@@ -331,17 +331,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   ResolutionPreset get _cameraResolutionPreset {
-    if (Platform.isAndroid) {
-      return ResolutionPreset.veryHigh;
-    }
-    return ResolutionPreset.high;
-  }
-
-  ImageFormatGroup get _cameraImageFormatGroup {
-    if (Platform.isAndroid) {
-      return ImageFormatGroup.yuv420;
-    }
-    return ImageFormatGroup.bgra8888;
+    return ResolutionPreset.max;
   }
 
   CameraDescription _selectInitialCamera(List<CameraDescription> cameras) {
@@ -370,7 +360,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     _currentZoomLevel = _minZoomLevel < 1.0 ? 1.0 : _minZoomLevel;
     await controller.setZoomLevel(_currentZoomLevel);
     _focusIndicatorPoint = null;
-    _flashMode = FlashMode.auto;
+    _flashMode = FlashMode.off;
     await controller.setFlashMode(_flashMode);
     _isRecordingVideo = false;
     _recordingStartedAt = null;
@@ -385,7 +375,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           initialCamera,
           _cameraResolutionPreset,
           enableAudio: false,
-          imageFormatGroup: _cameraImageFormatGroup,
         );
         await _configureCameraController(_cameraController!);
       }
@@ -406,7 +395,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       next,
       _cameraResolutionPreset,
       enableAudio: false,
-      imageFormatGroup: _cameraImageFormatGroup,
     );
     await _configureCameraController(_cameraController!);
     notifyListeners();
@@ -418,21 +406,28 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return 'Camera is unavailable.';
     }
     try {
-      final nextMode = switch (_flashMode) {
-        FlashMode.off => FlashMode.auto,
-        FlashMode.auto => _isVideoMode ? FlashMode.torch : FlashMode.always,
-        FlashMode.always => FlashMode.off,
-        FlashMode.torch => FlashMode.off,
-      };
-      await controller.setFlashMode(nextMode);
-      _flashMode = nextMode;
-      notifyListeners();
-      return switch (nextMode) {
-        FlashMode.auto => 'Flash auto',
-        FlashMode.always => 'Flash on',
-        FlashMode.torch => 'Flash on',
-        FlashMode.off => 'Flash off',
-      };
+      final preferredModes = _isVideoMode
+          ? <FlashMode>[FlashMode.off, FlashMode.torch]
+          : <FlashMode>[FlashMode.off, FlashMode.auto, FlashMode.always];
+      final currentIndex = preferredModes.indexOf(_flashMode);
+      final nextIndex = currentIndex == -1 ? 0 : (currentIndex + 1) % preferredModes.length;
+      for (var offset = 0; offset < preferredModes.length; offset++) {
+        final candidate = preferredModes[(nextIndex + offset) % preferredModes.length];
+        try {
+          await controller.setFlashMode(candidate);
+          _flashMode = candidate;
+          notifyListeners();
+          return switch (candidate) {
+            FlashMode.auto => 'Flash auto',
+            FlashMode.always => 'Flash on',
+            FlashMode.torch => 'Flash torch',
+            FlashMode.off => 'Flash off',
+          };
+        } catch (_) {
+          continue;
+        }
+      }
+      return 'Flash is unavailable on this camera.';
     } catch (_) {
       return 'Flash is unavailable on this camera.';
     }

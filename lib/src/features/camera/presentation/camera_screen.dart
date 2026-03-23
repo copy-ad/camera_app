@@ -148,6 +148,7 @@ class _InteractiveCameraViewport extends StatefulWidget {
 
 class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> {
   double _baseZoomLevel = 1.0;
+  bool _isScaling = false;
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +162,9 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) {
+            if (_isScaling) {
+              return;
+            }
             final normalizedPoint = Offset(
               details.localPosition.dx / constraints.maxWidth,
               details.localPosition.dy / constraints.maxHeight,
@@ -168,6 +172,7 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
             widget.controller.focusAtPoint(normalizedPoint);
           },
           onScaleStart: (_) {
+            _isScaling = true;
             _baseZoomLevel = widget.controller.currentZoomLevel;
           },
           onScaleUpdate: (details) {
@@ -175,6 +180,9 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
               return;
             }
             widget.controller.setZoomLevel(_baseZoomLevel * details.scale);
+          },
+          onScaleEnd: (_) {
+            _isScaling = false;
           },
           child: Stack(
             fit: StackFit.expand,
@@ -196,31 +204,26 @@ class _CameraViewport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final previewAspectRatio =
-        controller.value.aspectRatio == 0 ? 1.0 : controller.value.aspectRatio;
+    final previewSize = controller.value.previewSize;
+    if (previewSize == null) {
+      return CameraPreview(controller);
+    }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenAspectRatio = constraints.maxWidth / constraints.maxHeight;
-        final scale = previewAspectRatio / screenAspectRatio;
+    final portraitWidth = previewSize.height;
+    final portraitHeight = previewSize.width;
 
-        return ClipRect(
-          child: OverflowBox(
-            alignment: Alignment.center,
-            maxWidth: constraints.maxWidth,
-            maxHeight: constraints.maxHeight,
-            child: Transform.scale(
-              scale: scale < 1 ? 1 / scale : scale,
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: previewAspectRatio,
-                  child: CameraPreview(controller),
-                ),
-              ),
-            ),
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: portraitWidth,
+            height: portraitHeight,
+            child: CameraPreview(controller),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -243,16 +246,16 @@ class _FocusIndicatorOverlay extends StatelessWidget {
         final top = (focusPoint.dy * constraints.maxHeight) - 34;
 
         return Positioned(
-          left: left.clamp(12.0, constraints.maxWidth - 68.0),
-          top: top.clamp(12.0, constraints.maxHeight - 68.0),
+          left: left.clamp(16.0, constraints.maxWidth - 52.0),
+          top: top.clamp(16.0, constraints.maxHeight - 52.0),
           child: IgnorePointer(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              width: 68,
-              height: 68,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
                 border: Border.all(color: AppTheme.secondary, width: 2),
-                borderRadius: BorderRadius.circular(18),
+                shape: BoxShape.circle,
                 color: Colors.transparent,
               ),
               child: Center(

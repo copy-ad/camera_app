@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/glass_panel.dart';
 
-class UnlockScreen extends StatelessWidget {
+class UnlockScreen extends StatefulWidget {
   const UnlockScreen({
     super.key,
     required this.canUseBiometric,
@@ -16,6 +16,28 @@ class UnlockScreen extends StatelessWidget {
   final Future<bool> Function() onUnlock;
 
   @override
+  State<UnlockScreen> createState() => _UnlockScreenState();
+}
+
+class _UnlockScreenState extends State<UnlockScreen> {
+  bool _didAttemptAutoUnlock = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didAttemptAutoUnlock || !widget.canUseBiometric) {
+      return;
+    }
+    _didAttemptAutoUnlock = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || widget.isBusy) {
+        return;
+      }
+      widget.onUnlock();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -24,7 +46,11 @@ class UnlockScreen extends StatelessWidget {
           const DecoratedBox(
             decoration: BoxDecoration(
               color: AppTheme.background,
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF1A1A1A), AppTheme.background]),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF1A1A1A), AppTheme.background],
+              ),
             ),
           ),
           Center(
@@ -39,16 +65,36 @@ class UnlockScreen extends StatelessWidget {
                     Container(
                       width: 72,
                       height: 72,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.surfaceHighest, boxShadow: AppTheme.softGlow),
-                      child: const Icon(Icons.verified_user_rounded, color: AppTheme.primary, size: 34),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppTheme.surfaceHighest,
+                        boxShadow: AppTheme.softGlow,
+                      ),
+                      child: const Icon(
+                        Icons.verified_user_rounded,
+                        color: AppTheme.primary,
+                        size: 34,
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Vault Locked', style: TextStyle(fontFamily: 'Manrope', fontSize: 28, fontWeight: FontWeight.w800)),
+                    const Text(
+                      'Vault Locked',
+                      style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     Text(
-                      canUseBiometric ? 'Use Face ID, Touch ID, fingerprint, or device credentials to open TempCam.' : 'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
+                      widget.canUseBiometric
+                          ? 'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.'
+                          : 'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppTheme.onSurfaceVariant, height: 1.5),
+                      style: const TextStyle(
+                        color: AppTheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
                     ),
                     const SizedBox(height: 28),
                     SizedBox(
@@ -58,10 +104,12 @@ class UnlockScreen extends StatelessWidget {
                           backgroundColor: AppTheme.primary,
                           foregroundColor: AppTheme.background,
                           padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(22),
+                          ),
                         ),
-                        onPressed: isBusy ? null : () => onUnlock(),
-                        child: Text(isBusy ? 'Unlocking...' : 'Unlock TempCam'),
+                        onPressed: widget.isBusy ? null : () => widget.onUnlock(),
+                        child: Text(widget.isBusy ? 'Unlocking...' : 'Unlock TempCam'),
                       ),
                     ),
                   ],
@@ -74,4 +122,3 @@ class UnlockScreen extends StatelessWidget {
     );
   }
 }
-

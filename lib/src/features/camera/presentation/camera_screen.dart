@@ -19,7 +19,7 @@ class CameraScreen extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               if (camera != null && camera.value.isInitialized)
-                _CameraViewport(controller: camera)
+                _InteractiveCameraViewport(controller: controller)
               else
                 Container(
                   decoration: const BoxDecoration(
@@ -31,7 +31,7 @@ class CameraScreen extends StatelessWidget {
                   ),
                 ),
               _CameraTopControls(controller: controller),
-              const _CameraStats(),
+              _CameraStats(controller: controller),
               Positioned(
                 left: 0,
                 right: 0,
@@ -82,11 +82,13 @@ class CameraScreen extends StatelessWidget {
                 ),
               ),
               if (controller.isRecordingVideo)
-                const Positioned(
+                Positioned(
                   top: 130,
                   left: 0,
                   right: 0,
-                  child: Center(child: _RecordingBadge()),
+                  child: Center(
+                    child: _RecordingBadge(duration: controller.recordingDuration),
+                  ),
                 ),
               Positioned(
                 left: 22,
@@ -134,6 +136,59 @@ class CameraScreen extends StatelessWidget {
   }
 }
 
+class _InteractiveCameraViewport extends StatefulWidget {
+  const _InteractiveCameraViewport({required this.controller});
+
+  final AppController controller;
+
+  @override
+  State<_InteractiveCameraViewport> createState() =>
+      _InteractiveCameraViewportState();
+}
+
+class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> {
+  double _baseZoomLevel = 1.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final camera = widget.controller.cameraController;
+    if (camera == null || !camera.value.isInitialized) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (details) {
+            final normalizedPoint = Offset(
+              details.localPosition.dx / constraints.maxWidth,
+              details.localPosition.dy / constraints.maxHeight,
+            );
+            widget.controller.focusAtPoint(normalizedPoint);
+          },
+          onScaleStart: (_) {
+            _baseZoomLevel = widget.controller.currentZoomLevel;
+          },
+          onScaleUpdate: (details) {
+            if (details.pointerCount < 2) {
+              return;
+            }
+            widget.controller.setZoomLevel(_baseZoomLevel * details.scale);
+          },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _CameraViewport(controller: camera),
+              _FocusIndicatorOverlay(controller: widget.controller),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _CameraViewport extends StatelessWidget {
   const _CameraViewport({required this.controller});
 
@@ -170,6 +225,54 @@ class _CameraViewport extends StatelessWidget {
   }
 }
 
+class _FocusIndicatorOverlay extends StatelessWidget {
+  const _FocusIndicatorOverlay({required this.controller});
+
+  final AppController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final focusPoint = controller.focusIndicatorPoint;
+    if (focusPoint == null) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final left = (focusPoint.dx * constraints.maxWidth) - 34;
+        final top = (focusPoint.dy * constraints.maxHeight) - 34;
+
+        return Positioned(
+          left: left.clamp(12.0, constraints.maxWidth - 68.0),
+          top: top.clamp(12.0, constraints.maxHeight - 68.0),
+          child: IgnorePointer(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppTheme.secondary, width: 2),
+                borderRadius: BorderRadius.circular(18),
+                color: Colors.transparent,
+              ),
+              child: Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.secondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _CameraTopControls extends StatelessWidget {
   const _CameraTopControls({required this.controller});
 
@@ -184,9 +287,7 @@ class _CameraTopControls extends StatelessWidget {
         child: Align(
           alignment: Alignment.topLeft,
           child: _CircleActionButton(
-            icon: controller.isFlashEnabled
-                ? Icons.flash_on_rounded
-                : Icons.flash_off_rounded,
+            icon: _flashIconFor(controller.flashMode),
             onTap: () async {
               final message = await controller.toggleFlash();
               if (!context.mounted || message == null) {
@@ -201,20 +302,31 @@ class _CameraTopControls extends StatelessWidget {
       ),
     );
   }
+
+  IconData _flashIconFor(FlashMode mode) {
+    return switch (mode) {
+      FlashMode.auto => Icons.flash_auto_rounded,
+      FlashMode.always => Icons.flash_on_rounded,
+      FlashMode.torch => Icons.flash_on_rounded,
+      FlashMode.off => Icons.flash_off_rounded,
+    };
+  }
 }
 
 class _CameraStats extends StatelessWidget {
-  const _CameraStats();
+  const _CameraStats({required this.controller});
+
+  final AppController controller;
 
   @override
   Widget build(BuildContext context) {
-    return const Positioned(
+    return Positioned(
       top: 92,
       right: 26,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
+          const Text(
             'ISO 100',
             style: TextStyle(
               fontSize: 10,
@@ -222,10 +334,19 @@ class _CameraStats extends StatelessWidget {
               color: AppTheme.onSurfaceVariant,
             ),
           ),
-          SizedBox(height: 2),
-          Text(
+          const SizedBox(height: 2),
+          const Text(
             'f/1.8',
             style: TextStyle(
+              fontSize: 10,
+              letterSpacing: 2,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${controller.currentZoomLevel.toStringAsFixed(1)}x',
+            style: const TextStyle(
               fontSize: 10,
               letterSpacing: 2,
               color: AppTheme.onSurfaceVariant,
@@ -308,24 +429,33 @@ class _ModeChip extends StatelessWidget {
 }
 
 class _RecordingBadge extends StatelessWidget {
-  const _RecordingBadge();
+  const _RecordingBadge({required this.duration});
+
+  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xCC3B0A0A),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.fiber_manual_record_rounded, color: Color(0xFFFF5A5A), size: 14),
-          SizedBox(width: 6),
+          const Icon(
+            Icons.fiber_manual_record_rounded,
+            color: Color(0xFFFF5A5A),
+            size: 14,
+          ),
+          const SizedBox(width: 6),
           Text(
-            'REC',
-            style: TextStyle(
+            '$minutes:$seconds',
+            style: const TextStyle(
               fontSize: 10,
               letterSpacing: 2,
               fontWeight: FontWeight.w800,

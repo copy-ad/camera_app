@@ -1,4 +1,6 @@
-import 'package:hive/hive.dart';
+﻿import 'package:hive/hive.dart';
+
+enum MediaType { photo, video }
 
 class PhotoRecord {
   PhotoRecord({
@@ -8,6 +10,7 @@ class PhotoRecord {
     required this.timerLabel,
     this.expiresAt,
     this.isKeptForever = false,
+    this.mediaType = MediaType.photo,
   });
 
   final String id;
@@ -16,6 +19,7 @@ class PhotoRecord {
   final DateTime? expiresAt;
   final bool isKeptForever;
   final String timerLabel;
+  final MediaType mediaType;
 
   bool get isExpired {
     if (isKeptForever) {
@@ -24,11 +28,15 @@ class PhotoRecord {
     return expiresAt != null && expiresAt!.isBefore(DateTime.now());
   }
 
+  bool get isVideo => mediaType == MediaType.video;
+  bool get isPhoto => mediaType == MediaType.photo;
+
   PhotoRecord copyWith({
     String? filePath,
     DateTime? expiresAt,
     bool? isKeptForever,
     String? timerLabel,
+    MediaType? mediaType,
   }) {
     return PhotoRecord(
       id: id,
@@ -37,6 +45,7 @@ class PhotoRecord {
       expiresAt: expiresAt ?? this.expiresAt,
       isKeptForever: isKeptForever ?? this.isKeptForever,
       timerLabel: timerLabel ?? this.timerLabel,
+      mediaType: mediaType ?? this.mediaType,
     );
   }
 }
@@ -59,13 +68,14 @@ class PhotoRecordAdapter extends TypeAdapter<PhotoRecord> {
       expiresAt: fields[3] as DateTime?,
       isKeptForever: fields[4] as bool,
       timerLabel: fields[5] as String,
+      mediaType: MediaType.values.byName((fields[6] as String?) ?? 'photo'),
     );
   }
 
   @override
   void write(BinaryWriter writer, PhotoRecord obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -77,7 +87,8 @@ class PhotoRecordAdapter extends TypeAdapter<PhotoRecord> {
       ..writeByte(4)
       ..write(obj.isKeptForever)
       ..writeByte(5)
-      ..write(obj.timerLabel);
+      ..write(obj.timerLabel)
+      ..writeByte(6)
+      ..write(obj.mediaType.name);
   }
 }
-

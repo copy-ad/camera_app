@@ -39,43 +39,45 @@ class _MainShellState extends State<MainShell> {
               index: controller.currentTabIndex,
               children: screens,
             ),
-            bottomNavigationBar: SafeArea(
-              top: false,
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppTheme.background.withValues(alpha: 0.82),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusL),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x66000000),
-                      blurRadius: 24,
-                      offset: Offset(0, -4),
+            bottomNavigationBar: controller.currentTabIndex == 1
+                ? null
+                : SafeArea(
+                    top: false,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.background.withValues(alpha: 0.82),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusL),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x66000000),
+                            blurRadius: 24,
+                            offset: Offset(0, -4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _NavIcon(
+                            selected: controller.currentTabIndex == 0,
+                            icon: Icons.grid_view_rounded,
+                            onTap: () => controller.setTab(0),
+                          ),
+                          _CenterLens(
+                            selected: controller.currentTabIndex == 1,
+                            onTap: () => controller.setTab(1),
+                          ),
+                          _NavIcon(
+                            selected: controller.currentTabIndex == 2,
+                            icon: Icons.settings_rounded,
+                            onTap: () => controller.setTab(2),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _NavIcon(
-                      selected: controller.currentTabIndex == 0,
-                      icon: Icons.grid_view_rounded,
-                      onTap: () => controller.setTab(0),
-                    ),
-                    _CenterLens(
-                      selected: controller.currentTabIndex == 1,
-                      onTap: () => controller.setTab(1),
-                    ),
-                    _NavIcon(
-                      selected: controller.currentTabIndex == 2,
-                      icon: Icons.settings_rounded,
-                      onTap: () => controller.setTab(2),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
           ),
         );
       },
@@ -156,3 +158,4 @@ class _CenterLens extends StatelessWidget {
     );
   }
 }
+

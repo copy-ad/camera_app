@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
@@ -33,9 +33,14 @@ class PhotoRepository {
   Future<PhotoRecord> createFromCapture({
     required String sourcePath,
     required AppTimerOption timer,
+    MediaType mediaType = MediaType.photo,
   }) async {
     final id = _uuid.v4();
-    final storedPath = await _storageService.persistCapture(id: id, sourcePath: sourcePath);
+    final storedPath = await _storageService.persistCapture(
+      id: id,
+      sourcePath: sourcePath,
+      mediaType: mediaType,
+    );
     final now = DateTime.now();
     final record = PhotoRecord(
       id: id,
@@ -44,9 +49,21 @@ class PhotoRepository {
       expiresAt: now.add(timer.duration),
       isKeptForever: false,
       timerLabel: timer.label,
+      mediaType: mediaType,
     );
     await _box.put(id, record);
     return record;
+  }
+
+  Future<PhotoRecord> createVideoFromCapture({
+    required String sourcePath,
+    required AppTimerOption timer,
+  }) {
+    return createFromCapture(
+      sourcePath: sourcePath,
+      timer: timer,
+      mediaType: MediaType.video,
+    );
   }
 
   Future<void> deleteNow(PhotoRecord record) async {
@@ -86,6 +103,9 @@ class PhotoRepository {
   Future<File?> lastThumbnailFile() async {
     final items = readAllSorted().reversed.toList();
     for (final item in items) {
+      if (!item.isPhoto) {
+        continue;
+      }
       final file = File(item.filePath);
       if (await file.exists()) {
         return file;
@@ -94,4 +114,3 @@ class PhotoRepository {
     return null;
   }
 }
-

@@ -100,7 +100,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                             ),
                             child: Text(
                               badgeText,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 letterSpacing: 2,
                                 fontWeight: FontWeight.w800,
@@ -121,7 +121,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                       Text(
                         title,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Manrope',
                           fontSize: 36,
                           fontWeight: FontWeight.w800,
@@ -132,7 +132,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                       Text(
                         description,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18,
                             color: AppTheme.onSurfaceVariant,
                             height: 1.45),
@@ -183,7 +183,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                           child: Text(
                             controller.billingStatusMessage!,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: AppTheme.onSurfaceVariant, height: 1.4),
                           ),
                         ),
@@ -221,7 +221,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                                 },
                           child: Text(
                             buttonText,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontFamily: 'Manrope',
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800),
@@ -287,7 +287,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           'Access recorded until ${_formatExpiry(controller.premiumAccessExpiresAt!)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 11, color: AppTheme.onSurfaceVariant),
                         ),
                       ],
@@ -347,13 +347,13 @@ class _FeatureCard extends StatelessWidget {
           Icon(icon, color: accent),
           const SizedBox(height: 16),
           Text(title,
-              style: TextStyle(
+              style: const TextStyle(
                   fontFamily: 'Manrope',
                   fontSize: 19,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Text(body,
-              style: TextStyle(
+              style: const TextStyle(
                   color: AppTheme.onSurfaceVariant, height: 1.45)),
         ],
       ),
@@ -401,7 +401,7 @@ class _PricingCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
                       badge!.toUpperCase(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 10,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w800,
@@ -409,16 +409,16 @@ class _PricingCard extends StatelessWidget {
                     ),
                   ),
                 Text(title,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontFamily: 'Manrope',
                         fontSize: 24,
                         fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
                 Text(subtitle,
-                    style: TextStyle(color: AppTheme.onSurfaceVariant)),
+                    style: const TextStyle(color: AppTheme.onSurfaceVariant)),
                 const SizedBox(height: 4),
                 Text(caption,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: AppTheme.onSurfaceVariant, height: 1.35)),
               ],
             ),

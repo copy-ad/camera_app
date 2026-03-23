@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -89,7 +89,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                             ),
                             const SizedBox(height: 6),
                             const Text(
-                              'Managed volatility for your visual memory.',
+                              'Private temporary media stored only inside TempCam.',
                               style: TextStyle(color: AppTheme.onSurfaceVariant),
                             ),
                             const SizedBox(height: 22),
@@ -98,7 +98,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               onChanged: (_) => setState(() {}),
                               style: const TextStyle(color: AppTheme.onSurface),
                               decoration: InputDecoration(
-                                hintText: 'Search temporary archive...',
+                                hintText: 'Search private archive...',
                                 hintStyle: const TextStyle(color: AppTheme.outline),
                                 filled: true,
                                 fillColor: AppTheme.surfaceContainer,
@@ -130,7 +130,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'All Temporary Photos',
+                          'All Temporary Media',
                           style: TextStyle(
                             fontFamily: 'Manrope',
                             fontSize: 20,
@@ -213,7 +213,7 @@ class _ExpiringSoonSection extends StatelessWidget {
               style: TextStyle(fontFamily: 'Manrope', fontSize: 20, fontWeight: FontWeight.w700),
             ),
             Text(
-              'HIGH PRIORITY',
+              'PRIVATE',
               style: TextStyle(fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w700, color: AppTheme.secondary),
             ),
           ],
@@ -262,11 +262,7 @@ class _LargePreviewCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.file(
-              File(photo.filePath),
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(color: AppTheme.surfaceContainer),
-            ),
+            _MediaTileVisual(photo: photo),
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -275,6 +271,11 @@ class _LargePreviewCard extends StatelessWidget {
                   colors: [Color(0xAA131313), Colors.transparent],
                 ),
               ),
+            ),
+            Positioned(
+              top: 14,
+              left: 14,
+              child: _MediaBadge(photo: photo),
             ),
             Positioned(
               top: 14,
@@ -321,11 +322,7 @@ class _PhotoTile extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.file(
-              File(photo.filePath),
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(color: AppTheme.surfaceContainer),
-            ),
+            _MediaTileVisual(photo: photo),
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -334,6 +331,11 @@ class _PhotoTile extends StatelessWidget {
                   colors: [Color(0xAA131313), Colors.transparent],
                 ),
               ),
+            ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: _MediaBadge(photo: photo),
             ),
             Positioned(
               left: 12,
@@ -369,6 +371,50 @@ class _PhotoTile extends StatelessWidget {
   }
 }
 
+class _MediaTileVisual extends StatelessWidget {
+  const _MediaTileVisual({required this.photo});
+
+  final PhotoRecord photo;
+
+  @override
+  Widget build(BuildContext context) {
+    if (photo.isVideo) {
+      return Container(
+        color: AppTheme.surfaceContainer,
+        child: const Center(
+          child: Icon(Icons.play_circle_fill_rounded, color: AppTheme.primary, size: 56),
+        ),
+      );
+    }
+    return Image.file(
+      File(photo.filePath),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(color: AppTheme.surfaceContainer),
+    );
+  }
+}
+
+class _MediaBadge extends StatelessWidget {
+  const _MediaBadge({required this.photo});
+
+  final PhotoRecord photo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceLowest.withValues(alpha: 0.64),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        photo.isVideo ? 'VIDEO' : 'PHOTO',
+        style: const TextStyle(fontSize: 10, letterSpacing: 2, color: AppTheme.onSurfaceVariant),
+      ),
+    );
+  }
+}
+
 class _EmptyPhotosState extends StatelessWidget {
   const _EmptyPhotosState();
 
@@ -387,7 +433,7 @@ class _EmptyPhotosState extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              'Captured moments, only as long as you need them.',
+              'Captured moments stay private inside TempCam until you keep them forever.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.onSurfaceVariant),
             ),

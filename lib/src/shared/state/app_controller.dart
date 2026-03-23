@@ -18,6 +18,7 @@ import '../services/camera_service.dart';
 import '../services/notification_service.dart';
 
 class AppController extends ChangeNotifier with WidgetsBindingObserver {
+  static const MethodChannel _mediaGalleryChannel = MethodChannel('tempcam/media_gallery');
   AppController({
     required SettingsRepository settingsRepository,
     required PhotoRepository photoRepository,
@@ -55,9 +56,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool _isUnlocking = false;
   bool _biometricAvailable = false;
   bool _isCapturing = false;
+  Offset? _focusIndicatorPoint;
+  Timer? _focusIndicatorTimer;
+  double _minZoomLevel = 1.0;
+  double _maxZoomLevel = 1.0;
+  double _currentZoomLevel = 1.0;
   bool _isRecordingVideo = false;
   bool _isVideoMode = false;
-  bool _isFlashEnabled = false;
+  FlashMode _flashMode = FlashMode.auto;
+  DateTime? _recordingStartedAt;
+  Timer? _recordingDurationTimer;
   bool _isStoreAvailable = false;
   bool _isStoreLoading = false;
   bool _isPurchasePending = false;
@@ -77,9 +85,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isUnlocking => _isUnlocking;
   bool get biometricAvailable => _biometricAvailable;
   bool get isCapturing => _isCapturing;
+  Offset? get focusIndicatorPoint => _focusIndicatorPoint;
+  double get minZoomLevel => _minZoomLevel;
+  double get maxZoomLevel => _maxZoomLevel;
+  double get currentZoomLevel => _currentZoomLevel;
   bool get isRecordingVideo => _isRecordingVideo;
   bool get isVideoMode => _isVideoMode;
-  bool get isFlashEnabled => _isFlashEnabled;
+  FlashMode get flashMode => _flashMode;
+  bool get isFlashEnabled => _flashMode != FlashMode.off;
+  Duration get recordingDuration => _recordingStartedAt == null ? Duration.zero : DateTime.now().difference(_recordingStartedAt!);
   bool get isStoreAvailable => _isStoreAvailable;
   bool get isStoreLoading => _isStoreLoading;
   bool get isPurchasePending => _isPurchasePending;
@@ -318,9 +332,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   ResolutionPreset get _cameraResolutionPreset {
     if (Platform.isAndroid) {
-      return ResolutionPreset.low;
+      return ResolutionPreset.veryHigh;
     }
-    return ResolutionPreset.medium;
+    return ResolutionPreset.high;
   }
 
   ImageFormatGroup get _cameraImageFormatGroup {
@@ -340,8 +354,26 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _configureCameraController(CameraController controller) async {
     await controller.initialize();
     await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
-    _isFlashEnabled = controller.value.flashMode != FlashMode.off;
+    await controller.setFocusMode(FocusMode.auto);
+    await controller.setExposureMode(ExposureMode.auto);
+    if (controller.value.focusPointSupported) {
+      await controller.setFocusPoint(const Offset(0.5, 0.5));
+    }
+    if (controller.value.exposurePointSupported) {
+      await controller.setExposurePoint(const Offset(0.5, 0.5));
+    }
+    _minZoomLevel = await controller.getMinZoomLevel();
+    _maxZoomLevel = await controller.getMaxZoomLevel();
+    if (_maxZoomLevel > 8.0) {
+      _maxZoomLevel = 8.0;
+    }
+    _currentZoomLevel = _minZoomLevel < 1.0 ? 1.0 : _minZoomLevel;
+    await controller.setZoomLevel(_currentZoomLevel);
+    _focusIndicatorPoint = null;
+    _flashMode = FlashMode.auto;
+    await controller.setFlashMode(_flashMode);
     _isRecordingVideo = false;
+    _recordingStartedAt = null;
   }
 
   Future<void> _initializeCamera() async {
@@ -386,14 +418,63 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return 'Camera is unavailable.';
     }
     try {
-      final nextMode = _isFlashEnabled ? FlashMode.off : FlashMode.torch;
+      final nextMode = switch (_flashMode) {
+        FlashMode.off => FlashMode.auto,
+        FlashMode.auto => _isVideoMode ? FlashMode.torch : FlashMode.always,
+        FlashMode.always => FlashMode.off,
+        FlashMode.torch => FlashMode.off,
+      };
       await controller.setFlashMode(nextMode);
-      _isFlashEnabled = nextMode != FlashMode.off;
+      _flashMode = nextMode;
       notifyListeners();
-      return null;
+      return switch (nextMode) {
+        FlashMode.auto => 'Flash auto',
+        FlashMode.always => 'Flash on',
+        FlashMode.torch => 'Flash on',
+        FlashMode.off => 'Flash off',
+      };
     } catch (_) {
       return 'Flash is unavailable on this camera.';
     }
+  }
+
+  Future<void> focusAtPoint(Offset normalizedPoint) async {
+    final controller = _cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+    final point = Offset(
+      normalizedPoint.dx.clamp(0.0, 1.0),
+      normalizedPoint.dy.clamp(0.0, 1.0),
+    );
+    try {
+      if (controller.value.focusPointSupported) {
+        await controller.setFocusPoint(point);
+      }
+      if (controller.value.exposurePointSupported) {
+        await controller.setExposurePoint(point);
+      }
+      _focusIndicatorPoint = point;
+      _focusIndicatorTimer?.cancel();
+      _focusIndicatorTimer = Timer(const Duration(milliseconds: 1200), () {
+        _focusIndicatorPoint = null;
+        notifyListeners();
+      });
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> setZoomLevel(double zoomLevel) async {
+    final controller = _cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+    final clampedZoom = zoomLevel.clamp(_minZoomLevel, _maxZoomLevel).toDouble();
+    try {
+      await controller.setZoomLevel(clampedZoom);
+      _currentZoomLevel = clampedZoom;
+      notifyListeners();
+    } catch (_) {}
   }
 
   void toggleCaptureMode() {
@@ -421,19 +502,51 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (_isRecordingVideo) {
         final file = await controller.stopVideoRecording();
         _isRecordingVideo = false;
+        _recordingDurationTimer?.cancel();
+        _recordingStartedAt = null;
+        await _photoRepository.createVideoFromCapture(
+          sourcePath: file.path,
+          timer: settings.defaultTimer,
+        );
+        await refreshPhotos();
         notifyListeners();
-        final name = file.path.split(Platform.pathSeparator).last;
-        return 'Video saved: $name';
+        return 'Video saved to TempCam';
       }
       await controller.prepareForVideoRecording();
       await controller.startVideoRecording();
       _isRecordingVideo = true;
+      _recordingStartedAt = DateTime.now();
+      _recordingDurationTimer?.cancel();
+      _recordingDurationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        notifyListeners();
+      });
       notifyListeners();
       return 'Recording started';
     } catch (_) {
       _isRecordingVideo = false;
+      _recordingDurationTimer?.cancel();
+      _recordingStartedAt = null;
       notifyListeners();
       return 'Unable to use video recording right now.';
+    }
+  }
+
+  Future<String?> _exportMediaToMainGallery(PhotoRecord record) async {
+    if (!Platform.isAndroid) {
+      return record.filePath;
+    }
+    try {
+      final extension = record.isVideo ? '.mp4' : '.jpg';
+      final displayName = 'tempcam_${DateTime.now().millisecondsSinceEpoch}$extension';
+      return await _mediaGalleryChannel.invokeMethod<String>(
+        record.isVideo ? 'saveVideoToGallery' : 'saveImageToGallery',
+        <String, dynamic>{
+          'sourcePath': record.filePath,
+          'displayName': displayName,
+        },
+      );
+    } catch (_) {
+      return null;
     }
   }
 
@@ -563,9 +676,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await refreshPhotos();
   }
 
-  Future<void> keepPhotoForever(PhotoRecord record) async {
+  Future<String?> keepPhotoForever(PhotoRecord record) async {
+    final exportedPath = await _exportMediaToMainGallery(record);
+    if (exportedPath == null) {
+      return 'Unable to export this item to the main gallery.';
+    }
     await _photoRepository.keepForever(record);
     await refreshPhotos();
+    return record.isVideo ? 'Video kept forever and exported.' : 'Photo kept forever and exported.';
   }
 
   Future<void> extendPhoto(PhotoRecord record, AppTimerOption timer) async {
@@ -622,6 +740,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _focusIndicatorTimer?.cancel();
+    _recordingDurationTimer?.cancel();
     _cameraController?.dispose();
     _billingSubscription.cancel();
     unawaited(_billingService.dispose());

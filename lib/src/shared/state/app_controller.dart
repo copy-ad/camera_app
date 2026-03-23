@@ -131,18 +131,39 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> bootstrap() async {
     _settings = _settingsRepository.read();
-    await _normalizePremiumState();
-    await _notificationService.initialize();
-    _biometricAvailable = await _biometricService.isAvailable();
-    await _initializeBilling();
-    await cleanupExpired();
-    await _initializeCamera();
-    await _refreshThumbnail();
-    await _syncNotificationsForCurrentPhotos();
-    await Future<void>.delayed(const Duration(milliseconds: 1400));
-    _didFinishBootstrap = true;
-    _isLocked = hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
-    notifyListeners();
+    try {
+      await _normalizePremiumState();
+      try {
+        await _notificationService
+            .initialize()
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {}
+      try {
+        _biometricAvailable = await _biometricService
+            .isAvailable()
+            .timeout(const Duration(seconds: 3));
+      } catch (_) {
+        _biometricAvailable = false;
+      }
+      try {
+        await _initializeBilling().timeout(const Duration(seconds: 4));
+      } catch (_) {}
+      await cleanupExpired();
+      try {
+        await _initializeCamera().timeout(const Duration(seconds: 5));
+      } catch (_) {}
+      await _refreshThumbnail();
+      try {
+        await _syncNotificationsForCurrentPhotos()
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {}
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+    } finally {
+      _didFinishBootstrap = true;
+      _isLocked =
+          hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
+      notifyListeners();
+    }
   }
 
   Future<void> _initializeBilling() async {

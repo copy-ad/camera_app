@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
@@ -32,8 +34,6 @@ Future<void> bootstrap() async {
     billingService: BillingService(),
   );
 
-  await controller.bootstrap();
-
   runApp(
     MultiProvider(
       providers: [
@@ -42,4 +42,6 @@ Future<void> bootstrap() async {
       child: const TempCamApp(),
     ),
   );
+
+  unawaited(controller.bootstrap());
 }

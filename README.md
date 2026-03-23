@@ -1,12 +1,12 @@
 # TempCam
 
-TempCam is a private camera for people who want sensitive photos and videos to disappear automatically unless they choose to keep them forever.
+TempCam is a private camera for people who want temporary photos and videos to disappear automatically unless they choose to keep them forever.
 
 It is built for fast personal capture, temporary storage, and strong local privacy. The app is designed for moments that should stay on your phone, stay locked behind biometrics, and expire on your terms.
 
 ## Why Use TempCam
 
-- Capture private photos and videos without mixing them into your main gallery right away.
+- Capture temp photos and videos without mixing them into your main gallery right away.
 - Store temporary media inside a locked in-app vault instead of leaving everything exposed in the phone gallery.
 - Decide how long each capture should live, then let TempCam remove it automatically.
 - Keep only the media that matters, and export only those items to the main gallery.

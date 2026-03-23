@@ -85,7 +85,12 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                       setState(() => _chromeVisible = false);
                     }
                   },
-                  child: Center(child: _PrivateMediaPreview(photo: photo)),
+                  child: Center(
+                    child: _PrivateMediaPreview(
+                      photo: photo,
+                      onTap: _toggleChrome,
+                    ),
+                  ),
                 ),
                 IgnorePointer(
                   ignoring: !_chromeVisible,
@@ -156,14 +161,21 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 }
 
 class _PrivateMediaPreview extends StatelessWidget {
-  const _PrivateMediaPreview({required this.photo});
+  const _PrivateMediaPreview({
+    required this.photo,
+    required this.onTap,
+  });
 
   final PhotoRecord photo;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     if (photo.isVideo) {
-      return _PrivateVideoPlayer(filePath: photo.filePath);
+      return _PrivateVideoPlayer(
+        filePath: photo.filePath,
+        onSurfaceTap: onTap,
+      );
     }
     return Image.file(
       File(photo.filePath),
@@ -174,9 +186,13 @@ class _PrivateMediaPreview extends StatelessWidget {
 }
 
 class _PrivateVideoPlayer extends StatefulWidget {
-  const _PrivateVideoPlayer({required this.filePath});
+  const _PrivateVideoPlayer({
+    required this.filePath,
+    required this.onSurfaceTap,
+  });
 
   final String filePath;
+  final VoidCallback onSurfaceTap;
 
   @override
   State<_PrivateVideoPlayer> createState() => _PrivateVideoPlayerState();
@@ -226,7 +242,10 @@ class _PrivateVideoPlayerState extends State<_PrivateVideoPlayer> {
     }
 
     return GestureDetector(
-      onTap: () => setState(() => _showPlayerControls = !_showPlayerControls),
+      onTap: () {
+        widget.onSurfaceTap();
+        setState(() => _showPlayerControls = !_showPlayerControls);
+      },
       child: AspectRatio(
         aspectRatio: controller.value.aspectRatio,
         child: Stack(

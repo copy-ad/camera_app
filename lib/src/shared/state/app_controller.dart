@@ -545,6 +545,33 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     _isVideoMode = !_isVideoMode;
     notifyListeners();
+    unawaited(_syncFlashModeForCurrentCaptureMode());
+  }
+
+  Future<void> _syncFlashModeForCurrentCaptureMode() async {
+    final controller = _cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+
+    FlashMode targetMode = _flashMode;
+    if (_isVideoMode) {
+      if (_flashMode == FlashMode.always || _flashMode == FlashMode.torch) {
+        targetMode = FlashMode.torch;
+      } else {
+        targetMode = FlashMode.off;
+      }
+    } else {
+      if (_flashMode == FlashMode.torch || _flashMode == FlashMode.always) {
+        targetMode = FlashMode.always;
+      }
+    }
+
+    try {
+      await controller.setFlashMode(targetMode);
+      _flashMode = targetMode;
+      notifyListeners();
+    } catch (_) {}
   }
 
   Future<String?> handlePrimaryCapture(BuildContext context) async {

@@ -487,13 +487,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<String?> handlePrimaryCapture(BuildContext context) async {
     if (_isVideoMode) {
-      return toggleVideoRecording();
+      return toggleVideoRecording(context);
     }
     await captureWithTimerFlow(context);
     return null;
   }
 
-  Future<String?> toggleVideoRecording() async {
+  Future<String?> toggleVideoRecording(BuildContext context) async {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized || _isCapturing) {
       return 'Camera is unavailable.';
@@ -504,11 +504,25 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _isRecordingVideo = false;
         _recordingDurationTimer?.cancel();
         _recordingStartedAt = null;
+        notifyListeners();
+        if (!context.mounted) {
+          return null;
+        }
+        final selected = await TimerSelectionSheet.show(
+          context,
+          settings.defaultTimer,
+          hasPremiumAccess: hasPremiumAccess,
+        );
+        if (!context.mounted) {
+          return null;
+        }
+        final appliedTimer = selected ?? settings.defaultTimer;
         await _photoRepository.createVideoFromCapture(
           sourcePath: file.path,
-          timer: settings.defaultTimer,
+          timer: appliedTimer,
         );
         await refreshPhotos();
+        _currentTabIndex = 0;
         notifyListeners();
         return 'Video saved to TempCam';
       }

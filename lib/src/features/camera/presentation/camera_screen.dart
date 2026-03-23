@@ -165,9 +165,10 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
             if (_isScaling) {
               return;
             }
-            final normalizedPoint = Offset(
-              details.localPosition.dx / constraints.maxWidth,
-              details.localPosition.dy / constraints.maxHeight,
+            final normalizedPoint = _normalizedPreviewPoint(
+              camera,
+              details.localPosition,
+              Size(constraints.maxWidth, constraints.maxHeight),
             );
             widget.controller.focusAtPoint(normalizedPoint);
           },
@@ -194,6 +195,41 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
         );
       },
     );
+  }
+
+  Offset _normalizedPreviewPoint(
+    CameraController camera,
+    Offset localPosition,
+    Size viewportSize,
+  ) {
+    final previewSize = camera.value.previewSize;
+    if (previewSize == null || viewportSize.width <= 0 || viewportSize.height <= 0) {
+      return const Offset(0.5, 0.5);
+    }
+
+    final previewWidth = previewSize.height;
+    final previewHeight = previewSize.width;
+    final previewAspectRatio = previewWidth / previewHeight;
+    final viewportAspectRatio = viewportSize.width / viewportSize.height;
+
+    double scaledWidth;
+    double scaledHeight;
+    double offsetX = 0;
+    double offsetY = 0;
+
+    if (previewAspectRatio > viewportAspectRatio) {
+      scaledHeight = viewportSize.height;
+      scaledWidth = scaledHeight * previewAspectRatio;
+      offsetX = (scaledWidth - viewportSize.width) / 2;
+    } else {
+      scaledWidth = viewportSize.width;
+      scaledHeight = scaledWidth / previewAspectRatio;
+      offsetY = (scaledHeight - viewportSize.height) / 2;
+    }
+
+    final normalizedDx = ((localPosition.dx + offsetX) / scaledWidth).clamp(0.0, 1.0);
+    final normalizedDy = ((localPosition.dy + offsetY) / scaledHeight).clamp(0.0, 1.0);
+    return Offset(normalizedDx, normalizedDy);
   }
 }
 

@@ -112,6 +112,10 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                           await PremiumPaywallScreen.show(context);
                           return;
                         }
+                        final ok = await controller.unlockForSensitiveAccess();
+                        if (!context.mounted || !ok) {
+                          return;
+                        }
                         final message = await controller.keepPhotoForever(photo);
                         if (!context.mounted || message == null) {
                           return;
@@ -121,6 +125,10 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                           ..showSnackBar(SnackBar(content: Text(message)));
                       },
                       onDelete: () async {
+                        final ok = await controller.unlockForSensitiveAccess();
+                        if (!context.mounted || !ok) {
+                          return;
+                        }
                         await controller.deletePhoto(photo);
                         if (context.mounted) {
                           Navigator.of(context).pop();

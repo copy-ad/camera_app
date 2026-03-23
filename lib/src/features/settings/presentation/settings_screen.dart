@@ -10,6 +10,18 @@ import 'package:tempcam/src/shared/widgets/top_bar.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _authenticateThen(
+    BuildContext context,
+    AppController controller,
+    Future<void> Function() action,
+  ) async {
+    final ok = await controller.unlockForSensitiveAccess();
+    if (!context.mounted || !ok) {
+      return;
+    }
+    await action();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppController>(
@@ -48,9 +60,13 @@ class SettingsScreen extends StatelessWidget {
                           dropdownColor: AppTheme.surfaceHigh,
                           borderRadius: BorderRadius.circular(18),
                           items: AppTimerOption.settingsDefaults.map((option) => DropdownMenuItem(value: option, child: Text(option.label, style: const TextStyle(color: AppTheme.secondary)))).toList(),
-                          onChanged: (option) {
+                          onChanged: (option) async {
                             if (option != null) {
-                              controller.updateDefaultTimer(option);
+                              await _authenticateThen(
+                                context,
+                                controller,
+                                () => controller.updateDefaultTimer(option),
+                              );
                             }
                           },
                         ),
@@ -59,7 +75,13 @@ class SettingsScreen extends StatelessWidget {
                     const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0x33414755)),
                     SwitchListTile.adaptive(
                       value: controller.settings.notificationsEnabled,
-                      onChanged: controller.updateNotifications,
+                      onChanged: (value) async {
+                        await _authenticateThen(
+                          context,
+                          controller,
+                          () => controller.updateNotifications(value),
+                        );
+                      },
                       activeThumbColor: AppTheme.primary,
                       title: const Text('Notifications'),
                       subtitle: const Text('Prepared for future reminders before expiry', style: TextStyle(color: AppTheme.onSurfaceVariant)),
@@ -67,7 +89,15 @@ class SettingsScreen extends StatelessWidget {
                     const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0x33414755)),
                     SwitchListTile.adaptive(
                       value: controller.settings.biometricLockEnabled,
-                      onChanged: controller.biometricAvailable ? controller.updateBiometricLock : null,
+                      onChanged: controller.biometricAvailable
+                          ? (value) async {
+                              await _authenticateThen(
+                                context,
+                                controller,
+                                () => controller.updateBiometricLock(value),
+                              );
+                            }
+                          : null,
                       activeThumbColor: AppTheme.primary,
                       title: const Text('Biometric App Lock'),
                       subtitle: Text(

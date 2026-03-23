@@ -331,7 +331,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   ResolutionPreset get _cameraResolutionPreset {
-    return ResolutionPreset.max;
+    if (Platform.isAndroid) {
+      return ResolutionPreset.high;
+    }
+    return ResolutionPreset.high;
   }
 
   CameraDescription _selectInitialCamera(List<CameraDescription> cameras) {
@@ -585,10 +588,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (controller == null || !controller.value.isInitialized || _isCapturing) {
       return;
     }
+    XFile? file;
     try {
       _isCapturing = true;
       notifyListeners();
-      final file = await controller.takePicture();
+      file = await controller.takePicture();
+      _isCapturing = false;
+      notifyListeners();
       if (!context.mounted) {
         return;
       }
@@ -606,8 +612,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _currentTabIndex = 0;
       notifyListeners();
     } finally {
-      _isCapturing = false;
-      notifyListeners();
+      if (_isCapturing) {
+        _isCapturing = false;
+        notifyListeners();
+      }
     }
   }
 

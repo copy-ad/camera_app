@@ -296,11 +296,6 @@ class _LargePreviewCard extends StatelessWidget {
   }
 
   Future<void> _open(BuildContext context, PhotoRecord photo) async {
-    final controller = context.read<AppController>();
-    final ok = await controller.unlockForSensitiveAccess();
-    if (!context.mounted || !ok) {
-      return;
-    }
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => PhotoDetailScreen(photoId: photo.id)),
     );
@@ -360,11 +355,6 @@ class _PhotoTile extends StatelessWidget {
   }
 
   Future<void> _open(BuildContext context) async {
-    final controller = context.read<AppController>();
-    final ok = await controller.unlockForSensitiveAccess();
-    if (!context.mounted || !ok) {
-      return;
-    }
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => PhotoDetailScreen(photoId: photo.id)),
     );

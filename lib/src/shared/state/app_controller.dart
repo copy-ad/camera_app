@@ -138,6 +138,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await cleanupExpired();
     await _initializeCamera();
     await _refreshThumbnail();
+    await _syncNotificationsForCurrentPhotos();
     await Future<void>.delayed(const Duration(milliseconds: 1400));
     _didFinishBootstrap = true;
     _isLocked = hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
@@ -663,6 +664,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await cleanupExpired();
     _photos = _photoRepository.readAllSorted();
     await _refreshThumbnail();
+    await _syncNotificationsForCurrentPhotos();
     notifyListeners();
   }
 
@@ -672,7 +674,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _refreshThumbnail() async {
-    _latestThumbnail = await _photoRepository.lastThumbnailFile();
+    _latestThumbnail = await _photoRepository.lastThumbnailFileFromSorted(_photos);
+  }
+
+  Future<void> _syncNotificationsForCurrentPhotos() async {
+    await _notificationService.syncExpiryNotifications(
+      _photos,
+      enabled: _settings.notificationsEnabled,
+    );
   }
 
   void setTab(int index) {
@@ -725,6 +734,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> updateNotifications(bool enabled) async {
     _settings = _settings.copyWith(notificationsEnabled: enabled);
     await _settingsRepository.save(_settings);
+    if (enabled) {
+      await _syncNotificationsForCurrentPhotos();
+    } else {
+      await _notificationService.cancelAll();
+    }
     notifyListeners();
   }
 

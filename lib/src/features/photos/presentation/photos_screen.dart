@@ -52,6 +52,12 @@ class _PhotosScreenState extends State<PhotosScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {

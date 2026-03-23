@@ -100,9 +100,8 @@ class PhotoRepository {
     }
   }
 
-  Future<File?> lastThumbnailFile() async {
-    final items = readAllSorted().reversed.toList();
-    for (final item in items) {
+  Future<File?> lastThumbnailFileFromSorted(List<PhotoRecord> items) async {
+    for (final item in items.reversed) {
       if (!item.isPhoto) {
         continue;
       }
@@ -112,5 +111,9 @@ class PhotoRepository {
       }
     }
     return null;
+  }
+
+  Future<File?> lastThumbnailFile() async {
+    return lastThumbnailFileFromSorted(readAllSorted());
   }
 }

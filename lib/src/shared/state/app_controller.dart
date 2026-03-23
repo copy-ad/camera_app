@@ -71,9 +71,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool _isPurchasePending = false;
   bool _isAuthenticatingWithBiometrics = false;
   bool _ignoreNextResumeLock = false;
+  bool _isSwitchingCamera = false;
   String? _billingStatusMessage;
   ProductDetails? _yearlySubscriptionProduct;
   DateTime? _pausedAt;
+  int _cameraSetupToken = 0;
 
   AppSettings get settings => _settings;
   List<PhotoRecord> get photos => _photos;
@@ -97,6 +99,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isStoreAvailable => _isStoreAvailable;
   bool get isStoreLoading => _isStoreLoading;
   bool get isPurchasePending => _isPurchasePending;
+  bool get isSwitchingCamera => _isSwitchingCamera;
   bool get isUsingDevelopmentBypass => PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
@@ -344,29 +347,72 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _configureCameraController(CameraController controller) async {
+  Future<void> _configureCameraController(
+    CameraController controller, {
+    required int token,
+  }) async {
     await controller.initialize();
-    await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
-    await controller.setFocusMode(FocusMode.auto);
-    await controller.setExposureMode(ExposureMode.auto);
-    if (controller.value.focusPointSupported) {
-      await controller.setFocusPoint(const Offset(0.5, 0.5));
+    if (token != _cameraSetupToken || _cameraController != controller) {
+      await controller.dispose();
+      return;
     }
-    if (controller.value.exposurePointSupported) {
-      await controller.setExposurePoint(const Offset(0.5, 0.5));
-    }
-    _minZoomLevel = await controller.getMinZoomLevel();
-    _maxZoomLevel = await controller.getMaxZoomLevel();
-    if (_maxZoomLevel > 8.0) {
-      _maxZoomLevel = 8.0;
-    }
-    _currentZoomLevel = _minZoomLevel < 1.0 ? 1.0 : _minZoomLevel;
-    await controller.setZoomLevel(_currentZoomLevel);
+
+    _minZoomLevel = 1.0;
+    _maxZoomLevel = 8.0;
+    _currentZoomLevel = 1.0;
     _focusIndicatorPoint = null;
     _flashMode = FlashMode.off;
-    await controller.setFlashMode(_flashMode);
     _isRecordingVideo = false;
     _recordingStartedAt = null;
+    _isSwitchingCamera = false;
+    notifyListeners();
+
+    unawaited(_finalizeCameraControllerSetup(controller, token));
+  }
+
+  Future<void> _finalizeCameraControllerSetup(
+    CameraController controller,
+    int token,
+  ) async {
+    try {
+      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      await controller.setFocusMode(FocusMode.auto);
+      await controller.setExposureMode(ExposureMode.auto);
+      if (controller.value.focusPointSupported) {
+        await controller.setFocusPoint(const Offset(0.5, 0.5));
+      }
+      if (controller.value.exposurePointSupported) {
+        await controller.setExposurePoint(const Offset(0.5, 0.5));
+      }
+      final minZoomLevel = await controller.getMinZoomLevel();
+      var maxZoomLevel = await controller.getMaxZoomLevel();
+      if (maxZoomLevel > 8.0) {
+        maxZoomLevel = 8.0;
+      }
+      await controller.setZoomLevel(1.0);
+      await controller.setFlashMode(_flashMode);
+      if (token != _cameraSetupToken || _cameraController != controller) {
+        return;
+      }
+      _minZoomLevel = minZoomLevel;
+      _maxZoomLevel = maxZoomLevel;
+      _currentZoomLevel = 1.0;
+      notifyListeners();
+    } catch (_) {
+      if (token != _cameraSetupToken || _cameraController != controller) {
+        return;
+      }
+      _minZoomLevel = 1.0;
+      _maxZoomLevel = 8.0;
+      _currentZoomLevel = 1.0;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _disposeControllerSafely(CameraController controller) async {
+    try {
+      await controller.dispose();
+    } catch (_) {}
   }
 
   Future<void> _initializeCamera() async {
@@ -374,33 +420,51 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _availableCameras = await _cameraService.available();
       if (_availableCameras.isNotEmpty) {
         final initialCamera = _selectInitialCamera(_availableCameras);
+        final token = ++_cameraSetupToken;
         _cameraController = CameraController(
           initialCamera,
           _cameraResolutionPreset,
           enableAudio: false,
         );
-        await _configureCameraController(_cameraController!);
+        await _configureCameraController(_cameraController!, token: token);
       }
     } catch (_) {}
   }
 
   Future<void> switchCamera() async {
-    if (_availableCameras.length < 2 || _cameraController == null) {
+    if (_availableCameras.length < 2 || _cameraController == null || _isSwitchingCamera) {
       return;
     }
-    final current = _cameraController!.description;
+    _isSwitchingCamera = true;
+    notifyListeners();
+    final previousController = _cameraController!;
+    final current = previousController.description;
     final next = _availableCameras.firstWhere(
       (camera) => camera.lensDirection != current.lensDirection,
       orElse: () => _availableCameras.last,
     );
-    await _cameraController?.dispose();
-    _cameraController = CameraController(
+    final nextController = CameraController(
       next,
       _cameraResolutionPreset,
       enableAudio: false,
     );
-    await _configureCameraController(_cameraController!);
-    notifyListeners();
+    final token = ++_cameraSetupToken;
+    try {
+      _cameraController = null;
+      notifyListeners();
+      await _disposeControllerSafely(previousController);
+      if (token != _cameraSetupToken) {
+        return;
+      }
+      _cameraController = nextController;
+      await _configureCameraController(nextController, token: token);
+    } catch (_) {
+      _cameraController = null;
+      _isSwitchingCamera = false;
+      notifyListeners();
+      await _disposeControllerSafely(nextController);
+      return;
+    }
   }
 
   Future<String?> toggleFlash() async {
@@ -502,6 +566,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _isRecordingVideo = false;
         _recordingDurationTimer?.cancel();
         _recordingStartedAt = null;
+        if (_flashMode == FlashMode.torch) {
+          try {
+            await controller.setFlashMode(FlashMode.off);
+          } catch (_) {}
+          _flashMode = FlashMode.off;
+        }
         notifyListeners();
         if (!context.mounted) {
           return null;
@@ -759,7 +829,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _focusIndicatorTimer?.cancel();
     _recordingDurationTimer?.cancel();
-    _cameraController?.dispose();
+    final controller = _cameraController;
+    if (controller != null) {
+      unawaited(_disposeControllerSafely(controller));
+    }
     _billingSubscription.cancel();
     unawaited(_billingService.dispose());
     super.dispose();

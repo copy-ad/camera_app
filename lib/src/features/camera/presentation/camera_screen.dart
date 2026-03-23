@@ -30,6 +30,34 @@ class CameraScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+              if (controller.isSwitchingCamera)
+                const ColoredBox(
+                  color: Colors.black,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.4,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          'Switching camera...',
+                          style: TextStyle(
+                            color: AppTheme.onSurfaceVariant,
+                            fontSize: 12,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               _CameraTopControls(controller: controller),
               _CameraStats(controller: controller),
               Positioned(

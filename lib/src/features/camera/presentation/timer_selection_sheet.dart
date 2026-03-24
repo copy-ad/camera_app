@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/models/app_settings.dart';
@@ -8,21 +10,28 @@ class TimerSelectionSheet extends StatefulWidget {
     super.key,
     required this.initial,
     required this.hasPremiumAccess,
+    this.previewFilePath,
   });
 
   final AppTimerOption initial;
   final bool hasPremiumAccess;
+  final String? previewFilePath;
 
   static Future<AppTimerOption?> show(
     BuildContext context,
     AppTimerOption initial, {
     required bool hasPremiumAccess,
+    String? previewFilePath,
   }) {
     return showModalBottomSheet<AppTimerOption>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => TimerSelectionSheet(initial: initial, hasPremiumAccess: hasPremiumAccess),
+      builder: (_) => TimerSelectionSheet(
+        initial: initial,
+        hasPremiumAccess: hasPremiumAccess,
+        previewFilePath: previewFilePath,
+      ),
     );
   }
 
@@ -55,9 +64,35 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                 borderRadius: BorderRadius.circular(24),
                 gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF3A3A3A), Color(0xFF131313)]),
               ),
-              child: const Stack(
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Positioned(
+                  if (widget.previewFilePath != null)
+                    Image.file(
+                      File(widget.previewFilePath!),
+                      fit: BoxFit.cover,
+                    )
+                  else
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF3A3A3A), Color(0xFF131313)],
+                        ),
+                      ),
+                    ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [Color(0xC6131313), Colors.transparent],
+                      ),
+                    ),
+                  ),
+                  const Positioned(
                     bottom: 20,
                     left: 18,
                     child: Row(

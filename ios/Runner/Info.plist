@@ -26,6 +26,8 @@
 	<string>TempCam needs camera access to capture temporary private photos.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TempCam uses Face ID to protect your private local photo vault.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>TempCam needs microphone access to record audio with temporary private videos.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

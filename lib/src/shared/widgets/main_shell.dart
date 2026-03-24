@@ -17,16 +17,16 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   DateTime? _lastBackPressAt;
+  late final List<Widget> _screens = const [
+    PhotosScreen(),
+    CameraScreen(),
+    SettingsScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
-        final screens = [
-          const PhotosScreen(),
-          const CameraScreen(),
-          const SettingsScreen(),
-        ];
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
@@ -38,7 +38,7 @@ class _MainShellState extends State<MainShell> {
           child: Scaffold(
             body: IndexedStack(
               index: controller.currentTabIndex,
-              children: screens,
+              children: _screens,
             ),
             bottomNavigationBar: controller.currentTabIndex == 1
                 ? null

@@ -58,6 +58,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool _isCapturing = false;
   Offset? _focusIndicatorPoint;
   Timer? _focusIndicatorTimer;
+  Timer? _focusResetTimer;
+  DateTime? _lastManualFocusAt;
   double _minZoomLevel = 1.0;
   double _maxZoomLevel = 1.0;
   double _currentZoomLevel = 1.0;
@@ -383,6 +385,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     _maxZoomLevel = 8.0;
     _currentZoomLevel = 1.0;
     _focusIndicatorPoint = null;
+    _focusResetTimer?.cancel();
+    _lastManualFocusAt = null;
     _flashMode = FlashMode.off;
     _isRecordingVideo = false;
     _recordingStartedAt = null;
@@ -446,7 +450,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _cameraController = CameraController(
           initialCamera,
           _cameraResolutionPreset,
-          enableAudio: false,
+          enableAudio: true,
         );
         await _configureCameraController(_cameraController!, token: token);
       }
@@ -468,7 +472,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final nextController = CameraController(
       next,
       _cameraResolutionPreset,
-      enableAudio: false,
+      enableAudio: true,
     );
     final token = ++_cameraSetupToken;
     try {
@@ -532,20 +536,72 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       normalizedPoint.dy.clamp(0.0, 1.0),
     );
     try {
+      _focusResetTimer?.cancel();
+      await controller.setFocusMode(FocusMode.auto);
+      await controller.setExposureMode(ExposureMode.auto);
       if (controller.value.focusPointSupported) {
         await controller.setFocusPoint(point);
       }
       if (controller.value.exposurePointSupported) {
         await controller.setExposurePoint(point);
       }
+      _lastManualFocusAt = DateTime.now();
       _focusIndicatorPoint = point;
       _focusIndicatorTimer?.cancel();
       _focusIndicatorTimer = Timer(const Duration(milliseconds: 1200), () {
         _focusIndicatorPoint = null;
         notifyListeners();
       });
+      HapticFeedback.selectionClick();
       notifyListeners();
+      await Future<void>.delayed(const Duration(milliseconds: 280));
+      if (_cameraController != controller || !controller.value.isInitialized) {
+        return;
+      }
+      try {
+        await controller.setFocusMode(FocusMode.locked);
+      } catch (_) {}
+      try {
+        await controller.setExposureMode(ExposureMode.locked);
+      } catch (_) {}
+      _focusResetTimer = Timer(const Duration(seconds: 3), () {
+        unawaited(_resetFocusToAuto(controller));
+      });
     } catch (_) {}
+  }
+
+  Future<void> _resetFocusToAuto(CameraController controller) async {
+    if (_cameraController != controller || !controller.value.isInitialized) {
+      return;
+    }
+    try {
+      await controller.setFocusMode(FocusMode.auto);
+    } catch (_) {}
+    try {
+      await controller.setExposureMode(ExposureMode.auto);
+    } catch (_) {}
+    try {
+      if (controller.value.focusPointSupported) {
+        await controller.setFocusPoint(null);
+      }
+    } catch (_) {}
+    try {
+      if (controller.value.exposurePointSupported) {
+        await controller.setExposurePoint(null);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _waitForFocusToSettleIfNeeded() async {
+    final lastManualFocusAt = _lastManualFocusAt;
+    if (lastManualFocusAt == null) {
+      return;
+    }
+    final elapsed = DateTime.now().difference(lastManualFocusAt);
+    if (elapsed >= const Duration(milliseconds: 320)) {
+      return;
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 320) - elapsed);
   }
 
   Future<void> setZoomLevel(double zoomLevel) async {
@@ -719,6 +775,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     try {
       _isCapturing = true;
       notifyListeners();
+      await _waitForFocusToSettleIfNeeded();
       file = await controller.takePicture();
       _isCapturing = false;
       notifyListeners();
@@ -729,6 +786,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         context,
         settings.defaultTimer,
         hasPremiumAccess: hasPremiumAccess,
+        previewFilePath: file.path,
       );
       if (!context.mounted) {
         return;
@@ -890,6 +948,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _focusIndicatorTimer?.cancel();
+    _focusResetTimer?.cancel();
     _recordingDurationTimer?.cancel();
     final controller = _cameraController;
     if (controller != null) {

@@ -1,3 +1,4 @@
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -18,11 +19,12 @@ class NotificationService {
     importance: Importance.high,
   );
 
-  static const Duration _reminderLeadTime = Duration(minutes: 15);
+  static const Duration _reminderLeadTime = Duration(minutes: 10);
   String? _lastSyncSignature;
 
   Future<void> initialize() async {
     tz.initializeTimeZones();
+    await _configureLocalTimezone();
 
     const android = AndroidInitializationSettings(
       '@android:drawable/ic_menu_camera',
@@ -99,7 +101,7 @@ class NotificationService {
           ),
           iOS: const DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
@@ -149,7 +151,7 @@ class NotificationService {
 
   String _bodyFor(PhotoRecord record) {
     final media = record.isVideo ? 'video' : 'photo';
-    return 'Your TempCam $media will expire in about 15 minutes.';
+    return 'Your TempCam $media will auto-delete in about 10 minutes.';
   }
 
   int _notificationIdFor(String id) {
@@ -158,5 +160,14 @@ class NotificationService {
       hash = 37 * hash + codeUnit;
     }
     return hash & 0x7fffffff;
+  }
+
+  Future<void> _configureLocalTimezone() async {
+    try {
+      final localTimezone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(localTimezone));
+    } catch (_) {
+      tz.setLocalLocation(tz.UTC);
+    }
   }
 }

@@ -218,11 +218,7 @@ class _PrivateVideoPlayerState extends State<_PrivateVideoPlayer> {
     final controller = VideoPlayerController.file(File(widget.filePath));
     await controller.initialize();
     controller.setLooping(true);
-    controller.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    await controller.setVolume(1.0);
     if (!mounted) {
       await controller.dispose();
       return;
@@ -248,59 +244,98 @@ class _PrivateVideoPlayerState extends State<_PrivateVideoPlayer> {
       },
       child: AspectRatio(
         aspectRatio: controller.value.aspectRatio,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            VideoPlayer(controller),
-            if (_showPlayerControls)
-              Container(
-                color: Colors.black26,
-                child: Center(
-                  child: IconButton(
-                    iconSize: 72,
-                    color: Colors.white,
-                    onPressed: () {
-                      if (controller.value.isPlaying) {
-                        controller.pause();
-                      } else {
-                        controller.play();
-                      }
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      controller.value.isPlaying
-                          ? Icons.pause_circle_filled_rounded
-                          : Icons.play_circle_fill_rounded,
-                    ),
-                  ),
+        child: ValueListenableBuilder<VideoPlayerValue>(
+          valueListenable: controller,
+          builder: (context, value, _) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                DecoratedBox(
+                  decoration: const BoxDecoration(color: Colors.black),
+                  child: Center(child: VideoPlayer(controller)),
                 ),
-              ),
-            if (_showPlayerControls)
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    VideoProgressIndicator(
-                      controller,
-                      allowScrubbing: true,
-                      colors: const VideoProgressColors(
-                        playedColor: AppTheme.primary,
-                        bufferedColor: AppTheme.surfaceHighest,
-                        backgroundColor: AppTheme.surfaceContainer,
+                if (_showPlayerControls)
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x33000000), Color(0x77000000)],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${_formatDuration(controller.value.position)} / ${_formatDuration(controller.value.duration)}',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    child: Center(
+                      child: IconButton(
+                        iconSize: 72,
+                        color: Colors.white,
+                        onPressed: () {
+                          if (value.isPlaying) {
+                            controller.pause();
+                          } else {
+                            controller.play();
+                          }
+                        },
+                        icon: Icon(
+                          value.isPlaying
+                              ? Icons.pause_circle_filled_rounded
+                              : Icons.play_circle_fill_rounded,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
-          ],
+                  ),
+                if (_showPlayerControls)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.56),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.08),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VideoProgressIndicator(
+                            controller,
+                            allowScrubbing: true,
+                            colors: const VideoProgressColors(
+                              playedColor: AppTheme.primary,
+                              bufferedColor: AppTheme.surfaceHighest,
+                              backgroundColor: AppTheme.surfaceContainer,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                value.isPlaying
+                                    ? Icons.graphic_eq_rounded
+                                    : Icons.pause_rounded,
+                                size: 14,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${_formatDuration(value.position)} / ${_formatDuration(value.duration)}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );

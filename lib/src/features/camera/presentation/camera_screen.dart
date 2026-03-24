@@ -310,32 +310,108 @@ class _FocusIndicatorOverlay extends StatelessWidget {
         final top = (focusPoint.dy * constraints.maxHeight) - 34;
 
         return Positioned(
-          left: left.clamp(16.0, constraints.maxWidth - 52.0),
-          top: top.clamp(16.0, constraints.maxHeight - 52.0),
+          left: left.clamp(12.0, constraints.maxWidth - 60.0),
+          top: top.clamp(12.0, constraints.maxHeight - 60.0),
           child: IgnorePointer(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppTheme.secondary, width: 2),
-                shape: BoxShape.circle,
-                color: Colors.transparent,
-              ),
-              child: Center(
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.secondary,
-                  ),
-                ),
+            child: _ProFocusRing(
+              key: ValueKey(
+                '${focusPoint.dx.toStringAsFixed(3)}-${focusPoint.dy.toStringAsFixed(3)}',
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _ProFocusRing extends StatelessWidget {
+  const _ProFocusRing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.24, end: 1),
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      builder: (context, scale, child) {
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: SizedBox(
+        width: 60,
+        height: 60,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.secondary.withValues(alpha: 0.95),
+                  width: 1.8,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.secondary.withValues(alpha: 0.18),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+            ...const [
+              _FocusTick(alignment: Alignment.topCenter, width: 12, height: 2),
+              _FocusTick(alignment: Alignment.bottomCenter, width: 12, height: 2),
+              _FocusTick(alignment: Alignment.centerLeft, width: 2, height: 12),
+              _FocusTick(alignment: Alignment.centerRight, width: 2, height: 12),
+            ],
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppTheme.secondary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.secondary.withValues(alpha: 0.45),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FocusTick extends StatelessWidget {
+  const _FocusTick({
+    required this.alignment,
+    required this.width,
+    required this.height,
+  });
+
+  final Alignment alignment;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: AppTheme.secondary,
+          borderRadius: BorderRadius.circular(999),
+        ),
+      ),
     );
   }
 }

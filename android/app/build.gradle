@@ -9,6 +9,7 @@ def keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
+def isReleaseTask = gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
 
 android {
     namespace = "com.tempcam"
@@ -46,7 +47,7 @@ android {
 
     buildTypes {
         release {
-            if (!keystorePropertiesFile.exists()) {
+            if (isReleaseTask && !keystorePropertiesFile.exists()) {
                 throw new GradleException("Missing android/key.properties. Copy android/key.properties.example to android/key.properties and fill in your real upload keystore values before running a release build.")
             }
             signingConfig = signingConfigs.release

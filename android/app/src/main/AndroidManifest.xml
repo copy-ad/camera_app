@@ -11,7 +11,8 @@
     <application
         android:label="TempCam"
         android:name="${applicationName}"
-        android:icon="@android:drawable/ic_menu_camera">
+        android:icon="@drawable/ic_launcher_app"
+        android:roundIcon="@drawable/ic_launcher_app">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -105,16 +105,37 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isUsingDevelopmentBypass => PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
+  DateTime? get trialStartedAt => _settings.trialStartedAt;
 
-  bool get hasPremiumAccess {
-    if (PremiumConstants.paymentsTemporarilyDisabled) {
-      return true;
-    }
+  bool get hasStoreSubscriptionAccess {
     if (!_settings.hasPremiumAccess) {
       return false;
     }
     final expiry = _settings.premiumAccessExpiresAt;
     return expiry == null || expiry.isAfter(DateTime.now());
+  }
+
+  DateTime? get freeTrialEndsAt => _settings.trialStartedAt?.add(PremiumConstants.freeTrialDuration);
+
+  bool get isFreeTrialActive {
+    final trialEndsAt = freeTrialEndsAt;
+    return trialEndsAt != null && trialEndsAt.isAfter(DateTime.now());
+  }
+
+  Duration get freeTrialRemaining {
+    final trialEndsAt = freeTrialEndsAt;
+    if (trialEndsAt == null) {
+      return Duration.zero;
+    }
+    final remaining = trialEndsAt.difference(DateTime.now());
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  bool get hasPremiumAccess {
+    if (PremiumConstants.paymentsTemporarilyDisabled) {
+      return true;
+    }
+    return hasStoreSubscriptionAccess || isFreeTrialActive;
   }
 
   DateTime? get premiumAccessExpiresAt => _settings.premiumAccessExpiresAt;
@@ -134,6 +155,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> bootstrap() async {
     _settings = _settingsRepository.read();
     try {
+      await _ensureTrialStartDate();
       await _normalizePremiumState();
       try {
         await _notificationService
@@ -166,6 +188,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
       notifyListeners();
     }
+  }
+
+  Future<void> _ensureTrialStartDate() async {
+    if (_settings.trialStartedAt != null) {
+      return;
+    }
+    _settings = _settings.copyWith(trialStartedAt: DateTime.now());
+    await _settingsRepository.save(_settings);
   }
 
   Future<void> _initializeBilling() async {

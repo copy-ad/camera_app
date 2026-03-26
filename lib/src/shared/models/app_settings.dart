@@ -40,6 +40,7 @@ class AppSettings {
     required this.hasPremiumAccess,
     required this.debugAccessBypassEnabled,
     this.lastUnlockTime,
+    this.trialStartedAt,
     this.premiumAccessExpiresAt,
     this.premiumProductId,
     this.premiumLastValidatedAt,
@@ -51,6 +52,7 @@ class AppSettings {
   final bool hasPremiumAccess;
   final bool debugAccessBypassEnabled;
   final DateTime? lastUnlockTime;
+  final DateTime? trialStartedAt;
   final DateTime? premiumAccessExpiresAt;
   final String? premiumProductId;
   final DateTime? premiumLastValidatedAt;
@@ -63,6 +65,8 @@ class AppSettings {
     bool? debugAccessBypassEnabled,
     DateTime? lastUnlockTime,
     bool clearLastUnlockTime = false,
+    DateTime? trialStartedAt,
+    bool clearTrialStartedAt = false,
     DateTime? premiumAccessExpiresAt,
     bool clearPremiumAccessExpiresAt = false,
     String? premiumProductId,
@@ -77,6 +81,7 @@ class AppSettings {
       hasPremiumAccess: hasPremiumAccess ?? this.hasPremiumAccess,
       debugAccessBypassEnabled: debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
       lastUnlockTime: clearLastUnlockTime ? null : lastUnlockTime ?? this.lastUnlockTime,
+      trialStartedAt: clearTrialStartedAt ? null : trialStartedAt ?? this.trialStartedAt,
       premiumAccessExpiresAt: clearPremiumAccessExpiresAt ? null : premiumAccessExpiresAt ?? this.premiumAccessExpiresAt,
       premiumProductId: clearPremiumProductId ? null : premiumProductId ?? this.premiumProductId,
       premiumLastValidatedAt: clearPremiumLastValidatedAt ? null : premiumLastValidatedAt ?? this.premiumLastValidatedAt,
@@ -90,6 +95,7 @@ class AppSettings {
       biometricLockEnabled: false,
       hasPremiumAccess: false,
       debugAccessBypassEnabled: false,
+      trialStartedAt: DateTime.now(),
     );
   }
 }
@@ -130,13 +136,14 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       premiumProductId: fields[6] as String?,
       premiumLastValidatedAt: fields[7] as DateTime?,
       debugAccessBypassEnabled: fields[8] as bool? ?? false,
+      trialStartedAt: fields[9] as DateTime? ?? DateTime.now(),
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.defaultTimer)
       ..writeByte(1)
@@ -154,6 +161,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(7)
       ..write(obj.premiumLastValidatedAt)
       ..writeByte(8)
-      ..write(obj.debugAccessBypassEnabled);
+      ..write(obj.debugAccessBypassEnabled)
+      ..writeByte(9)
+      ..write(obj.trialStartedAt);
   }
 }

@@ -31,7 +31,9 @@ class SettingsScreen extends StatelessWidget {
             children: [
               _SettingsHero(
                 isActive: controller.hasPremiumAccess,
+                isTrialActive: controller.isFreeTrialActive && !controller.hasStoreSubscriptionAccess,
                 priceLabel: controller.yearlyPriceLabel,
+                trialEndsAt: controller.freeTrialEndsAt,
                 accessUntil: controller.premiumAccessExpiresAt,
                 onManageAccess: () => PremiumPaywallScreen.show(context),
               ),
@@ -188,13 +190,17 @@ class SettingsScreen extends StatelessWidget {
 class _SettingsHero extends StatelessWidget {
   const _SettingsHero({
     required this.isActive,
+    required this.isTrialActive,
     required this.priceLabel,
+    required this.trialEndsAt,
     required this.accessUntil,
     required this.onManageAccess,
   });
 
   final bool isActive;
+  final bool isTrialActive;
   final String priceLabel;
+  final DateTime? trialEndsAt;
   final DateTime? accessUntil;
   final VoidCallback onManageAccess;
 
@@ -241,9 +247,15 @@ class _SettingsHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isActive ? 'ACTIVE' : 'REQUIRED',
+                  isTrialActive
+                      ? 'FREE TRIAL'
+                      : isActive
+                          ? 'ACTIVE'
+                          : 'REQUIRED',
                   style: TextStyle(
-                    color: isActive ? const Color(0xFF3C2F00) : AppTheme.onSurface,
+                    color: isTrialActive || isActive
+                        ? const Color(0xFF3C2F00)
+                        : AppTheme.onSurface,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
                   ),
@@ -253,7 +265,11 @@ class _SettingsHero extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            isActive ? 'Your access is live.' : 'Yearly access powers TempCam.',
+            isTrialActive
+                ? 'Your 15-day free trial is live.'
+                : isActive
+                    ? 'Your access is live.'
+                    : 'Yearly access powers TempCam.',
             style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 28,
@@ -263,10 +279,14 @@ class _SettingsHero extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            isActive
-                ? accessUntil == null
-                    ? 'Your current subscription is active through the store.'
-                    : 'Access is recorded until ${_formatDate(accessUntil!)}.'
+            isTrialActive
+                ? trialEndsAt == null
+                    ? 'Your full trial access is active right now.'
+                    : 'Your free trial stays unlocked until ${_formatDate(trialEndsAt!)}.'
+                : isActive
+                    ? accessUntil == null
+                        ? 'Your current subscription is active through the store.'
+                        : 'Access is recorded until ${_formatDate(accessUntil!)}.'
                 : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
             style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
@@ -282,7 +302,11 @@ class _SettingsHero extends StatelessWidget {
             ),
             onPressed: onManageAccess,
             child: Text(
-              isActive ? 'Manage Access' : 'View Access Options',
+              isTrialActive
+                  ? 'View Yearly Plan'
+                  : isActive
+                      ? 'Manage Access'
+                      : 'View Access Options',
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),

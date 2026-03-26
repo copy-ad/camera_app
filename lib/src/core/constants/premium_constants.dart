@@ -3,6 +3,7 @@ abstract final class PremiumConstants {
     'TEMPCAM_DISABLE_PAYMENTS',
     defaultValue: false,
   );
+  static const Duration freeTrialDuration = Duration(days: 15);
   static const String yearlySubscriptionProductId = 'tempcam_premium_yearly';
   static const String fallbackYearlyPriceLabel = '\$3.00';
   static const String fallbackYearlyPlanLabel = '\$3.00 / year';

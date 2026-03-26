@@ -172,7 +172,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
       _isStoreAvailable = false;
       _isStoreLoading = false;
-      _billingStatusMessage = 'Payments are temporarily disabled for local testing builds.';
+      _billingStatusMessage = 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
       notifyListeners();
       return;
     }
@@ -184,6 +184,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _yearlySubscriptionProduct = _billingService.yearlyProduct;
       if (_isStoreAvailable && _yearlySubscriptionProduct == null) {
         _billingStatusMessage = 'The yearly subscription is not available in this build yet.';
+      } else if (_isStoreAvailable) {
+        unawaited(_syncExistingStorePurchases());
       }
     } catch (_) {
       _isStoreAvailable = false;
@@ -196,7 +198,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> refreshBillingCatalog() async {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
-      _billingStatusMessage = 'Payments are temporarily disabled for local testing builds.';
+      _billingStatusMessage = 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
       notifyListeners();
       return;
     }
@@ -216,7 +218,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<String?> purchasePremiumSubscription() async {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
-      return 'Payments are temporarily disabled for local testing builds.';
+      return 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
     }
 
     _billingStatusMessage = null;
@@ -242,7 +244,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<String?> restorePremiumPurchases() async {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
-      return 'Payments are temporarily disabled for local testing builds.';
+      return 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
     }
 
     _billingStatusMessage = null;
@@ -253,6 +255,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     try {
       await _billingService.restorePurchases();
+      _isPurchasePending = false;
+      notifyListeners();
       return 'Restore request sent to the store.';
     } catch (_) {
       _isPurchasePending = false;
@@ -264,6 +268,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> enableDevelopmentAccessBypass() async {}
 
   Future<void> disableDevelopmentAccessBypass() async {}
+
+  Future<void> _syncExistingStorePurchases() async {
+    if (!_isStoreAvailable || PremiumConstants.paymentsTemporarilyDisabled) {
+      return;
+    }
+    try {
+      await _billingService.restorePurchases();
+    } catch (_) {}
+  }
 
   Future<void> _handleBillingEvent(BillingEvent event) async {
     if (event.status == BillingEventStatus.pending) {

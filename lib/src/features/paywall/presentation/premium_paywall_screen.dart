@@ -53,8 +53,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                     ? 'Connecting To Store...'
                     : 'Buy 1 Year For ${controller.yearlyPriceLabel}';
         const String footerText = isTestAccess
-            ? 'Set paymentsTemporarilyDisabled to false before uploading.'
-            : 'One subscription. No monthly tier. Managed directly by Apple or Google.';
+            ? 'Disable TEMPCAM_DISABLE_PAYMENTS before uploading to the store.'
+            : 'Auto-renewing yearly subscription. Cancel anytime in Google Play or App Store subscriptions.';
         final String pricingCaption = isTestAccess
             ? 'Store billing is currently bypassed by a temporary app-wide test switch.'
             : isActive
@@ -154,8 +154,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                             _FeatureCard(
                                 Icons.calendar_month_rounded,
                                 AppTheme.secondary,
-                                'One Year Window',
-                                'The client records one year of access from the verified store purchase date.'),
+                                'Yearly Billing',
+                                'One auto-renewing yearly subscription managed directly by Google Play or the App Store.'),
                             _FeatureCard(
                                 Icons.fingerprint_rounded,
                                 AppTheme.primary,
@@ -260,20 +260,60 @@ class PremiumPaywallScreen extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Add your privacy policy URL before release.')),
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (_) => const _LegalInfoSheet(
+                                    title: 'Privacy Policy',
+                                    sections: [
+                                      _LegalSection(
+                                        heading: 'What TempCam stores',
+                                        body:
+                                            'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                      ),
+                                      _LegalSection(
+                                        heading: 'What TempCam does not do',
+                                        body:
+                                            'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
+                                      ),
+                                      _LegalSection(
+                                        heading: 'Before release',
+                                        body:
+                                            'Host this privacy policy on a public URL and add that URL in the Play Console privacy policy field before publishing.',
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                               child: const Text('Privacy Policy'),
                             ),
                             TextButton(
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Add your terms of service URL before release.')),
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (_) => const _LegalInfoSheet(
+                                    title: 'Subscription Terms',
+                                    sections: [
+                                      _LegalSection(
+                                        heading: 'Plan',
+                                        body:
+                                            'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                      ),
+                                      _LegalSection(
+                                        heading: 'Billing',
+                                        body:
+                                            'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
+                                      ),
+                                      _LegalSection(
+                                        heading: 'Managing access',
+                                        body:
+                                            'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                               child: const Text('Terms'),
@@ -445,4 +485,89 @@ class _PricingCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _LegalInfoSheet extends StatelessWidget {
+  const _LegalInfoSheet({
+    required this.title,
+    required this.sections,
+  });
+
+  final String title;
+  final List<_LegalSection> sections;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xF1141414),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceHighest,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Manrope',
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 18),
+            ...sections.map(
+              (section) => Padding(
+                padding: EdgeInsets.only(bottom: section == sections.last ? 0 : 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      section.heading,
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      section.body,
+                      style: const TextStyle(
+                        color: AppTheme.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LegalSection {
+  const _LegalSection({
+    required this.heading,
+    required this.body,
+  });
+
+  final String heading;
+  final String body;
 }

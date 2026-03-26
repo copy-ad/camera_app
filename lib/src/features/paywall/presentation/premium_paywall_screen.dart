@@ -139,39 +139,44 @@ class PremiumPaywallScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 22),
-                          GridView.count(
-                            shrinkWrap: true,
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 14,
-                            mainAxisSpacing: 14,
-                            childAspectRatio: 1.05,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: const [
-                              _FeatureCard(
-                                Icons.lock_clock_rounded,
-                                AppTheme.primary,
-                                'Whole App Access',
-                                'Without an active yearly subscription, the camera vault stays locked at launch.',
-                              ),
-                              _FeatureCard(
-                                Icons.calendar_month_rounded,
-                                AppTheme.secondary,
-                                'Yearly Billing',
-                                'One auto-renewing yearly subscription managed directly by Google Play or the App Store.',
-                              ),
-                              _FeatureCard(
-                                Icons.fingerprint_rounded,
-                                AppTheme.primary,
-                                'Biometric Re-Entry',
-                                'After access is active, Face ID or fingerprint can protect future app launches.',
-                              ),
-                              _FeatureCard(
-                                Icons.restore_rounded,
-                                AppTheme.secondary,
-                                'Restore Support',
-                                'Recover your yearly access from the App Store or Google Play on reinstall.',
-                              ),
-                            ],
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final compact = constraints.maxWidth < 380;
+                              return GridView.count(
+                                shrinkWrap: true,
+                                crossAxisCount: compact ? 1 : 2,
+                                crossAxisSpacing: 14,
+                                mainAxisSpacing: 14,
+                                childAspectRatio: compact ? 2.2 : 0.88,
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: const [
+                                  _FeatureCard(
+                                    Icons.lock_clock_rounded,
+                                    AppTheme.primary,
+                                    'Whole App Access',
+                                    'Without an active yearly subscription, the camera vault stays locked at launch.',
+                                  ),
+                                  _FeatureCard(
+                                    Icons.calendar_month_rounded,
+                                    AppTheme.secondary,
+                                    'Yearly Billing',
+                                    'One auto-renewing yearly subscription managed directly by Google Play or the App Store.',
+                                  ),
+                                  _FeatureCard(
+                                    Icons.fingerprint_rounded,
+                                    AppTheme.primary,
+                                    'Biometric Re-Entry',
+                                    'After access is active, Face ID or fingerprint can protect future app launches.',
+                                  ),
+                                  _FeatureCard(
+                                    Icons.restore_rounded,
+                                    AppTheme.secondary,
+                                    'Restore Support',
+                                    'Recover your yearly access from the App Store or Google Play on reinstall.',
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                           const SizedBox(height: 18),
                           if (controller.billingStatusMessage != null) ...[
@@ -366,31 +371,77 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer.withValues(alpha: 0.76),
-        borderRadius: BorderRadius.circular(24),
-        border:
-            Border.all(color: AppTheme.outlineVariant.withValues(alpha: 0.18)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: accent),
-          const SizedBox(height: 12),
-          Text(title,
-              style: const TextStyle(
-                  fontFamily: 'Manrope',
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700)),
-          const SizedBox(height: 6),
-          Text(body,
-              style: const TextStyle(
-                  fontSize: 13,
-                  color: AppTheme.onSurfaceVariant, height: 1.45)),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final horizontal = constraints.maxWidth > 220;
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainer.withValues(alpha: 0.76),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: AppTheme.outlineVariant.withValues(alpha: 0.18),
+            ),
+          ),
+          child: horizontal
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(icon, color: accent, size: 22),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontFamily: 'Manrope',
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            body,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.onSurfaceVariant,
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(icon, color: accent),
+                    const SizedBox(height: 12),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      body,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 }

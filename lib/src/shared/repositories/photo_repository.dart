@@ -71,6 +71,17 @@ class PhotoRepository {
     await _box.delete(record.id);
   }
 
+  Future<void> deleteMany(Iterable<PhotoRecord> records) async {
+    final ids = <String>[];
+    for (final record in records) {
+      await _storageService.deleteIfExists(record.filePath);
+      ids.add(record.id);
+    }
+    if (ids.isNotEmpty) {
+      await _box.deleteAll(ids);
+    }
+  }
+
   Future<void> keepForever(PhotoRecord record) async {
     final updated = record.copyWith(
       expiresAt: null,

@@ -535,8 +535,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       normalizedPoint.dx.clamp(0.0, 1.0),
       normalizedPoint.dy.clamp(0.0, 1.0),
     );
+    _focusResetTimer?.cancel();
+    _lastManualFocusAt = DateTime.now();
+    _focusIndicatorPoint = point;
+    _focusIndicatorTimer?.cancel();
+    _focusIndicatorTimer = Timer(const Duration(milliseconds: 1200), () {
+      _focusIndicatorPoint = null;
+      notifyListeners();
+    });
+    notifyListeners();
+    unawaited(HapticFeedback.selectionClick());
     try {
-      _focusResetTimer?.cancel();
       await controller.setFocusMode(FocusMode.auto);
       await controller.setExposureMode(ExposureMode.auto);
       if (controller.value.focusPointSupported) {
@@ -545,15 +554,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (controller.value.exposurePointSupported) {
         await controller.setExposurePoint(point);
       }
-      _lastManualFocusAt = DateTime.now();
-      _focusIndicatorPoint = point;
-      _focusIndicatorTimer?.cancel();
-      _focusIndicatorTimer = Timer(const Duration(milliseconds: 1200), () {
-        _focusIndicatorPoint = null;
-        notifyListeners();
-      });
-      HapticFeedback.selectionClick();
-      notifyListeners();
       await Future<void>.delayed(const Duration(milliseconds: 280));
       if (_cameraController != controller || !controller.value.isInitialized) {
         return;
@@ -685,6 +685,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           context,
           settings.defaultTimer,
           hasPremiumAccess: hasPremiumAccess,
+          previewFilePath: file.path,
+          previewMediaType: MediaType.video,
         );
         if (!context.mounted) {
           return null;
@@ -787,6 +789,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         settings.defaultTimer,
         hasPremiumAccess: hasPremiumAccess,
         previewFilePath: file.path,
+        previewMediaType: MediaType.photo,
       );
       if (!context.mounted) {
         return;
@@ -880,6 +883,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> deletePhoto(PhotoRecord record) async {
     await _photoRepository.deleteNow(record);
+    await refreshPhotos();
+  }
+
+  Future<void> deletePhotos(Iterable<PhotoRecord> records) async {
+    final items = records.toList(growable: false);
+    if (items.isEmpty) {
+      return;
+    }
+    await _photoRepository.deleteMany(items);
     await refreshPhotos();
   }
 

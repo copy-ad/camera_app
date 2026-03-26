@@ -1,0 +1,68 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="120" y1="24" x2="926" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#192A45"/>
+      <stop offset="0.46" stop-color="#0F1621"/>
+      <stop offset="1" stop-color="#06090D"/>
+    </linearGradient>
+    <linearGradient id="panel3" x1="642" y1="94" x2="940" y2="396" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#162233"/>
+      <stop offset="1" stop-color="#0E141C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" rx="34" fill="url(#bg3)"/>
+  <circle cx="892" cy="96" r="116" fill="#A7C8FF" fill-opacity="0.08"/>
+  <circle cx="120" cy="432" r="88" fill="#E9C349" fill-opacity="0.08"/>
+
+  <g transform="translate(70 80)">
+    <text x="0" y="22" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="6">TEMPCAM</text>
+    <text x="0" y="92" fill="#F4F6FA" font-family="Arial, Helvetica, sans-serif" font-size="63" font-weight="800">Fast Camera.</text>
+    <text x="0" y="148" fill="#F4F6FA" font-family="Arial, Helvetica, sans-serif" font-size="63" font-weight="800">Short-Lived Media.</text>
+    <text x="0" y="202" fill="#BAC4D7" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="500">
+      Shoot quickly, set a timer, and let TempCam clean up
+    </text>
+    <text x="0" y="238" fill="#BAC4D7" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="500">
+      what should never stay in the main gallery.
+    </text>
+
+    <g transform="translate(0 286)">
+      <rect x="0" y="0" width="140" height="40" rx="20" fill="#111A25" stroke="#A7C8FF" stroke-opacity="0.16"/>
+      <text x="22" y="26" fill="#EAF0F9" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Tap Focus</text>
+
+      <rect x="154" y="0" width="162" height="40" rx="20" fill="#111A25" stroke="#E9C349" stroke-opacity="0.16"/>
+      <text x="176" y="26" fill="#EAF0F9" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Photo + Video</text>
+
+      <rect x="330" y="0" width="166" height="40" rx="20" fill="#111A25" stroke="#A7C8FF" stroke-opacity="0.16"/>
+      <text x="352" y="26" fill="#EAF0F9" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Timer First Flow</text>
+    </g>
+  </g>
+
+  <g transform="translate(654 66)">
+    <rect x="0" y="0" width="288" height="368" rx="34" fill="#090D13" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <rect x="18" y="18" width="252" height="332" rx="28" fill="url(#panel3)"/>
+    <text x="34" y="42" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">CAMERA</text>
+    <text x="216" y="42" fill="#9EABBD" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">ISO 100</text>
+
+    <rect x="34" y="60" width="220" height="194" rx="22" fill="#131C28"/>
+    <rect x="34" y="60" width="220" height="194" rx="22" fill="#A7C8FF" fill-opacity="0.05"/>
+    <circle cx="144" cy="157" r="42" fill="#A7C8FF" fill-opacity="0.12"/>
+    <circle cx="144" cy="157" r="28" fill="#A7C8FF" fill-opacity="0.22"/>
+    <path d="M144 137L133 152H155L144 137Z" fill="#E9C349"/>
+    <path d="M133 163H155L144 178L133 163Z" fill="#E9C349"/>
+    <circle cx="206" cy="102" r="9" fill="#FFDA6C"/>
+    <rect x="58" y="220" width="172" height="24" rx="12" fill="#151E2A"/>
+    <text x="88" y="236" fill="#E9EEF7" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">Default 24 Hours</text>
+
+    <rect x="86" y="266" width="116" height="30" rx="15" fill="#151E2A"/>
+    <rect x="90" y="270" width="52" height="22" rx="11" fill="#A7C8FF"/>
+    <text x="104" y="285" fill="#083464" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">PHOTO</text>
+    <text x="154" y="285" fill="#9CA8BB" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">VIDEO</text>
+
+    <circle cx="144" cy="318" r="28" fill="#A7C8FF" fill-opacity="0.16"/>
+    <circle cx="144" cy="318" r="20" fill="#8BB9FF"/>
+    <circle cx="144" cy="318" r="14" fill="#5B9AFF"/>
+    <circle cx="68" cy="318" r="18" fill="#141C28"/>
+    <circle cx="220" cy="318" r="18" fill="#141C28"/>
+  </g>
+</svg>

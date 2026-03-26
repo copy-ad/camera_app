@@ -1,0 +1,95 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="20" x2="890" y2="470" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F304B"/>
+      <stop offset="0.55" stop-color="#101723"/>
+      <stop offset="1" stop-color="#06080D"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="220" y1="120" x2="815" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A2230"/>
+      <stop offset="1" stop-color="#11161F"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#AECFFF"/>
+      <stop offset="1" stop-color="#7FB3FF"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="500" rx="34" fill="url(#bg)"/>
+  <circle cx="846" cy="112" r="126" fill="#A7C8FF" fill-opacity="0.08"/>
+  <circle cx="162" cy="420" r="102" fill="#E9C349" fill-opacity="0.08"/>
+  <rect x="48" y="48" width="928" height="404" rx="30" fill="url(#panel)" stroke="#FFFFFF" stroke-opacity="0.06"/>
+
+  <g transform="translate(88 88)">
+    <rect x="0" y="0" width="92" height="92" rx="28" fill="#0C1119"/>
+    <path d="M26 35H39L45 26H59L65 35H71C78.732 35 85 41.268 85 49V63C85 70.732 78.732 77 71 77H26C18.268 77 12 70.732 12 63V49C12 41.268 18.268 35 26 35Z" fill="#1A2331"/>
+    <circle cx="49" cy="56" r="20" fill="#A7C8FF"/>
+    <circle cx="49" cy="56" r="18" fill="#223247"/>
+    <circle cx="49" cy="56" r="11.5" fill="#DCEBFF"/>
+    <circle cx="49" cy="56" r="8.2" fill="#162334"/>
+    <path d="M49 45L43.8 52.5H54.2L49 45Z" fill="#E9C349"/>
+    <path d="M43.8 60H54.2L49 67.5L43.8 60Z" fill="#E9C349"/>
+    <circle cx="68" cy="38" r="5" fill="#FFDA6C"/>
+    <path d="M49 10C70.539 10 88 27.461 88 49C88 70.539 70.539 88 49 88C27.461 88 10 70.539 10 49C10 27.461 27.461 10 49 10ZM49 14C29.67 14 14 29.67 14 49C14 68.33 29.67 84 49 84C68.33 84 84 68.33 84 49C84 29.67 68.33 14 49 14Z" fill="#A7C8FF" fill-opacity="0.28"/>
+  </g>
+
+  <g transform="translate(214 92)">
+    <text x="0" y="22" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="6">TEMPCAM</text>
+    <text x="0" y="96" fill="#F3F5FA" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="800">Temporary Camera.</text>
+    <text x="0" y="152" fill="#F3F5FA" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="800">Private By Default.</text>
+    <text x="0" y="202" fill="#B8C2D6" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="500">
+      Capture photos and videos that stay in TempCam until they
+    </text>
+    <text x="0" y="238" fill="#B8C2D6" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="500">
+      expire, get deleted, or are kept forever by you.
+    </text>
+
+    <g transform="translate(0 272)">
+      <rect x="0" y="0" width="188" height="42" rx="21" fill="#161E2A" stroke="#A7C8FF" stroke-opacity="0.18"/>
+      <circle cx="28" cy="21" r="8" fill="#A7C8FF"/>
+      <text x="48" y="27" fill="#E8EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Temp Vault</text>
+
+      <rect x="202" y="0" width="212" height="42" rx="21" fill="#161E2A" stroke="#E9C349" stroke-opacity="0.18"/>
+      <circle cx="230" cy="21" r="8" fill="#E9C349"/>
+      <text x="250" y="27" fill="#E8EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Self-Destruct Timer</text>
+
+      <rect x="428" y="0" width="196" height="42" rx="21" fill="#161E2A" stroke="#A7C8FF" stroke-opacity="0.18"/>
+      <circle cx="456" cy="21" r="8" fill="#8AD6B8"/>
+      <text x="476" y="27" fill="#E8EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Biometric Lock</text>
+    </g>
+  </g>
+
+  <g transform="translate(748 88)">
+    <rect x="34" y="0" width="170" height="324" rx="34" fill="#0A0E14" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <rect x="48" y="18" width="142" height="288" rx="24" fill="#121923"/>
+    <rect x="60" y="34" width="118" height="186" rx="20" fill="#141D2A"/>
+    <rect x="60" y="34" width="118" height="186" rx="20" fill="url(#badge)" fill-opacity="0.08"/>
+    <circle cx="90" cy="62" r="18" fill="#1C2431"/>
+    <path d="M90 53L84.8 60.2H95.2L90 53Z" fill="#E9C349"/>
+    <path d="M84.8 67H95.2L90 74.2L84.8 67Z" fill="#E9C349"/>
+    <text x="114" y="68" fill="#E9EEF8" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700">24 Hours</text>
+    <text x="60" y="106" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">ENCRYPTED PREVIEW</text>
+    <rect x="60" y="128" width="118" height="76" rx="18" fill="#1A2230" stroke="#A7C8FF" stroke-opacity="0.18"/>
+    <circle cx="119" cy="166" r="26" fill="#A7C8FF" fill-opacity="0.16"/>
+    <circle cx="119" cy="166" r="18" fill="#A7C8FF"/>
+    <circle cx="119" cy="166" r="12" fill="#223247"/>
+    <rect x="60" y="236" width="56" height="26" rx="13" fill="#1C2532"/>
+    <text x="74" y="253" fill="#F0F4FB" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">PHOTO</text>
+    <rect x="122" y="236" width="56" height="26" rx="13" fill="#11161F"/>
+    <text x="137" y="253" fill="#7E8A9E" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">VIDEO</text>
+    <circle cx="119" cy="286" r="20" fill="#A7C8FF" filter="url(#glow)"/>
+    <circle cx="119" cy="286" r="14" fill="#7FB3FF"/>
+  </g>
+
+  <g transform="translate(78 418)">
+    <rect x="0" y="0" width="210" height="40" rx="20" fill="#111822" stroke="#A7C8FF" stroke-opacity="0.16"/>
+    <text x="22" y="26" fill="#E9EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">1 yearly plan • $3 / year</text>
+  </g>
+</svg>

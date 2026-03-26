@@ -1,0 +1,75 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="180" y1="10" x2="900" y2="490" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111D2E"/>
+      <stop offset="0.52" stop-color="#0C1017"/>
+      <stop offset="1" stop-color="#08090D"/>
+    </linearGradient>
+    <linearGradient id="card2" x1="610" y1="86" x2="950" y2="402" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#182233"/>
+      <stop offset="1" stop-color="#10151D"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" rx="34" fill="url(#bg2)"/>
+  <circle cx="180" cy="114" r="112" fill="#A7C8FF" fill-opacity="0.07"/>
+  <circle cx="902" cy="398" r="134" fill="#E9C349" fill-opacity="0.07"/>
+
+  <g transform="translate(70 78)">
+    <text x="0" y="22" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="6">TEMPCAM</text>
+    <text x="0" y="92" fill="#F4F6FA" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800">Secure Temp Vault</text>
+    <text x="0" y="148" fill="#BAC4D7" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="500">
+      Keep private captures out of the main gallery until
+    </text>
+    <text x="0" y="184" fill="#BAC4D7" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="500">
+      you choose to keep them forever.
+    </text>
+
+    <g transform="translate(0 228)">
+      <rect x="0" y="0" width="180" height="92" rx="24" fill="#141C28" stroke="#FFFFFF" stroke-opacity="0.05"/>
+      <text x="22" y="34" fill="#E9EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Internal Gallery</text>
+      <text x="22" y="62" fill="#95A0B5" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500">Photos and videos stay inside TempCam first.</text>
+
+      <rect x="198" y="0" width="190" height="92" rx="24" fill="#141C28" stroke="#FFFFFF" stroke-opacity="0.05"/>
+      <text x="220" y="34" fill="#E9EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Auto Delete</text>
+      <text x="220" y="62" fill="#95A0B5" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500">Each capture can expire on your chosen timer.</text>
+
+      <rect x="406" y="0" width="188" height="92" rx="24" fill="#141C28" stroke="#FFFFFF" stroke-opacity="0.05"/>
+      <text x="428" y="34" fill="#E9EDF7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Keep Forever</text>
+      <text x="428" y="62" fill="#95A0B5" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500">Export only the items that should remain.</text>
+    </g>
+  </g>
+
+  <g transform="translate(644 64)">
+    <rect x="0" y="0" width="298" height="372" rx="30" fill="url(#card2)" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <rect x="22" y="24" width="254" height="48" rx="24" fill="#101721"/>
+    <text x="46" y="54" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">Encrypted Vault</text>
+    <text x="204" y="54" fill="#7D8A9E" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700">24 items</text>
+
+    <rect x="22" y="92" width="116" height="118" rx="20" fill="#1B2432"/>
+    <rect x="22" y="92" width="116" height="118" rx="20" fill="#A7C8FF" fill-opacity="0.08"/>
+    <circle cx="80" cy="150" r="24" fill="#A7C8FF" fill-opacity="0.2"/>
+    <circle cx="80" cy="150" r="16" fill="#A7C8FF"/>
+    <circle cx="80" cy="150" r="10" fill="#223247"/>
+    <rect x="34" y="104" width="52" height="22" rx="11" fill="#111A25"/>
+    <text x="49" y="119" fill="#EAEFF8" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">PHOTO</text>
+    <rect x="90" y="178" width="36" height="18" rx="9" fill="#E9C349"/>
+    <text x="98" y="191" fill="#3C2F00" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="700">3h</text>
+
+    <rect x="160" y="92" width="116" height="118" rx="20" fill="#1B2432"/>
+    <rect x="160" y="92" width="116" height="118" rx="20" fill="#E9C349" fill-opacity="0.06"/>
+    <circle cx="218" cy="149" r="28" fill="#FFFFFF" fill-opacity="0.08"/>
+    <path d="M212 136L229 149L212 162V136Z" fill="#FFFFFF"/>
+    <rect x="172" y="104" width="52" height="22" rx="11" fill="#111A25"/>
+    <text x="185" y="119" fill="#EAEFF8" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">VIDEO</text>
+    <rect x="228" y="178" width="36" height="18" rx="9" fill="#E9C349"/>
+    <text x="233" y="191" fill="#3C2F00" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="700">24h</text>
+
+    <rect x="22" y="230" width="254" height="118" rx="24" fill="#101721" stroke="#A7C8FF" stroke-opacity="0.15"/>
+    <text x="40" y="266" fill="#A7C8FF" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="2">BIOMETRIC LOCK</text>
+    <circle cx="72" cy="304" r="22" fill="#A7C8FF" fill-opacity="0.14"/>
+    <path d="M72 290c6 0 11 5 11 11v6c0 10-11 17-11 17s-11-7-11-17v-6c0-6 5-11 11-11z" fill="#A7C8FF"/>
+    <text x="108" y="300" fill="#EAF0F9" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Protected access</text>
+    <text x="108" y="328" fill="#95A0B5" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500">Open the vault and sensitive actions with device biometrics.</text>
+  </g>
+</svg>

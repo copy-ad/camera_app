@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:tempcam/src/features/lock/presentation/unlock_screen.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
@@ -17,7 +18,17 @@ class TempCamRoot extends StatefulWidget {
 }
 
 class _TempCamRootState extends State<TempCamRoot> {
+  final QuickActions _quickActions = const QuickActions();
   bool _isShowingTrialDialog = false;
+  bool _quickActionsReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _configureQuickActions();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +85,43 @@ class _TempCamRootState extends State<TempCamRoot> {
         );
       },
     );
+  }
+
+  Future<void> _configureQuickActions() async {
+    if (!mounted || _quickActionsReady) {
+      return;
+    }
+    _quickActionsReady = true;
+    try {
+      await _quickActions.initialize((shortcutType) {
+        if (!mounted) {
+          return;
+        }
+        final controller = context.read<AppController>();
+        switch (shortcutType) {
+          case 'open_camera':
+            controller.openCameraQuickAction();
+            return;
+          case 'open_vault':
+            controller.openVaultQuickAction();
+            return;
+          default:
+            return;
+        }
+      });
+      await _quickActions.setShortcutItems(const <ShortcutItem>[
+        ShortcutItem(
+          type: 'open_camera',
+          localizedTitle: 'Open Camera',
+          icon: 'icon_camera_shortcut',
+        ),
+        ShortcutItem(
+          type: 'open_vault',
+          localizedTitle: 'Open Vault',
+          icon: 'icon_vault_shortcut',
+        ),
+      ]);
+    } catch (_) {}
   }
 }
 

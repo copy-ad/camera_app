@@ -24,6 +24,12 @@
 @import flutter_timezone;
 #endif
 
+#if __has_include(<image_picker_ios/FLTImagePickerPlugin.h>)
+#import <image_picker_ios/FLTImagePickerPlugin.h>
+#else
+@import image_picker_ios;
+#endif
+
 #if __has_include(<in_app_purchase_storekit/InAppPurchasePlugin.h>)
 #import <in_app_purchase_storekit/InAppPurchasePlugin.h>
 #else
@@ -34,6 +40,12 @@
 #import <local_auth_darwin/LocalAuthPlugin.h>
 #else
 @import local_auth_darwin;
+#endif
+
+#if __has_include(<quick_actions_ios/QuickActionsPlugin.h>)
+#import <quick_actions_ios/QuickActionsPlugin.h>
+#else
+@import quick_actions_ios;
 #endif
 
 #if __has_include(<video_player_avfoundation/FVPVideoPlayerPlugin.h>)
@@ -54,8 +66,10 @@
   [CameraPlugin registerWithRegistrar:[registry registrarForPlugin:@"CameraPlugin"]];
   [FlutterLocalNotificationsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterLocalNotificationsPlugin"]];
   [FlutterTimezonePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterTimezonePlugin"]];
+  [FLTImagePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTImagePickerPlugin"]];
   [InAppPurchasePlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppPurchasePlugin"]];
   [LocalAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"LocalAuthPlugin"]];
+  [QuickActionsPlugin registerWithRegistrar:[registry registrarForPlugin:@"QuickActionsPlugin"]];
   [FVPVideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FVPVideoPlayerPlugin"]];
   [VideoThumbnailPlugin registerWithRegistrar:[registry registrarForPlugin:@"VideoThumbnailPlugin"]];
 }

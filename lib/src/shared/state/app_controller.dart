@@ -853,6 +853,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  void openCameraQuickAction() {
+    _currentTabIndex = 1;
+    notifyListeners();
+  }
+
+  void openVaultQuickAction() {
+    _currentTabIndex = 0;
+    notifyListeners();
+  }
+
   Future<void> captureWithTimerFlow(BuildContext context) async {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized || _isCapturing) {

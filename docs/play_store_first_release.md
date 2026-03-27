@@ -33,7 +33,7 @@ Example:
 storePassword=YOUR_STORE_PASSWORD
 keyPassword=YOUR_KEY_PASSWORD
 keyAlias=upload
-storeFile=../upload-keystore.jks
+storeFile=../../upload-keystore.jks
 ```
 
 Never commit `android/key.properties` or your real keystore to Git.
@@ -42,8 +42,8 @@ Never commit `android/key.properties` or your real keystore to Git.
 
 Before Play submission, host these on a public HTTPS URL:
 
-- `docs/privacy_policy.md`
-- `docs/subscription_terms.md`
+- `docs/privacy-policy.html`
+- `docs/subscription-terms.html`
 
 Good options:
 
@@ -64,6 +64,7 @@ In Play Console:
 4. Complete App content.
 5. Complete Data safety.
 6. Add the public privacy policy URL.
+7. Keep your subscription terms URL ready for in-app legal access.
 
 ## 5. Create the Subscription
 

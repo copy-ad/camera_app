@@ -1,16 +1,14 @@
 # TempCam Privacy Policy
 
-Last updated: March 26, 2026
+Last updated: March 27, 2026
 
 ## 1. Who We Are
 
-TempCam is a temporary private camera app that stores temporary photos and videos locally on the user’s device until they expire, are deleted, or are kept forever by the user.
+TempCam is a local-first temporary camera app operated by Bizclicq.
 
-Replace this section before publishing:
+Support contact:
 
-- Developer name:
-- Contact email:
-- Website:
+- Email: admin@bizclicq.com
 
 ## 2. What TempCam Does
 
@@ -32,16 +30,18 @@ Depending on the device and user choices, TempCam may access:
 - Local notifications
 - Biometric authentication
 - Media files created inside TempCam
+- Google Play or Apple subscription purchase status
 
 ## 4. How TempCam Uses Data
 
-TempCam uses accessed data only to provide core app features:
+TempCam uses accessed data only to provide app features:
 
 - Camera: to capture photos and videos
 - Microphone: to record audio for videos
 - Notifications: to alert the user before temporary media expires
 - Biometrics: to lock app access and protect sensitive actions
 - Local media files: to show, store, auto-delete, or export captures
+- Subscription status: to verify whether yearly access or a store-managed free trial is active
 
 ## 5. Storage and Retention
 
@@ -49,16 +49,21 @@ TempCam uses accessed data only to provide core app features:
 - Temporary items remain there until they expire, are manually deleted, or are kept forever.
 - If a user selects `Keep Forever`, that selected item is exported to the main device gallery.
 - Expired temporary items are removed from TempCam storage by the app.
+- TempCam does not provide an in-app cloud backup feature for temporary media.
 
-## 6. Data Sharing
+## 6. Payments and Trials
 
-TempCam does not sell user data.
+- TempCam offers access through a Google Play or Apple App Store subscription.
+- Billing, trial eligibility, renewals, refunds, and cancellations are handled by the platform store.
+- TempCam does not directly process card payments.
 
-TempCam does not use an in-app cloud backup flow for temporary media.
+## 7. Data Sharing
 
-Google Play or Apple may process billing information for subscription purchases as the platform store provider. Billing is handled by the platform, not by TempCam directly.
+- TempCam does not sell user data.
+- TempCam does not run its own advertising network for temporary media.
+- Google Play or Apple may process billing-related data as the platform store provider.
 
-## 7. Security
+## 8. Security
 
 TempCam is designed to keep temporary media private by:
 
@@ -66,7 +71,9 @@ TempCam is designed to keep temporary media private by:
 - supporting biometric app lock
 - requiring sensitive actions to be protected when biometric lock is enabled
 
-## 8. Third Parties
+No system is perfectly secure, but TempCam is designed to minimize unnecessary data exposure.
+
+## 9. Third Parties
 
 TempCam may rely on platform services and SDKs required for:
 
@@ -77,7 +84,7 @@ TempCam may rely on platform services and SDKs required for:
 
 These services are used only to support app functionality.
 
-## 9. User Controls
+## 10. User Controls
 
 Users can:
 
@@ -85,19 +92,18 @@ Users can:
 - disable or enable biometric lock
 - delete temporary media
 - keep selected media forever
+- cancel the subscription through Google Play or the App Store
 
-## 10. Children
+## 11. Children
 
-TempCam is not intended for children unless specifically described otherwise in your store listing.
+TempCam is not intended for children unless specifically described otherwise in the store listing.
 
-## 11. Changes
+## 12. Changes
 
-This privacy policy may be updated over time. Update the date at the top whenever you publish changes.
+This Privacy Policy may be updated over time. The date at the top will be updated when changes are published.
 
-## 12. Contact
+## 13. Contact
 
-Replace this section before publishing:
+For support or privacy questions:
 
-- Email:
-- Website:
-- Support contact:
+- Email: admin@bizclicq.com

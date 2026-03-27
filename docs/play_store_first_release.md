@@ -52,6 +52,7 @@ Good options:
 - your own website
 
 Google Play requires a public privacy policy URL.
+For subscriptions, keep terms text accessible inside the app too.
 
 ## 4. Create the App in Play Console
 
@@ -100,12 +101,15 @@ Do not go straight to production.
 3. Build and upload an Android App Bundle:
 
 ```powershell
-flutter build appbundle --release
+flutter build appbundle --release --obfuscate --split-debug-info=build/symbols
 ```
 
 Expected output:
 
 - `build/app/outputs/bundle/release/app-release.aab`
+
+Keep the `build/symbols` folder private and backed up. You need it later if you
+want readable crash stack traces after obfuscation.
 
 4. Add tester email accounts.
 5. Accept the internal testing opt-in link on your Android phone.
@@ -146,6 +150,24 @@ Also test:
 
 Production billing is enabled by default.
 
+Release hardening already enabled in the Android project:
+
+- R8 / code shrinking
+- resource shrinking
+- release signing
+
+Recommended production build command:
+
+```powershell
+flutter build appbundle --release --obfuscate --split-debug-info=build/symbols
+```
+
+Why use it:
+
+- makes Dart symbols harder to reverse engineer
+- reduces the value of basic string and symbol scraping tools
+- keeps a local symbol map for crash investigation
+
 If you ever need to disable billing for local development only:
 
 ```powershell
@@ -160,9 +182,13 @@ Check all of these:
 
 - real keystore configured
 - privacy policy URL live
+- subscription terms URL live
 - subscription active in Play Console
+- store-managed free trial offer active if you are using one
 - internal test purchase works
 - restore works
+- same-account reinstall does not create a second free trial
+- clear-data does not create a second free trial
 - notifications work on device
 - biometric lock works on device
 - camera, photo capture, video capture, and playback work on device
@@ -190,12 +216,16 @@ If Play asks for more review information, explain:
 
 ## 12. Important Technical Limitation
 
-The current app uses client-side entitlement storage with store purchase syncing and restore support.
+The current app uses client-side entitlement state with store purchase syncing and restore support.
 
 That is good enough for an initial release, but the stronger long-term version is:
 
 - a secure backend
 - Play Developer API purchase verification
 - server-side entitlement state
+
+Without a backend, Google Play trial and subscription eligibility is protected for
+the same store account, but a totally different Google account can still be
+separately eligible according to Play's rules.
 
 That should be your next billing hardening step after the first release is live.

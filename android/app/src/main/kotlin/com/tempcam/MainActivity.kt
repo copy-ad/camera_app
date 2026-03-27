@@ -1,7 +1,9 @@
 package com.tempcam
 
 import android.content.ContentValues
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Environment
@@ -16,6 +18,7 @@ import java.io.FileOutputStream
 class MainActivity : FlutterFragmentActivity() {
     companion object {
         private const val MEDIA_GALLERY_CHANNEL = "tempcam/media_gallery"
+        private const val SYSTEM_CHANNEL = "tempcam/system"
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -57,6 +60,36 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            SYSTEM_CHANNEL,
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "openExternalUrl" -> {
+                    val url = call.argument<String>("url")
+                    if (url.isNullOrBlank()) {
+                        result.error("bad_args", "url is required.", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        result.success(openExternalUrl(url))
+                    } catch (exception: Exception) {
+                        result.error("open_failed", exception.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun openExternalUrl(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        startActivity(intent)
+        return true
     }
 
     private fun saveVideoToGallery(sourcePath: String, displayName: String): String {

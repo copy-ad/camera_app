@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/constants/legal_links.dart';
 import '../../../core/constants/premium_constants.dart';
 import '../../../shared/state/app_controller.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -11,12 +13,43 @@ class PremiumPaywallScreen extends StatelessWidget {
     this.requiredForAccess = false,
   });
 
+  static const MethodChannel _systemChannel = MethodChannel('tempcam/system');
+
   final bool requiredForAccess;
 
   static Future<void> show(BuildContext context) {
     return Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const PremiumPaywallScreen()),
     );
+  }
+
+  static Future<void> _openLegalLink(
+    BuildContext context, {
+    required String rawUrl,
+    required VoidCallback fallback,
+  }) async {
+    final url = rawUrl.trim();
+    if (url.isEmpty) {
+      fallback();
+      return;
+    }
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      fallback();
+      return;
+    }
+    try {
+      final launched = await _systemChannel.invokeMethod<bool>(
+        'openExternalUrl',
+        <String, dynamic>{'url': uri.toString()},
+      );
+      if (launched == true) {
+        return;
+      }
+    } catch (_) {}
+    if (context.mounted) {
+      fallback();
+    }
   }
 
   @override
@@ -284,54 +317,70 @@ class PremiumPaywallScreen extends StatelessWidget {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    showModalBottomSheet<void>(
-                                      context: context,
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: true,
-                                      builder: (_) => const _LegalInfoSheet(
-                                        title: 'Privacy Policy',
-                                        sections: [
-                                          _LegalSection(
-                                            heading: 'What TempCam stores',
-                                            body: 'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                    _openLegalLink(
+                                      context,
+                                      rawUrl: LegalLinks.privacyPolicyUrl,
+                                      fallback: () {
+                                        showModalBottomSheet<void>(
+                                          context: context,
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
+                                          builder: (_) => const _LegalInfoSheet(
+                                            title: 'Privacy Policy',
+                                            sections: [
+                                              _LegalSection(
+                                                heading: 'What TempCam stores',
+                                                body: 'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                              ),
+                                              _LegalSection(
+                                                heading: 'What TempCam does not do',
+                                                body: 'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
+                                              ),
+                                              _LegalSection(
+                                                heading: 'Before release',
+                                                body: 'Set TEMPCAM_PRIVACY_POLICY_URL during your release build to open your hosted policy page from the app.',
+                                              ),
+                                            ],
                                           ),
-                                          _LegalSection(
-                                            heading: 'What TempCam does not do',
-                                            body: 'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
-                                          ),
-                                          _LegalSection(
-                                            heading: 'Before release',
-                                            body: 'Host this privacy policy on a public URL and add that URL in the Play Console privacy policy field before publishing.',
-                                          ),
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     );
                                   },
                                   child: const Text('Privacy Policy'),
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    showModalBottomSheet<void>(
-                                      context: context,
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: true,
-                                      builder: (_) => const _LegalInfoSheet(
-                                        title: 'Subscription Terms',
-                                        sections: [
-                                          _LegalSection(
-                                            heading: 'Plan',
-                                            body: 'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                    _openLegalLink(
+                                      context,
+                                      rawUrl: LegalLinks.subscriptionTermsUrl,
+                                      fallback: () {
+                                        showModalBottomSheet<void>(
+                                          context: context,
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
+                                          builder: (_) => const _LegalInfoSheet(
+                                            title: 'Subscription Terms',
+                                            sections: [
+                                              _LegalSection(
+                                                heading: 'Plan',
+                                                body: 'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                              ),
+                                              _LegalSection(
+                                                heading: 'Billing',
+                                                body: 'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
+                                              ),
+                                              _LegalSection(
+                                                heading: 'Managing access',
+                                                body: 'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
+                                              ),
+                                              _LegalSection(
+                                                heading: 'Release setup',
+                                                body: 'Set TEMPCAM_SUBSCRIPTION_TERMS_URL during your release build to open your hosted terms page from the app.',
+                                              ),
+                                            ],
                                           ),
-                                          _LegalSection(
-                                            heading: 'Billing',
-                                            body: 'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
-                                          ),
-                                          _LegalSection(
-                                            heading: 'Managing access',
-                                            body: 'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
-                                          ),
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     );
                                   },
                                   child: const Text('Terms'),

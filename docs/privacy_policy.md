@@ -32,6 +32,7 @@ Depending on the device and user choices, TempCam may access:
 - Local notifications
 - Biometric authentication
 - Media files created inside TempCam
+- User-selected photos or videos imported into TempCam from the device
 - On-device history entries for important vault actions
 - Google Play or Apple subscription purchase status
 
@@ -44,12 +45,14 @@ TempCam uses accessed data only to provide app features:
 - Notifications: to alert the user before temporary media expires
 - Biometrics: to lock app access and protect sensitive actions
 - Local media files: to show, store, auto-delete, or export captures
+- User-selected imported media: to copy chosen photos or videos into TempCam and apply the selected timer
 - On-device history entries: to help users confirm when items were exported, deleted manually, or auto-deleted
 - Subscription status: to verify whether yearly access or a store-managed free trial is active
 
 ## 5. Storage and Retention
 
 - Temporary photos and videos are stored locally on the device inside TempCam.
+- If the user chooses to import existing device media, TempCam copies the selected items into its local private storage.
 - Temporary items remain there until they expire, are manually deleted, or are kept forever.
 - If a user selects `Keep Forever`, that selected item is exported to the main device gallery.
 - Expired temporary items are removed from TempCam storage by the app.
@@ -100,6 +103,7 @@ Users can:
 - disable or enable biometric lock
 - adjust the quick lock timeout
 - enable or disable Session Privacy Mode
+- use launcher shortcuts to open TempCam faster on supported devices
 - delete temporary media
 - keep selected media forever
 - cancel the subscription through Google Play or the App Store

@@ -38,6 +38,7 @@ TempCam is useful for:
 ### Temporary Vault
 
 - Captured photos and videos are stored inside TempCam first
+- Import existing device photos and videos into TempCam with a self-destruct timer
 - Temporary media does not automatically go to the phone gallery
 - Each item can expire automatically based on its timer
 - Expired items are cleaned up from the vault
@@ -114,6 +115,7 @@ TempCam is useful for:
 - Quick lock timeout choices
 - Trusted vault history view
 - Panic Exit access from core screens
+- Launcher quick actions for opening Camera or Vault faster
 
 ## Why Buy TempCam
 
@@ -145,5 +147,7 @@ If you regularly capture things that should not stay visible in your main galler
 - Photo and video support in the same secure vault
 - Panic Exit for fast privacy
 - Store-managed trial and yearly access flow
+- Import existing media into the temp vault when the normal camera was used by mistake
+- Launcher quick actions for faster access to Camera and Vault
 
 TempCam is for people who want a camera that respects privacy first, not permanence first.

@@ -35,6 +35,7 @@ class SettingsScreen extends StatelessWidget {
                 priceLabel: controller.yearlyPriceLabel,
                 accessUntil: controller.premiumAccessExpiresAt,
                 onManageAccess: () => PremiumPaywallScreen.show(context),
+                onPanicExit: controller.panicExit,
               ),
               const SizedBox(height: 24),
               const _SettingsSectionLabel('Capture Defaults'),
@@ -193,6 +194,7 @@ class _SettingsHero extends StatelessWidget {
     required this.priceLabel,
     required this.accessUntil,
     required this.onManageAccess,
+    required this.onPanicExit,
   });
 
   final bool isActive;
@@ -200,6 +202,7 @@ class _SettingsHero extends StatelessWidget {
   final String priceLabel;
   final DateTime? accessUntil;
   final VoidCallback onManageAccess;
+  final Future<void> Function() onPanicExit;
 
   @override
   Widget build(BuildContext context) {
@@ -235,28 +238,41 @@ class _SettingsHero extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? AppTheme.secondary.withValues(alpha: 0.94)
-                      : AppTheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  hasStoreManagedTrialOffer && !isActive
-                      ? 'FREE TRIAL'
-                      : isActive
-                          ? 'ACTIVE'
-                          : 'REQUIRED',
-                  style: TextStyle(
-                    color: hasStoreManagedTrialOffer || isActive
-                        ? const Color(0xFF3C2F00)
-                        : AppTheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppTheme.secondary.withValues(alpha: 0.94)
+                          : AppTheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      hasStoreManagedTrialOffer && !isActive
+                          ? 'FREE TRIAL'
+                          : isActive
+                              ? 'ACTIVE'
+                              : 'REQUIRED',
+                      style: TextStyle(
+                        color: hasStoreManagedTrialOffer || isActive
+                            ? const Color(0xFF3C2F00)
+                            : AppTheme.onSurface,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.06),
+                      foregroundColor: AppTheme.onSurface,
+                    ),
+                    onPressed: () => onPanicExit(),
+                    icon: const Icon(Icons.visibility_off_rounded),
+                  ),
+                ],
               ),
             ],
           ),

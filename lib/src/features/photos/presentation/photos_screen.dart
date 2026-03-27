@@ -100,6 +100,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                             photoCount: photoCount,
                             videoCount: videoCount,
                             onOpenCamera: () => controller.setTab(1),
+                            onPanicExit: controller.panicExit,
                           ),
                           const SizedBox(height: 18),
                           SingleChildScrollView(
@@ -352,12 +353,14 @@ class _GalleryHero extends StatelessWidget {
     required this.photoCount,
     required this.videoCount,
     required this.onOpenCamera,
+    required this.onPanicExit,
   });
 
   final int totalCount;
   final int photoCount;
   final int videoCount;
   final VoidCallback onOpenCamera;
+  final Future<void> Function() onPanicExit;
 
   @override
   Widget build(BuildContext context) {
@@ -393,13 +396,26 @@ class _GalleryHero extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 0.06),
-                  foregroundColor: AppTheme.onSurface,
-                ),
-                onPressed: onOpenCamera,
-                icon: const Icon(Icons.camera_alt_rounded),
+              Row(
+                children: [
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.06),
+                      foregroundColor: AppTheme.onSurface,
+                    ),
+                    onPressed: onOpenCamera,
+                    icon: const Icon(Icons.camera_alt_rounded),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.06),
+                      foregroundColor: AppTheme.onSurface,
+                    ),
+                    onPressed: () => onPanicExit(),
+                    icon: const Icon(Icons.visibility_off_rounded),
+                  ),
+                ],
               ),
             ],
           ),

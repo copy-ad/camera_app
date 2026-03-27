@@ -427,20 +427,26 @@ class _CameraTopControls extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: _CircleActionButton(
-            icon: _flashIconFor(controller.flashMode),
-            onTap: () async {
-              final message = await controller.toggleFlash();
-              if (!context.mounted || message == null) {
-                return;
-              }
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(content: Text(message)));
-            },
-          ),
+        child: Row(
+          children: [
+            _CircleActionButton(
+              icon: _flashIconFor(controller.flashMode),
+              onTap: () async {
+                final message = await controller.toggleFlash();
+                if (!context.mounted || message == null) {
+                  return;
+                }
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(content: Text(message)));
+              },
+            ),
+            const Spacer(),
+            _CircleActionButton(
+              icon: Icons.visibility_off_rounded,
+              onTap: () => controller.panicExit(),
+            ),
+          ],
         ),
       ),
     );

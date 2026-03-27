@@ -940,6 +940,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     return unlockApp();
   }
 
+  Future<void> panicExit() async {
+    _pausedAt = DateTime.now();
+    _currentTabIndex = 1;
+    _isLocked =
+        hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
+    notifyListeners();
+    await SystemNavigator.pop();
+  }
+
   Future<void> deletePhoto(PhotoRecord record) async {
     await _photoRepository.deleteNow(record);
     await refreshPhotos();

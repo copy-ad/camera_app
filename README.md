@@ -27,9 +27,12 @@ TempCam is useful for:
 - Dedicated in-app camera for photos and videos
 - Front and back camera support
 - Tap to focus
+- Premium-style animated focus ring
 - Pinch to zoom
 - Flash controls for photo and video modes
+- Photo and video mode switching
 - Video recording timer
+- Live photo or video preview before setting the timer
 - Fast access camera-first workflow
 
 ### Temporary Vault
@@ -38,6 +41,7 @@ TempCam is useful for:
 - Temporary media does not automatically go to the phone gallery
 - Each item can expire automatically based on its timer
 - Expired items are cleaned up from the vault
+- Media stays in app-private storage until the user explicitly exports it
 
 ### Flexible Expiry Timers
 
@@ -63,12 +67,16 @@ TempCam is useful for:
 - Custom quick lock timeout for returning to TempCam after backgrounding
 - Optional instant session relocking with Session Privacy Mode
 - Protected recent-app preview so TempCam content is hidden when the app loses focus
+- Panic Exit for quickly closing TempCam in stressful moments
 
 ### Private Gallery
 
 - View all temporary photos and videos in one internal gallery
 - Open photos in a dedicated detail view
 - Open private videos with in-app playback
+- Real video thumbnails in the vault
+- Filter vault items by `All`, `Photos`, or `Videos`
+- Multi-select items and delete them together
 - Extend timer, keep forever, or delete from the detail screen
 
 ### Notifications
@@ -78,6 +86,7 @@ TempCam is useful for:
 - Notifications are updated when media is created, extended, deleted, kept forever, or expires
 - Notifications can be turned on or off from Settings
 - Stealth notification mode keeps lock-screen wording generic
+- Reminders are designed to appear about 10 minutes before auto-deletion
 
 ### Trusted History
 
@@ -86,6 +95,25 @@ TempCam is useful for:
 - Manual deletions are recorded locally
 - Auto-deletions after expiry are recorded locally
 - History stays on the device and helps users confirm what happened to sensitive media
+
+### Subscription Access
+
+- Free app listing with store-managed yearly access
+- Google Play managed 15-day free trial offer for eligible users
+- One yearly subscription plan after the trial
+- Restore purchase support
+- Secure paywall with Privacy Policy and Terms access
+
+### Settings And Control
+
+- Default self-destruct timer controls
+- Notification controls
+- Stealth notification toggle
+- Biometric lock controls
+- Session Privacy Mode toggle
+- Quick lock timeout choices
+- Trusted vault history view
+- Panic Exit access from core screens
 
 ## Why Buy TempCam
 
@@ -115,5 +143,7 @@ If you regularly capture things that should not stay visible in your main galler
 - Trusted on-device history for export and deletion events
 - Manual keep-forever export
 - Photo and video support in the same secure vault
+- Panic Exit for fast privacy
+- Store-managed trial and yearly access flow
 
 TempCam is for people who want a camera that respects privacy first, not permanence first.

@@ -105,37 +105,22 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isUsingDevelopmentBypass => PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
-  DateTime? get trialStartedAt => _settings.trialStartedAt;
+  bool get hasStoreManagedTrialOffer => _billingService.hasStoreManagedTrialOffer;
 
   bool get hasStoreSubscriptionAccess {
-    if (!_settings.hasPremiumAccess) {
-      return false;
-    }
-    final expiry = _settings.premiumAccessExpiresAt;
-    return expiry == null || expiry.isAfter(DateTime.now());
+    return _settings.hasPremiumAccess;
   }
 
-  DateTime? get freeTrialEndsAt => _settings.trialStartedAt?.add(PremiumConstants.freeTrialDuration);
-
-  bool get isFreeTrialActive {
-    final trialEndsAt = freeTrialEndsAt;
-    return trialEndsAt != null && trialEndsAt.isAfter(DateTime.now());
-  }
-
-  Duration get freeTrialRemaining {
-    final trialEndsAt = freeTrialEndsAt;
-    if (trialEndsAt == null) {
-      return Duration.zero;
-    }
-    final remaining = trialEndsAt.difference(DateTime.now());
-    return remaining.isNegative ? Duration.zero : remaining;
-  }
+  bool get shouldShowTrialStartedNotice =>
+      !PremiumConstants.paymentsTemporarilyDisabled &&
+      !hasStoreSubscriptionAccess &&
+      !_settings.trialNoticeShown;
 
   bool get hasPremiumAccess {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
       return true;
     }
-    return hasStoreSubscriptionAccess || isFreeTrialActive;
+    return hasStoreSubscriptionAccess;
   }
 
   DateTime? get premiumAccessExpiresAt => _settings.premiumAccessExpiresAt;
@@ -155,7 +140,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> bootstrap() async {
     _settings = _settingsRepository.read();
     try {
-      await _ensureTrialStartDate();
       await _normalizePremiumState();
       try {
         await _notificationService
@@ -190,12 +174,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _ensureTrialStartDate() async {
-    if (_settings.trialStartedAt != null) {
+  Future<void> markTrialStartedNoticeSeen() async {
+    if (_settings.trialNoticeShown) {
       return;
     }
-    _settings = _settings.copyWith(trialStartedAt: DateTime.now());
+    _settings = _settings.copyWith(trialNoticeShown: true);
     await _settingsRepository.save(_settings);
+    notifyListeners();
   }
 
   Future<void> _initializeBilling() async {
@@ -215,7 +200,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (_isStoreAvailable && _yearlySubscriptionProduct == null) {
         _billingStatusMessage = 'The yearly subscription is not available in this build yet.';
       } else if (_isStoreAvailable) {
-        unawaited(_syncExistingStorePurchases());
+        await _refreshStoreEntitlementStatus();
+        if (!Platform.isAndroid) {
+          unawaited(_syncExistingStorePurchases());
+        }
       }
     } catch (_) {
       _isStoreAvailable = false;
@@ -285,6 +273,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     try {
       await _billingService.restorePurchases();
+      await _refreshStoreEntitlementStatus();
       _isPurchasePending = false;
       notifyListeners();
       return 'Restore request sent to the store.';
@@ -342,15 +331,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _activatePremiumAccess(PurchaseDetails purchase) async {
-    final transactionDate = _parseStoreDate(purchase.transactionDate);
-    final derivedExpiry = (transactionDate ?? DateTime.now()).add(PremiumConstants.subscriptionAccessWindow);
-    final savedExpiry = _settings.premiumAccessExpiresAt;
-    final expiry = savedExpiry != null && savedExpiry.isAfter(derivedExpiry) ? savedExpiry : derivedExpiry;
     _settings = _settings.copyWith(
       hasPremiumAccess: true,
       debugAccessBypassEnabled: false,
+      trialNoticeShown: true,
       premiumProductId: purchase.productID,
-      premiumAccessExpiresAt: expiry,
+      clearPremiumAccessExpiresAt: true,
       premiumLastValidatedAt: DateTime.now(),
     );
     await _settingsRepository.save(_settings);
@@ -373,17 +359,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
 
     var updated = false;
-    final expiry = _settings.premiumAccessExpiresAt;
-    if (_settings.hasPremiumAccess && expiry != null && !expiry.isAfter(DateTime.now())) {
-      _settings = _settings.copyWith(
-        hasPremiumAccess: false,
-        clearPremiumAccessExpiresAt: true,
-        clearPremiumProductId: true,
-      );
-      _isLocked = false;
-      updated = true;
-    }
-
     if (!hasPremiumAccess) {
       if (_settings.defaultTimer.requiresPremium) {
         _settings = _settings.copyWith(defaultTimer: AppTimerOption.twentyFourHours);
@@ -398,6 +373,47 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (updated) {
       await _settingsRepository.save(_settings);
     }
+  }
+
+  Future<void> _refreshStoreEntitlementStatus() async {
+    if (!_isStoreAvailable || PremiumConstants.paymentsTemporarilyDisabled) {
+      return;
+    }
+    if (!Platform.isAndroid) {
+      return;
+    }
+    try {
+      final purchases = await _billingService.queryActivePurchases();
+      final matches = purchases
+          .where(
+            (purchase) =>
+                purchase.productID ==
+                PremiumConstants.yearlySubscriptionProductId,
+          )
+          .toList(growable: false);
+      if (matches.isEmpty) {
+        if (_settings.hasPremiumAccess ||
+            _settings.premiumProductId != null ||
+            _settings.premiumAccessExpiresAt != null) {
+          _settings = _settings.copyWith(
+            hasPremiumAccess: false,
+            clearPremiumAccessExpiresAt: true,
+            clearPremiumProductId: true,
+          );
+          _isLocked = false;
+          await _settingsRepository.save(_settings);
+        }
+        return;
+      }
+      final latest = matches.reduce((current, next) {
+        final currentDate = _parseStoreDate(current.transactionDate) ??
+            DateTime.fromMillisecondsSinceEpoch(0);
+        final nextDate = _parseStoreDate(next.transactionDate) ??
+            DateTime.fromMillisecondsSinceEpoch(0);
+        return nextDate.isAfter(currentDate) ? next : current;
+      });
+      await _activatePremiumAccess(latest);
+    } catch (_) {}
   }
 
   ResolutionPreset get _cameraResolutionPreset {
@@ -980,6 +996,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _handleResume() async {
     await refreshPhotos();
+    await _refreshStoreEntitlementStatus();
     await _normalizePremiumState();
     if (!hasPremiumAccess) {
       _isLocked = false;

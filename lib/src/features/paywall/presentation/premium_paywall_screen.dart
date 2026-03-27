@@ -25,42 +25,41 @@ class PremiumPaywallScreen extends StatelessWidget {
       builder: (context, controller, _) {
         const bool isTestAccess = PremiumConstants.paymentsTemporarilyDisabled;
         final bool isActive = controller.hasPremiumAccess;
-        final bool isTrialActive = controller.isFreeTrialActive && !controller.hasStoreSubscriptionAccess;
+        final bool hasStoreTrial = controller.hasStoreManagedTrialOffer;
         final bool isBusy =
             controller.isPurchasePending || controller.isStoreLoading;
         final String priceLine = controller.yearlySubscriptionProduct == null
             ? PremiumConstants.fallbackYearlyPlanLabel
             : '${controller.yearlyPriceLabel} / year';
-        final DateTime? freeTrialEndsAt = controller.freeTrialEndsAt;
         final String title = isTestAccess
             ? 'Payments Disabled Temporarily'
-            : isTrialActive
-                ? '15-Day Free Trial Active'
-                : requiredForAccess
-                    ? 'Trial Ended'
-                    : isActive
-                        ? 'Manage TempCam Access'
-                        : 'Unlock TempCam';
+            : requiredForAccess
+                ? 'Access Required'
+                : isActive
+                    ? 'Manage TempCam Access'
+                    : 'Unlock TempCam';
         final String description = isTestAccess
             ? 'This build bypasses subscriptions so you can test TempCam on your phone before store upload.'
-            : isTrialActive
-                ? 'Everyone gets 15 days free first. Your full TempCam access stays open until the trial ends, then yearly access keeps the app unlocked.'
-                : requiredForAccess
-                    ? 'Your 15-day free trial has ended. Buy or restore yearly access to open TempCam again.'
-                    : isActive
-                        ? 'Your subscription is handled directly by the App Store or Google Play with one yearly plan.'
-                        : 'Start or restore yearly access to keep TempCam unlocked after the free trial.';
+            : requiredForAccess
+                ? hasStoreTrial
+                    ? 'Start the Google Play or App Store managed 15-day free trial, or restore your yearly access to open TempCam.'
+                    : 'Buy or restore yearly access to open TempCam. If your store account is eligible, the platform may apply the 15-day free trial during checkout.'
+                : isActive
+                    ? 'Your subscription is handled directly by the App Store or Google Play with one yearly plan.'
+                    : hasStoreTrial
+                        ? 'Start your secure store-managed 15-day free trial, then continue with one yearly plan.'
+                        : 'Start or restore yearly access. If your store account is eligible, the platform may apply the 15-day free trial during checkout.';
         final String badgeText = isTestAccess
             ? 'PAYMENT OFF'
-            : isTrialActive
-                ? 'FREE TRIAL'
+            : hasStoreTrial
+                ? '15 DAYS FREE'
                 : isActive
                 ? 'ACTIVE'
                 : 'YEARLY ACCESS';
         final String buttonText = isTestAccess
             ? 'Payment Disabled For Testing'
-            : isTrialActive
-                ? 'Buy 1 Year For ${controller.yearlyPriceLabel}'
+            : hasStoreTrial
+                ? 'Start 15 Days Free'
                 : isActive
                 ? 'Access Active'
                 : isBusy
@@ -71,10 +70,8 @@ class PremiumPaywallScreen extends StatelessWidget {
             : 'Auto-renewing yearly subscription. Cancel anytime in Google Play or App Store subscriptions.';
         final String pricingCaption = isTestAccess
             ? 'Store billing is currently bypassed by a temporary app-wide test switch.'
-            : isTrialActive
-                ? freeTrialEndsAt == null
-                    ? 'Your free trial is active right now.'
-                    : 'Your free trial ends on ${_formatExpiry(freeTrialEndsAt)}. Subscribe anytime to avoid interruption.'
+            : hasStoreTrial
+                ? 'If eligible, checkout starts with the store-managed 15-day free trial and then renews yearly.'
                 : isActive
                 ? 'Your yearly subscription is active.'
                 : controller.yearlySubscriptionProduct == null
@@ -171,8 +168,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                                   _FeatureCard(
                                     Icons.lock_clock_rounded,
                                     AppTheme.primary,
-                                    '15 Days Free',
-                                    'Every new install starts with a full 15-day free TempCam trial before payment is required.',
+                                    'Store Trial',
+                                    'The 15-day free trial is managed by Google Play or the App Store, so clearing app data will not restart it.',
                                   ),
                                   _FeatureCard(
                                     Icons.calendar_month_rounded,
@@ -183,8 +180,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                                   _FeatureCard(
                                     Icons.fingerprint_rounded,
                                     AppTheme.primary,
-                                    'Full Access First',
-                                    'The free trial unlocks the whole app, including secure vault tools and capture workflows.',
+                                    'Secure Access',
+                                    'Once the subscription or trial is active, TempCam unlocks fully and can re-lock with biometrics.',
                                   ),
                                   _FeatureCard(
                                     Icons.restore_rounded,
@@ -221,8 +218,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                             selected: true,
                             badge: isTestAccess
                                 ? 'Testing'
-                                : isTrialActive
-                                    ? 'After Trial'
+                                : hasStoreTrial
+                                    ? 'Trial Then Yearly'
                                     : 'Only Plan',
                           ),
                           const SizedBox(height: 18),
@@ -235,7 +232,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(vertical: 18),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                               ),
-                              onPressed: isTestAccess || (isActive && !isTrialActive) || isBusy
+                              onPressed: isTestAccess || isActive || isBusy
                                   ? null
                                   : () async {
                                       final message = await context.read<AppController>().purchasePremiumSubscription();
@@ -342,13 +339,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                               ],
                             ),
                           ],
-                          if (isTrialActive && freeTrialEndsAt != null && !isTestAccess) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              'Free trial ends ${_formatExpiry(freeTrialEndsAt)}',
-                              style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceVariant),
-                            ),
-                          ] else if (controller.premiumAccessExpiresAt != null && isActive && !isTestAccess) ...[
+                          if (controller.premiumAccessExpiresAt != null && isActive && !isTestAccess) ...[
                             const SizedBox(height: 8),
                             Text(
                               'Access recorded until ${_formatExpiry(controller.premiumAccessExpiresAt!)}',

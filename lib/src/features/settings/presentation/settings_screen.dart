@@ -31,9 +31,8 @@ class SettingsScreen extends StatelessWidget {
             children: [
               _SettingsHero(
                 isActive: controller.hasPremiumAccess,
-                isTrialActive: controller.isFreeTrialActive && !controller.hasStoreSubscriptionAccess,
+                hasStoreManagedTrialOffer: controller.hasStoreManagedTrialOffer,
                 priceLabel: controller.yearlyPriceLabel,
-                trialEndsAt: controller.freeTrialEndsAt,
                 accessUntil: controller.premiumAccessExpiresAt,
                 onManageAccess: () => PremiumPaywallScreen.show(context),
               ),
@@ -190,17 +189,15 @@ class SettingsScreen extends StatelessWidget {
 class _SettingsHero extends StatelessWidget {
   const _SettingsHero({
     required this.isActive,
-    required this.isTrialActive,
+    required this.hasStoreManagedTrialOffer,
     required this.priceLabel,
-    required this.trialEndsAt,
     required this.accessUntil,
     required this.onManageAccess,
   });
 
   final bool isActive;
-  final bool isTrialActive;
+  final bool hasStoreManagedTrialOffer;
   final String priceLabel;
-  final DateTime? trialEndsAt;
   final DateTime? accessUntil;
   final VoidCallback onManageAccess;
 
@@ -247,13 +244,13 @@ class _SettingsHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isTrialActive
+                  hasStoreManagedTrialOffer && !isActive
                       ? 'FREE TRIAL'
                       : isActive
                           ? 'ACTIVE'
                           : 'REQUIRED',
                   style: TextStyle(
-                    color: isTrialActive || isActive
+                    color: hasStoreManagedTrialOffer || isActive
                         ? const Color(0xFF3C2F00)
                         : AppTheme.onSurface,
                     fontWeight: FontWeight.w800,
@@ -265,10 +262,10 @@ class _SettingsHero extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            isTrialActive
-                ? 'Your 15-day free trial is live.'
-                : isActive
-                    ? 'Your access is live.'
+            isActive
+                ? 'Your access is live.'
+                : hasStoreManagedTrialOffer
+                    ? 'Start with 15 days free.'
                     : 'Yearly access powers TempCam.',
             style: const TextStyle(
               fontFamily: 'Manrope',
@@ -279,15 +276,13 @@ class _SettingsHero extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            isTrialActive
-                ? trialEndsAt == null
-                    ? 'Your full trial access is active right now.'
-                    : 'Your free trial stays unlocked until ${_formatDate(trialEndsAt!)}.'
-                : isActive
-                    ? accessUntil == null
-                        ? 'Your current subscription is active through the store.'
-                        : 'Access is recorded until ${_formatDate(accessUntil!)}.'
-                : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
+            isActive
+                ? accessUntil == null
+                    ? 'Your current subscription is active through the store.'
+                    : 'Access is recorded until ${_formatDate(accessUntil!)}.'
+                : hasStoreManagedTrialOffer
+                    ? 'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.'
+                    : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
             style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,
@@ -302,7 +297,7 @@ class _SettingsHero extends StatelessWidget {
             ),
             onPressed: onManageAccess,
             child: Text(
-              isTrialActive
+              hasStoreManagedTrialOffer && !isActive
                   ? 'View Yearly Plan'
                   : isActive
                       ? 'Manage Access'

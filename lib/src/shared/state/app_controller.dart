@@ -917,6 +917,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  Future<void> updateSessionPrivacyMode(bool enabled) async {
+    _settings = _settings.copyWith(sessionPrivacyModeEnabled: enabled);
+    await _settingsRepository.save(_settings);
+    notifyListeners();
+  }
+
   Future<bool> unlockApp() async {
     if (!_settings.biometricLockEnabled || !_biometricAvailable) {
       _isLocked = false;
@@ -1001,8 +1007,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (_isAuthenticatingWithBiometrics) {
       return;
     }
-    if (state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused) {
       _pausedAt = DateTime.now();
+      if (_settings.sessionPrivacyModeEnabled &&
+          hasPremiumAccess &&
+          _settings.biometricLockEnabled &&
+          _biometricAvailable) {
+        _isLocked = true;
+        notifyListeners();
+      }
     }
     if (state == AppLifecycleState.resumed) {
       if (_ignoreNextResumeLock) {
@@ -1023,6 +1038,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     if (!_settings.biometricLockEnabled || !_biometricAvailable) {
+      notifyListeners();
+      return;
+    }
+    if (_settings.sessionPrivacyModeEnabled) {
+      _isLocked = true;
       notifyListeners();
       return;
     }

@@ -38,6 +38,7 @@ class AppSettings {
     required this.notificationsEnabled,
     required this.stealthNotificationsEnabled,
     required this.biometricLockEnabled,
+    required this.sessionPrivacyModeEnabled,
     required this.hasPremiumAccess,
     required this.debugAccessBypassEnabled,
     this.lastUnlockTime,
@@ -52,6 +53,7 @@ class AppSettings {
   final bool notificationsEnabled;
   final bool stealthNotificationsEnabled;
   final bool biometricLockEnabled;
+  final bool sessionPrivacyModeEnabled;
   final bool hasPremiumAccess;
   final bool debugAccessBypassEnabled;
   final DateTime? lastUnlockTime;
@@ -66,6 +68,7 @@ class AppSettings {
     bool? notificationsEnabled,
     bool? stealthNotificationsEnabled,
     bool? biometricLockEnabled,
+    bool? sessionPrivacyModeEnabled,
     bool? hasPremiumAccess,
     bool? debugAccessBypassEnabled,
     DateTime? lastUnlockTime,
@@ -86,6 +89,8 @@ class AppSettings {
       stealthNotificationsEnabled:
           stealthNotificationsEnabled ?? this.stealthNotificationsEnabled,
       biometricLockEnabled: biometricLockEnabled ?? this.biometricLockEnabled,
+      sessionPrivacyModeEnabled:
+          sessionPrivacyModeEnabled ?? this.sessionPrivacyModeEnabled,
       hasPremiumAccess: hasPremiumAccess ?? this.hasPremiumAccess,
       debugAccessBypassEnabled: debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
       lastUnlockTime: clearLastUnlockTime ? null : lastUnlockTime ?? this.lastUnlockTime,
@@ -103,6 +108,7 @@ class AppSettings {
       notificationsEnabled: true,
       stealthNotificationsEnabled: false,
       biometricLockEnabled: false,
+      sessionPrivacyModeEnabled: false,
       hasPremiumAccess: false,
       debugAccessBypassEnabled: false,
       trialStartedAt: DateTime.now(),
@@ -142,6 +148,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       notificationsEnabled: fields[1] as bool? ?? true,
       stealthNotificationsEnabled: fields[11] as bool? ?? false,
       biometricLockEnabled: fields[2] as bool? ?? false,
+      sessionPrivacyModeEnabled: fields[12] as bool? ?? false,
       lastUnlockTime: fields[3] as DateTime?,
       hasPremiumAccess: fields[4] as bool? ?? false,
       premiumAccessExpiresAt: fields[5] as DateTime?,
@@ -156,7 +163,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.defaultTimer)
       ..writeByte(1)
@@ -165,6 +172,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..write(obj.stealthNotificationsEnabled)
       ..writeByte(2)
       ..write(obj.biometricLockEnabled)
+      ..writeByte(12)
+      ..write(obj.sessionPrivacyModeEnabled)
       ..writeByte(3)
       ..write(obj.lastUnlockTime)
       ..writeByte(4)

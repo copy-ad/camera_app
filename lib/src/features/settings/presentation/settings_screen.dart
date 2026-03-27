@@ -149,6 +149,30 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(height: 14),
                     const Divider(color: Color(0x33414755), height: 1),
                     const SizedBox(height: 14),
+                    _ActionRow(
+                      icon: Icons.lock_clock_rounded,
+                      title: 'Session Privacy Mode',
+                      subtitle: controller.settings.biometricLockEnabled
+                          ? 'Lock TempCam immediately whenever the app loses focus.'
+                          : 'Enable Biometric Lock first to use instant session relocking.',
+                      trailing: Switch.adaptive(
+                        value: controller.settings.sessionPrivacyModeEnabled,
+                        activeThumbColor: AppTheme.primary,
+                        onChanged: controller.biometricAvailable &&
+                                controller.settings.biometricLockEnabled
+                            ? (value) async {
+                                await _authenticateThen(
+                                  context,
+                                  controller,
+                                  () => controller.updateSessionPrivacyMode(value),
+                                );
+                              }
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Divider(color: Color(0x33414755), height: 1),
+                    const SizedBox(height: 14),
                     const _SecurityNote(),
                   ],
                 ),

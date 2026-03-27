@@ -2,12 +2,12 @@ abstract final class LegalLinks {
   const LegalLinks._();
 
   static const String privacyPolicyUrl = String.fromEnvironment(
-    'https://copy-ad.github.io/camera_app/privacy-policy.html',
+    'TEMPCAM_PRIVACY_POLICY_URL',
     defaultValue: '',
   );
 
   static const String subscriptionTermsUrl = String.fromEnvironment(
-    'https://copy-ad.github.io/camera_app/subscription-terms.html',
+    'TEMPCAM_SUBSCRIPTION_TERMS_URL',
     defaultValue: '',
   );
 }

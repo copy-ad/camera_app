@@ -324,18 +324,18 @@ packages:
     dependency: "direct main"
     description:
       name: image_picker
-      sha256: "784210112be18ea55f69d7076e2c656a4e24949fa9e76429fe53af0c0f4fa320"
+      sha256: "021834d9c0c3de46bf0fe40341fa07168407f694d9b2bb18d532dc1261867f7a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "1.1.2"
   image_picker_android:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: image_picker_android
-      sha256: "9eae0cbd672549dacc18df855c2a23782afe4854ada5190b7d63b30ee0b0d3fd"
+      sha256: "8c5abf0dcc24fe6e8e0b4a5c0b51a5cf30cefdf6407a3213dae61edc75a70f56"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.13+15"
+    version: "0.8.12+12"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -668,10 +668,10 @@ packages:
     dependency: "direct main"
     description:
       name: quick_actions
-      sha256: "7e35dd6a21f5bbd21acf6899039eaf85001a5ac26d52cbd6a8a2814505b90798"
+      sha256: "2c1d9a91f3218b4e987a7e1e95ba0415b7f48a2cb3ffacc027a1e3d3c117223f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.0.8"
   quick_actions_android:
     dependency: transitive
     description:

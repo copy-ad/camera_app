@@ -884,6 +884,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  Future<void> updateQuickLockTimeout(QuickLockTimeoutOption option) async {
+    _settings = _settings.copyWith(quickLockTimeout: option);
+    await _settingsRepository.save(_settings);
+    notifyListeners();
+  }
+
   Future<void> updateStealthNotifications(bool enabled) async {
     _settings = _settings.copyWith(stealthNotificationsEnabled: enabled);
     await _settingsRepository.save(_settings);
@@ -1049,7 +1055,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final pausedAt = _pausedAt;
     if (pausedAt == null) {
       _isLocked = true;
-    } else if (DateTime.now().difference(pausedAt) >= const Duration(seconds: 12)) {
+    } else if (DateTime.now().difference(pausedAt) >=
+        _settings.quickLockTimeout.duration) {
       _isLocked = true;
     }
     notifyListeners();

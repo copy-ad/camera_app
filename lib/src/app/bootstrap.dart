@@ -19,6 +19,7 @@ import 'tempcam_app.dart';
 Future<void> bootstrap() async {
   Hive
     ..registerAdapter(AppTimerOptionAdapter())
+    ..registerAdapter(QuickLockTimeoutOptionAdapter())
     ..registerAdapter(AppSettingsAdapter())
     ..registerAdapter(PhotoRecordAdapter());
 

@@ -28,6 +28,23 @@ enum AppTimerOption {
       ];
 }
 
+enum QuickLockTimeoutOption {
+  fiveSeconds('5 Seconds', Duration(seconds: 5)),
+  fifteenSeconds('15 Seconds', Duration(seconds: 15)),
+  thirtySeconds('30 Seconds', Duration(seconds: 30));
+
+  const QuickLockTimeoutOption(this.label, this.duration);
+
+  final String label;
+  final Duration duration;
+
+  static List<QuickLockTimeoutOption> get valuesForSettings => const [
+        QuickLockTimeoutOption.fiveSeconds,
+        QuickLockTimeoutOption.fifteenSeconds,
+        QuickLockTimeoutOption.thirtySeconds,
+      ];
+}
+
 extension AppTimerOptionX on AppTimerOption {
   bool get requiresPremium => this == AppTimerOption.sevenDays;
 }
@@ -39,6 +56,7 @@ class AppSettings {
     required this.stealthNotificationsEnabled,
     required this.biometricLockEnabled,
     required this.sessionPrivacyModeEnabled,
+    required this.quickLockTimeout,
     required this.hasPremiumAccess,
     required this.debugAccessBypassEnabled,
     this.lastUnlockTime,
@@ -54,6 +72,7 @@ class AppSettings {
   final bool stealthNotificationsEnabled;
   final bool biometricLockEnabled;
   final bool sessionPrivacyModeEnabled;
+  final QuickLockTimeoutOption quickLockTimeout;
   final bool hasPremiumAccess;
   final bool debugAccessBypassEnabled;
   final DateTime? lastUnlockTime;
@@ -69,6 +88,7 @@ class AppSettings {
     bool? stealthNotificationsEnabled,
     bool? biometricLockEnabled,
     bool? sessionPrivacyModeEnabled,
+    QuickLockTimeoutOption? quickLockTimeout,
     bool? hasPremiumAccess,
     bool? debugAccessBypassEnabled,
     DateTime? lastUnlockTime,
@@ -91,6 +111,7 @@ class AppSettings {
       biometricLockEnabled: biometricLockEnabled ?? this.biometricLockEnabled,
       sessionPrivacyModeEnabled:
           sessionPrivacyModeEnabled ?? this.sessionPrivacyModeEnabled,
+      quickLockTimeout: quickLockTimeout ?? this.quickLockTimeout,
       hasPremiumAccess: hasPremiumAccess ?? this.hasPremiumAccess,
       debugAccessBypassEnabled: debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
       lastUnlockTime: clearLastUnlockTime ? null : lastUnlockTime ?? this.lastUnlockTime,
@@ -109,6 +130,7 @@ class AppSettings {
       stealthNotificationsEnabled: false,
       biometricLockEnabled: false,
       sessionPrivacyModeEnabled: false,
+      quickLockTimeout: QuickLockTimeoutOption.fifteenSeconds,
       hasPremiumAccess: false,
       debugAccessBypassEnabled: false,
       trialStartedAt: DateTime.now(),
@@ -132,6 +154,21 @@ class AppTimerOptionAdapter extends TypeAdapter<AppTimerOption> {
   }
 }
 
+class QuickLockTimeoutOptionAdapter extends TypeAdapter<QuickLockTimeoutOption> {
+  @override
+  final int typeId = 3;
+
+  @override
+  QuickLockTimeoutOption read(BinaryReader reader) {
+    return QuickLockTimeoutOption.values[reader.readByte()];
+  }
+
+  @override
+  void write(BinaryWriter writer, QuickLockTimeoutOption obj) {
+    writer.writeByte(obj.index);
+  }
+}
+
 class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   final int typeId = 1;
@@ -149,6 +186,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       stealthNotificationsEnabled: fields[11] as bool? ?? false,
       biometricLockEnabled: fields[2] as bool? ?? false,
       sessionPrivacyModeEnabled: fields[12] as bool? ?? false,
+      quickLockTimeout: fields[13] as QuickLockTimeoutOption? ??
+          QuickLockTimeoutOption.fifteenSeconds,
       lastUnlockTime: fields[3] as DateTime?,
       hasPremiumAccess: fields[4] as bool? ?? false,
       premiumAccessExpiresAt: fields[5] as DateTime?,
@@ -163,7 +202,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.defaultTimer)
       ..writeByte(1)
@@ -174,6 +213,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..write(obj.biometricLockEnabled)
       ..writeByte(12)
       ..write(obj.sessionPrivacyModeEnabled)
+      ..writeByte(13)
+      ..write(obj.quickLockTimeout)
       ..writeByte(3)
       ..write(obj.lastUnlockTime)
       ..writeByte(4)

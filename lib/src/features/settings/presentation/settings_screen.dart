@@ -173,6 +173,50 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(height: 14),
                     const Divider(color: Color(0x33414755), height: 1),
                     const SizedBox(height: 14),
+                    _ActionRow(
+                      icon: Icons.timer_off_rounded,
+                      title: 'Quick Lock Timeout',
+                      subtitle: controller.settings.sessionPrivacyModeEnabled
+                          ? 'Session Privacy Mode locks instantly, so timeout is bypassed.'
+                          : 'Choose how long TempCam can stay in the background before it asks for biometrics again.',
+                      trailing: DropdownButtonHideUnderline(
+                        child: DropdownButton<QuickLockTimeoutOption>(
+                          value: controller.settings.quickLockTimeout,
+                          dropdownColor: AppTheme.surfaceHigh,
+                          borderRadius: BorderRadius.circular(18),
+                          items: QuickLockTimeoutOption.valuesForSettings
+                              .map(
+                                (option) =>
+                                    DropdownMenuItem<QuickLockTimeoutOption>(
+                                  value: option,
+                                  child: Text(
+                                    option.label,
+                                    style: const TextStyle(
+                                      color: AppTheme.secondary,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: controller.settings.biometricLockEnabled
+                              ? (option) async {
+                                  if (option == null) {
+                                    return;
+                                  }
+                                  await _authenticateThen(
+                                    context,
+                                    controller,
+                                    () =>
+                                        controller.updateQuickLockTimeout(option),
+                                  );
+                                }
+                              : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Divider(color: Color(0x33414755), height: 1),
+                    const SizedBox(height: 14),
                     const _SecurityNote(),
                   ],
                 ),

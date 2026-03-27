@@ -103,12 +103,13 @@ class PhotoRepository {
     await _box.put(record.id, updated);
   }
 
-  Future<void> cleanupExpired() async {
+  Future<List<PhotoRecord>> cleanupExpired() async {
     final expired = _box.values.where((item) => item.isExpired).toList();
     for (final photo in expired) {
       await _storageService.deleteIfExists(photo.filePath);
       await _box.delete(photo.id);
     }
+    return expired;
   }
 
   Future<File?> lastThumbnailFileFromSorted(List<PhotoRecord> items) async {

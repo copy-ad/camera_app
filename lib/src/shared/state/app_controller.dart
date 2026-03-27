@@ -10,8 +10,10 @@ import '../../core/constants/premium_constants.dart';
 import '../../features/camera/presentation/timer_selection_sheet.dart';
 import '../models/app_settings.dart';
 import '../models/photo_record.dart';
+import '../models/vault_history_entry.dart';
 import '../repositories/photo_repository.dart';
 import '../repositories/settings_repository.dart';
+import '../repositories/vault_history_repository.dart';
 import '../services/biometric_service.dart';
 import '../services/billing_service.dart';
 import '../services/camera_service.dart';
@@ -22,12 +24,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   AppController({
     required SettingsRepository settingsRepository,
     required PhotoRepository photoRepository,
+    required VaultHistoryRepository vaultHistoryRepository,
     required NotificationService notificationService,
     required CameraService cameraService,
     required BiometricService biometricService,
     required BillingService billingService,
   })  : _settingsRepository = settingsRepository,
         _photoRepository = photoRepository,
+        _vaultHistoryRepository = vaultHistoryRepository,
         _notificationService = notificationService,
         _cameraService = cameraService,
         _biometricService = biometricService,
@@ -38,6 +42,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   final SettingsRepository _settingsRepository;
   final PhotoRepository _photoRepository;
+  final VaultHistoryRepository _vaultHistoryRepository;
   final NotificationService _notificationService;
   final CameraService _cameraService;
   final BiometricService _biometricService;
@@ -47,6 +52,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   AppSettings _settings = AppSettings.defaults();
   List<PhotoRecord> _photos = [];
+  List<VaultHistoryEntry> _vaultHistory = [];
   CameraController? _cameraController;
   List<CameraDescription> _availableCameras = const [];
   File? _latestThumbnail;
@@ -81,6 +87,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   AppSettings get settings => _settings;
   List<PhotoRecord> get photos => _photos;
+  List<VaultHistoryEntry> get vaultHistory => _vaultHistory;
   CameraController? get cameraController => _cameraController;
   File? get latestThumbnail => _latestThumbnail;
   int get currentTabIndex => _currentTabIndex;
@@ -157,6 +164,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         await _initializeBilling().timeout(const Duration(seconds: 4));
       } catch (_) {}
       await cleanupExpired();
+      _refreshVaultHistory();
       try {
         await _initializeCamera().timeout(const Duration(seconds: 5));
       } catch (_) {}
@@ -801,18 +809,31 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> refreshPhotos() async {
     await cleanupExpired();
     _photos = _photoRepository.readAllSorted();
+    _refreshVaultHistory();
     await _refreshThumbnail();
     await _syncNotificationsForCurrentPhotos();
     notifyListeners();
   }
 
   Future<void> cleanupExpired() async {
-    await _photoRepository.cleanupExpired();
+    final expired = await _photoRepository.cleanupExpired();
     _photos = _photoRepository.readAllSorted();
+    for (final item in expired) {
+      await _recordVaultHistory(
+        eventType: VaultHistoryEventType.autoDeleted,
+        title: item.isVideo ? 'Video auto-deleted' : 'Photo auto-deleted',
+        details:
+            '${item.isVideo ? 'Video' : 'Photo'} expired after ${item.timerLabel.toLowerCase()} and was removed from TempCam.',
+      );
+    }
   }
 
   Future<void> _refreshThumbnail() async {
     _latestThumbnail = await _photoRepository.lastThumbnailFileFromSorted(_photos);
+  }
+
+  void _refreshVaultHistory() {
+    _vaultHistory = _vaultHistoryRepository.readRecent();
   }
 
   Future<void> _syncNotificationsForCurrentPhotos() async {
@@ -973,6 +994,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> deletePhoto(PhotoRecord record) async {
     await _photoRepository.deleteNow(record);
+    await _recordVaultHistory(
+      eventType: VaultHistoryEventType.deleted,
+      title: record.isVideo ? 'Video deleted now' : 'Photo deleted now',
+      details:
+          '${record.isVideo ? 'Video' : 'Photo'} removed manually before its timer ended.',
+    );
     await refreshPhotos();
   }
 
@@ -982,6 +1009,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     await _photoRepository.deleteMany(items);
+    for (final record in items) {
+      await _recordVaultHistory(
+        eventType: VaultHistoryEventType.deleted,
+        title: record.isVideo ? 'Video deleted now' : 'Photo deleted now',
+        details:
+            '${record.isVideo ? 'Video' : 'Photo'} removed manually before its timer ended.',
+      );
+    }
     await refreshPhotos();
   }
 
@@ -991,6 +1026,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return 'Unable to export this item to the main gallery.';
     }
     await _photoRepository.keepForever(record);
+    await _recordVaultHistory(
+      eventType: VaultHistoryEventType.exported,
+      title: record.isVideo ? 'Video kept forever' : 'Photo kept forever',
+      details:
+          '${record.isVideo ? 'Video' : 'Photo'} exported to the main gallery and removed from TempCam expiry.',
+    );
     await refreshPhotos();
     return record.isVideo ? 'Video kept forever and exported.' : 'Photo kept forever and exported.';
   }
@@ -1075,5 +1116,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     _billingSubscription.cancel();
     unawaited(_billingService.dispose());
     super.dispose();
+  }
+
+  Future<void> _recordVaultHistory({
+    required VaultHistoryEventType eventType,
+    required String title,
+    required String details,
+  }) async {
+    await _vaultHistoryRepository.add(
+      eventType: eventType,
+      title: title,
+      details: details,
+    );
   }
 }

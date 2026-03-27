@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tempcam/src/core/constants/app_strings.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
 import 'package:tempcam/src/shared/models/app_settings.dart';
+import 'package:tempcam/src/shared/models/vault_history_entry.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
 
@@ -222,6 +223,19 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              const _SettingsSectionLabel('Trusted History'),
+              const SizedBox(height: 12),
+              _PremiumCard(
+                child: controller.vaultHistory.isEmpty
+                    ? const _HistoryEmptyState()
+                    : Column(
+                        children: controller.vaultHistory
+                            .take(6)
+                            .map((entry) => _HistoryRow(entry: entry))
+                            .toList(),
+                      ),
+              ),
+              const SizedBox(height: 24),
               const _SettingsSectionLabel('Why People Use TempCam'),
               const SizedBox(height: 12),
               const _PremiumCard(
@@ -420,6 +434,14 @@ class _SettingsHero extends StatelessWidget {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${months[value.month - 1]} ${value.day}, ${value.year}';
   }
+
+  static String _formatDateTime(DateTime value) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final hour = value.hour % 12 == 0 ? 12 : value.hour % 12;
+    final minute = value.minute.toString().padLeft(2, '0');
+    final suffix = value.hour >= 12 ? 'PM' : 'AM';
+    return '${months[value.month - 1]} ${value.day}, $hour:$minute $suffix';
+  }
 }
 
 class _SettingsSectionLabel extends StatelessWidget {
@@ -546,6 +568,111 @@ class _SecurityNote extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _HistoryEmptyState extends StatelessWidget {
+  const _HistoryEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.history_toggle_off_rounded,
+          color: AppTheme.onSurfaceVariant,
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            'Keep Forever exports, manual deletions, and auto-deletions will appear here as a local trust log.',
+            style: TextStyle(
+              color: AppTheme.onSurfaceVariant,
+              height: 1.45,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HistoryRow extends StatelessWidget {
+  const _HistoryRow({required this.entry});
+
+  final VaultHistoryEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = switch (entry.eventType) {
+      VaultHistoryEventType.exported => Icons.upload_rounded,
+      VaultHistoryEventType.deleted => Icons.delete_outline_rounded,
+      VaultHistoryEventType.autoDeleted => Icons.auto_delete_rounded,
+    };
+    final accent = switch (entry.eventType) {
+      VaultHistoryEventType.exported => AppTheme.primary,
+      VaultHistoryEventType.deleted => AppTheme.error,
+      VaultHistoryEventType.autoDeleted => AppTheme.secondary,
+    };
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.14),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: accent),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.details,
+                    style: const TextStyle(
+                      color: AppTheme.onSurfaceVariant,
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _SettingsHero._formatDateTime(entry.occurredAt),
+                    style: const TextStyle(
+                      color: AppTheme.onSurfaceVariant,
+                      fontSize: 11,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

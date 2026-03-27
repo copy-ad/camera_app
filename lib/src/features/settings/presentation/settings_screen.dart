@@ -560,7 +560,7 @@ class _SecurityNote extends StatelessWidget {
         const SizedBox(width: 14),
         const Expanded(
           child: Text(
-            'Temp media stays local to your device until you explicitly keep it forever. Sensitive actions stay protected behind biometric confirmation when enabled.',
+            'Temp media stays local to your device until you explicitly keep it forever. Recent-app previews are shielded, and sensitive actions stay protected behind biometric confirmation when enabled.',
             style: TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,

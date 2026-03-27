@@ -60,6 +60,9 @@ TempCam is useful for:
 - Direct biometric prompt when opening the app
 - Sensitive actions can require biometric confirmation
 - Temporary media remains inside app-private storage
+- Custom quick lock timeout for returning to TempCam after backgrounding
+- Optional instant session relocking with Session Privacy Mode
+- Protected recent-app preview so TempCam content is hidden when the app loses focus
 
 ### Private Gallery
 
@@ -74,6 +77,15 @@ TempCam is useful for:
 - Notifications are scheduled from the current vault state
 - Notifications are updated when media is created, extended, deleted, kept forever, or expires
 - Notifications can be turned on or off from Settings
+- Stealth notification mode keeps lock-screen wording generic
+
+### Trusted History
+
+- TempCam keeps a local trust log for important vault actions
+- Keep Forever exports are recorded locally
+- Manual deletions are recorded locally
+- Auto-deletions after expiry are recorded locally
+- History stays on the device and helps users confirm what happened to sensitive media
 
 ## Why Buy TempCam
 
@@ -99,6 +111,8 @@ If you regularly capture things that should not stay visible in your main galler
 - Private by default
 - Local-first storage
 - Biometric protection
+- Protected recent-app previews
+- Trusted on-device history for export and deletion events
 - Manual keep-forever export
 - Photo and video support in the same secure vault
 

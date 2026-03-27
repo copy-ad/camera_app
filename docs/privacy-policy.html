@@ -59,6 +59,8 @@
           <li>Lets users set self-destruct timers</li>
           <li>Sends local reminders before expiry</li>
           <li>Protects app access with biometric lock</li>
+          <li>Shields app previews when TempCam moves into the background</li>
+          <li>Keeps a local history of important vault actions such as exports and deletions</li>
           <li>Exports selected media to the main device gallery when the user chooses Keep Forever</li>
         </ul>
 
@@ -69,6 +71,7 @@
           <li>Local notifications</li>
           <li>Biometric authentication</li>
           <li>Media files created inside TempCam</li>
+          <li>On-device history entries for important vault actions</li>
           <li>Google Play or Apple subscription purchase status</li>
         </ul>
 
@@ -79,6 +82,7 @@
           <li>Notifications: to alert the user before temporary media expires</li>
           <li>Biometrics: to lock app access and protect sensitive actions</li>
           <li>Local media files: to show, store, auto-delete, or export captures</li>
+          <li>On-device history entries: to help users confirm when items were exported, deleted manually, or auto-deleted</li>
           <li>Subscription status: to verify whether yearly access or a store-managed free trial is active</li>
         </ul>
 
@@ -88,6 +92,7 @@
           <li>Temporary items remain there until they expire, are manually deleted, or are kept forever.</li>
           <li>If a user selects Keep Forever, that selected item is exported to the main device gallery.</li>
           <li>Expired temporary items are removed from TempCam storage by the app.</li>
+          <li>TempCam may store a small local history of exports, manual deletions, and auto-deletions to help the user verify important vault actions.</li>
           <li>TempCam does not provide an in-app cloud backup feature for temporary media.</li>
         </ul>
 
@@ -108,7 +113,8 @@
         <h2>8. Security</h2>
         <p>
           TempCam is designed to keep temporary media private by storing temp media in app-local storage first,
-          supporting biometric app lock, and protecting sensitive actions when biometric lock is enabled.
+          supporting biometric app lock, shielding recent-app previews when the app is backgrounded, allowing
+          a configurable quick relock timeout, and protecting sensitive actions when biometric lock is enabled.
         </p>
 
         <h2>9. Third Parties</h2>
@@ -122,7 +128,10 @@
         <h2>10. User Controls</h2>
         <ul>
           <li>Enable or disable notifications</li>
+          <li>Enable or disable stealth notifications</li>
           <li>Enable or disable biometric lock</li>
+          <li>Adjust the quick lock timeout</li>
+          <li>Enable or disable Session Privacy Mode</li>
           <li>Delete temporary media</li>
           <li>Keep selected media forever</li>
           <li>Cancel the subscription through Google Play or the App Store</li>

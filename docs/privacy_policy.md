@@ -19,6 +19,8 @@ TempCam allows users to:
 - set self-destruct timers
 - receive local reminders before expiry
 - protect access with biometric lock
+- shield app previews when TempCam moves into the background
+- keep a local history of important vault actions such as exports and deletions
 - export selected media to the main device gallery by choosing `Keep Forever`
 
 ## 3. Data TempCam Accesses
@@ -30,6 +32,7 @@ Depending on the device and user choices, TempCam may access:
 - Local notifications
 - Biometric authentication
 - Media files created inside TempCam
+- On-device history entries for important vault actions
 - Google Play or Apple subscription purchase status
 
 ## 4. How TempCam Uses Data
@@ -41,6 +44,7 @@ TempCam uses accessed data only to provide app features:
 - Notifications: to alert the user before temporary media expires
 - Biometrics: to lock app access and protect sensitive actions
 - Local media files: to show, store, auto-delete, or export captures
+- On-device history entries: to help users confirm when items were exported, deleted manually, or auto-deleted
 - Subscription status: to verify whether yearly access or a store-managed free trial is active
 
 ## 5. Storage and Retention
@@ -49,6 +53,7 @@ TempCam uses accessed data only to provide app features:
 - Temporary items remain there until they expire, are manually deleted, or are kept forever.
 - If a user selects `Keep Forever`, that selected item is exported to the main device gallery.
 - Expired temporary items are removed from TempCam storage by the app.
+- TempCam may store a small local history of exports, manual deletions, and auto-deletions to help the user verify important vault actions.
 - TempCam does not provide an in-app cloud backup feature for temporary media.
 
 ## 6. Payments and Trials
@@ -69,6 +74,8 @@ TempCam is designed to keep temporary media private by:
 
 - storing temp media inside app-local storage first
 - supporting biometric app lock
+- shielding recent-app previews when the app is backgrounded
+- allowing users to configure a quick biometric relock timeout
 - requiring sensitive actions to be protected when biometric lock is enabled
 
 No system is perfectly secure, but TempCam is designed to minimize unnecessary data exposure.
@@ -89,7 +96,10 @@ These services are used only to support app functionality.
 Users can:
 
 - disable or enable notifications
+- enable or disable stealth notifications
 - disable or enable biometric lock
+- adjust the quick lock timeout
+- enable or disable Session Privacy Mode
 - delete temporary media
 - keep selected media forever
 - cancel the subscription through Google Play or the App Store

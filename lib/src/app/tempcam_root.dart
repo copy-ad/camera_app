@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tempcam/src/features/lock/presentation/unlock_screen.dart';
@@ -21,11 +23,9 @@ class _TempCamRootState extends State<TempCamRoot> {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
-        if (!controller.didFinishBootstrap) {
-          return const ObsidianSplashScreen();
-        }
-
-        if (controller.shouldShowTrialStartedNotice && !_isShowingTrialDialog) {
+        if (controller.didFinishBootstrap &&
+            controller.shouldShowTrialStartedNotice &&
+            !_isShowingTrialDialog) {
           _isShowingTrialDialog = true;
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (!mounted) {
@@ -50,18 +50,87 @@ class _TempCamRootState extends State<TempCamRoot> {
           });
         }
 
-        if (!controller.hasPremiumAccess) {
-          return const PremiumPaywallScreen(requiredForAccess: true);
-        }
-        if (controller.isLocked) {
-          return UnlockScreen(
+        late final Widget child;
+        if (!controller.didFinishBootstrap) {
+          child = const ObsidianSplashScreen();
+        } else if (!controller.hasPremiumAccess) {
+          child = const PremiumPaywallScreen(requiredForAccess: true);
+        } else if (controller.isLocked) {
+          child = UnlockScreen(
             canUseBiometric: controller.biometricAvailable,
             isBusy: controller.isUnlocking,
             onUnlock: controller.unlockApp,
           );
+        } else {
+          child = const MainShell();
         }
-        return const MainShell();
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            child,
+            if (controller.isPreviewShieldActive) const _RecentsPrivacyShield(),
+          ],
+        );
       },
+    );
+  }
+}
+
+class _RecentsPrivacyShield extends StatelessWidget {
+  const _RecentsPrivacyShield();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: const Color(0xFF0A0A0A),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(color: Colors.black.withValues(alpha: 0.82)),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceContainer.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.shield_moon_rounded,
+                    color: AppTheme.primary,
+                    size: 36,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'TEMPCAM',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Protected Preview',
+                    style: TextStyle(
+                      color: AppTheme.onSurfaceVariant,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

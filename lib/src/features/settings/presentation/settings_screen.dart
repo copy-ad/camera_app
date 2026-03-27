@@ -264,7 +264,7 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '${AppStrings.appName} v1.0.0',
+                      '${AppStrings.appName} v${AppStrings.versionName}',
                       style: TextStyle(
                         fontSize: 10,
                         letterSpacing: 2,

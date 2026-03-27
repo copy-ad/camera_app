@@ -80,6 +80,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool _isAuthenticatingWithBiometrics = false;
   bool _ignoreNextResumeLock = false;
   bool _isSwitchingCamera = false;
+  bool _isPreviewShieldActive = false;
   String? _billingStatusMessage;
   ProductDetails? _yearlySubscriptionProduct;
   DateTime? _pausedAt;
@@ -109,6 +110,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isStoreLoading => _isStoreLoading;
   bool get isPurchasePending => _isPurchasePending;
   bool get isSwitchingCamera => _isSwitchingCamera;
+  bool get isPreviewShieldActive => _isPreviewShieldActive;
   bool get isUsingDevelopmentBypass => PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
@@ -1058,6 +1060,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.paused) {
       _pausedAt = DateTime.now();
+      _isPreviewShieldActive = true;
       if (_settings.sessionPrivacyModeEnabled &&
           hasPremiumAccess &&
           _settings.biometricLockEnabled &&
@@ -1067,8 +1070,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       }
     }
     if (state == AppLifecycleState.resumed) {
+      _isPreviewShieldActive = false;
       if (_ignoreNextResumeLock) {
         _ignoreNextResumeLock = false;
+        notifyListeners();
         return;
       }
       unawaited(_handleResume());

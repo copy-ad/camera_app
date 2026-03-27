@@ -922,6 +922,20 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  Future<String?> sendTestNotification() async {
+    if (!_settings.notificationsEnabled) {
+      return 'Enable expiry notifications first.';
+    }
+    try {
+      await _notificationService.showTestNotification(
+        stealthMode: _settings.stealthNotificationsEnabled,
+      );
+      return 'Test notification sent.';
+    } catch (_) {
+      return 'Unable to send a test notification right now.';
+    }
+  }
+
   Future<void> updateBiometricLock(bool enabled) async {
     if (enabled && _biometricAvailable) {
       _isAuthenticatingWithBiometrics = true;

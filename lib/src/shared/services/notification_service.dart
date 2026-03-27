@@ -48,6 +48,10 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestExactAlarmsPermission();
 
     await _plugin
         .resolvePlatformSpecificImplementation<
@@ -108,7 +112,7 @@ class NotificationService {
           ),
           iOS: const DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
@@ -118,6 +122,28 @@ class NotificationService {
   Future<void> cancelAll() async {
     _lastSyncSignature = 'disabled';
     await _plugin.cancelAll();
+  }
+
+  Future<void> showTestNotification({required bool stealthMode}) async {
+    await _plugin.show(
+      999001,
+      stealthMode ? 'Reminder' : 'TempCam test notification',
+      stealthMode
+          ? 'Notification delivery is working on this device.'
+          : 'TempCam notifications are working on this device.',
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _expiryChannel.id,
+          _expiryChannel.name,
+          channelDescription: _expiryChannel.description,
+          importance: Importance.high,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.status,
+          visibility: NotificationVisibility.private,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+    );
   }
 
   String _buildSignature(

@@ -118,6 +118,37 @@ class SettingsScreen extends StatelessWidget {
                             : null,
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Opacity(
+                        opacity: 0.72,
+                        child: TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppTheme.onSurfaceVariant,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onPressed: () async {
+                            final message = await controller.sendTestNotification();
+                            if (!context.mounted || message == null) {
+                              return;
+                            }
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(SnackBar(content: Text(message)));
+                          },
+                          icon: const Icon(Icons.bug_report_outlined, size: 16),
+                          label: const Text('Send test alert'),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

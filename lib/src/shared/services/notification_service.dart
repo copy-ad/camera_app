@@ -27,7 +27,7 @@ class NotificationService {
     await _configureLocalTimezone();
 
     const android = AndroidInitializationSettings(
-      '@android:drawable/ic_menu_camera',
+      'ic_stat_tempcam',
     );
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -105,6 +105,7 @@ class NotificationService {
             _expiryChannel.id,
             _expiryChannel.name,
             channelDescription: _expiryChannel.description,
+            icon: 'ic_stat_tempcam',
             importance: Importance.high,
             priority: Priority.high,
             category: AndroidNotificationCategory.reminder,
@@ -122,28 +123,6 @@ class NotificationService {
   Future<void> cancelAll() async {
     _lastSyncSignature = 'disabled';
     await _plugin.cancelAll();
-  }
-
-  Future<void> showTestNotification({required bool stealthMode}) async {
-    await _plugin.show(
-      999001,
-      stealthMode ? 'Reminder' : 'TempCam test notification',
-      stealthMode
-          ? 'Notification delivery is working on this device.'
-          : 'TempCam notifications are working on this device.',
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _expiryChannel.id,
-          _expiryChannel.name,
-          channelDescription: _expiryChannel.description,
-          importance: Importance.high,
-          priority: Priority.high,
-          category: AndroidNotificationCategory.status,
-          visibility: NotificationVisibility.private,
-        ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-    );
   }
 
   String _buildSignature(

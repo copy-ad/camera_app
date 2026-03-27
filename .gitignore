@@ -8,7 +8,10 @@
 /ios/Flutter/Flutter.podspec
 /ios/Flutter/ephemeral/
 /android/.gradle/
+/android/.kotlin/
 /android/local.properties
+/android/key.properties
+/upload-keystore.jks
 /android/app/debug
 /android/app/profile
 /android/app/release

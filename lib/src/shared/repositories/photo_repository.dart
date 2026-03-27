@@ -1,6 +1,7 @@
 ﻿import 'dart:io';
 
 import 'package:hive/hive.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import '../models/app_settings.dart';
@@ -66,6 +67,23 @@ class PhotoRepository {
     );
   }
 
+  Future<List<PhotoRecord>> importFromDevice({
+    required List<String> sourcePaths,
+    required AppTimerOption timer,
+  }) async {
+    final imported = <PhotoRecord>[];
+    for (final sourcePath in sourcePaths) {
+      imported.add(
+        await createFromCapture(
+          sourcePath: sourcePath,
+          timer: timer,
+          mediaType: _inferMediaType(sourcePath),
+        ),
+      );
+    }
+    return imported;
+  }
+
   Future<void> deleteNow(PhotoRecord record) async {
     await _storageService.deleteIfExists(record.filePath);
     await _box.delete(record.id);
@@ -127,5 +145,21 @@ class PhotoRepository {
 
   Future<File?> lastThumbnailFile() async {
     return lastThumbnailFileFromSorted(readAllSorted());
+  }
+
+  MediaType _inferMediaType(String sourcePath) {
+    final extension = p.extension(sourcePath).toLowerCase();
+    const videoExtensions = {
+      '.mp4',
+      '.mov',
+      '.m4v',
+      '.avi',
+      '.mkv',
+      '.webm',
+      '.3gp',
+    };
+    return videoExtensions.contains(extension)
+        ? MediaType.video
+        : MediaType.photo;
   }
 }

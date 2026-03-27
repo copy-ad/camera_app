@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/premium_constants.dart';
 import '../../features/camera/presentation/timer_selection_sheet.dart';
@@ -47,6 +48,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   final CameraService _cameraService;
   final BiometricService _biometricService;
   final BillingService _billingService;
+  final ImagePicker _mediaPicker = ImagePicker();
 
   late final StreamSubscription<BillingEvent> _billingSubscription;
 
@@ -922,6 +924,48 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  Future<String?> importMediaToVault(BuildContext context) async {
+    if (_isCapturing || _isRecordingVideo) {
+      return 'Finish the current capture before importing media.';
+    }
+    try {
+      final pickedFiles = await _mediaPicker.pickMultipleMedia(
+        requestFullMetadata: false,
+      );
+      if (pickedFiles.isEmpty) {
+        return null;
+      }
+      if (!context.mounted) {
+        return null;
+      }
+      final selected = await TimerSelectionSheet.show(
+        context,
+        settings.defaultTimer,
+        hasPremiumAccess: hasPremiumAccess,
+        previewFilePath: pickedFiles.first.path,
+        previewMediaType: _mediaTypeFromPath(pickedFiles.first.path),
+      );
+      if (!context.mounted) {
+        return null;
+      }
+      final timer = selected ?? settings.defaultTimer;
+      await _photoRepository.importFromDevice(
+        sourcePaths:
+            pickedFiles.map((file) => file.path).toList(growable: false),
+        timer: timer,
+      );
+      await refreshPhotos();
+      _currentTabIndex = 0;
+      notifyListeners();
+      final count = pickedFiles.length;
+      return count == 1
+          ? '1 item imported into TempCam.'
+          : '$count items imported into TempCam.';
+    } catch (_) {
+      return 'Unable to import media right now.';
+    }
+  }
+
   Future<void> updateBiometricLock(bool enabled) async {
     if (enabled && _biometricAvailable) {
       _isAuthenticatingWithBiometrics = true;
@@ -1133,5 +1177,19 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       title: title,
       details: details,
     );
+  }
+
+  MediaType _mediaTypeFromPath(String path) {
+    final normalized = path.toLowerCase();
+    if (normalized.endsWith('.mp4') ||
+        normalized.endsWith('.mov') ||
+        normalized.endsWith('.m4v') ||
+        normalized.endsWith('.avi') ||
+        normalized.endsWith('.mkv') ||
+        normalized.endsWith('.webm') ||
+        normalized.endsWith('.3gp')) {
+      return MediaType.video;
+    }
+    return MediaType.photo;
   }
 }

@@ -100,6 +100,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                             photoCount: photoCount,
                             videoCount: videoCount,
                             onOpenCamera: () => controller.setTab(1),
+                            onImport: () => _importMedia(controller),
                             onPanicExit: controller.panicExit,
                           ),
                           const SizedBox(height: 18),
@@ -345,6 +346,16 @@ class _PhotosScreenState extends State<PhotosScreen> {
         ),
       );
   }
+
+  Future<void> _importMedia(AppController controller) async {
+    final message = await controller.importMediaToVault(context);
+    if (!mounted || message == null) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 }
 
 class _GalleryHero extends StatelessWidget {
@@ -353,6 +364,7 @@ class _GalleryHero extends StatelessWidget {
     required this.photoCount,
     required this.videoCount,
     required this.onOpenCamera,
+    required this.onImport,
     required this.onPanicExit,
   });
 
@@ -360,6 +372,7 @@ class _GalleryHero extends StatelessWidget {
   final int photoCount;
   final int videoCount;
   final VoidCallback onOpenCamera;
+  final Future<void> Function() onImport;
   final Future<void> Function() onPanicExit;
 
   @override
@@ -405,6 +418,15 @@ class _GalleryHero extends StatelessWidget {
                     ),
                     onPressed: onOpenCamera,
                     icon: const Icon(Icons.camera_alt_rounded),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.06),
+                      foregroundColor: AppTheme.onSurface,
+                    ),
+                    onPressed: () => onImport(),
+                    icon: const Icon(Icons.file_upload_rounded),
                   ),
                   const SizedBox(width: 8),
                   IconButton(

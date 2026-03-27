@@ -95,6 +95,28 @@ class SettingsScreen extends StatelessWidget {
                         },
                       ),
                     ),
+                    const SizedBox(height: 14),
+                    const Divider(color: Color(0x33414755), height: 1),
+                    const SizedBox(height: 14),
+                    _ActionRow(
+                      icon: Icons.notifications_none_rounded,
+                      title: 'Stealth Notifications',
+                      subtitle:
+                          'Hide photo and video wording in reminders for a quieter lock-screen presence.',
+                      trailing: Switch.adaptive(
+                        value: controller.settings.stealthNotificationsEnabled,
+                        activeThumbColor: AppTheme.primary,
+                        onChanged: controller.settings.notificationsEnabled
+                            ? (value) async {
+                                await _authenticateThen(
+                                  context,
+                                  controller,
+                                  () => controller.updateStealthNotifications(value),
+                                );
+                              }
+                            : null,
+                      ),
+                    ),
                   ],
                 ),
               ),

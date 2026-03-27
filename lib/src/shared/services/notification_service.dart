@@ -63,8 +63,13 @@ class NotificationService {
   Future<void> syncExpiryNotifications(
     List<PhotoRecord> records, {
     required bool enabled,
+    required bool stealthMode,
   }) async {
-    final signature = _buildSignature(records, enabled: enabled);
+    final signature = _buildSignature(
+      records,
+      enabled: enabled,
+      stealthMode: stealthMode,
+    );
     if (_lastSyncSignature == signature) {
       return;
     }
@@ -88,8 +93,8 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         _notificationIdFor(record.id),
-        _titleFor(record),
-        _bodyFor(record),
+        _titleFor(record, stealthMode: stealthMode),
+        _bodyFor(record, stealthMode: stealthMode),
         scheduledAt,
         NotificationDetails(
           android: AndroidNotificationDetails(
@@ -98,6 +103,8 @@ class NotificationService {
             channelDescription: _expiryChannel.description,
             importance: Importance.high,
             priority: Priority.high,
+            category: AndroidNotificationCategory.reminder,
+            visibility: NotificationVisibility.private,
           ),
           iOS: const DarwinNotificationDetails(),
         ),
@@ -116,8 +123,10 @@ class NotificationService {
   String _buildSignature(
     List<PhotoRecord> records, {
     required bool enabled,
+    required bool stealthMode,
   }) {
     final buffer = StringBuffer(enabled ? 'on|' : 'off|');
+    buffer.write(stealthMode ? 'stealth|' : 'standard|');
     for (final record in records) {
       buffer
         ..write(record.id)
@@ -143,13 +152,17 @@ class NotificationService {
     return tz.TZDateTime.from(effective, tz.local);
   }
 
-  String _titleFor(PhotoRecord record) {
-    return record.isVideo
-        ? 'Video expiring soon'
-        : 'Photo expiring soon';
+  String _titleFor(PhotoRecord record, {required bool stealthMode}) {
+    if (stealthMode) {
+      return 'Reminder';
+    }
+    return record.isVideo ? 'Video expiring soon' : 'Photo expiring soon';
   }
 
-  String _bodyFor(PhotoRecord record) {
+  String _bodyFor(PhotoRecord record, {required bool stealthMode}) {
+    if (stealthMode) {
+      return 'One item needs your attention in about 10 minutes.';
+    }
     final media = record.isVideo ? 'video' : 'photo';
     return 'Your TempCam $media will auto-delete in about 10 minutes.';
   }

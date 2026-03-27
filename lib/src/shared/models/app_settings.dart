@@ -36,6 +36,7 @@ class AppSettings {
   AppSettings({
     required this.defaultTimer,
     required this.notificationsEnabled,
+    required this.stealthNotificationsEnabled,
     required this.biometricLockEnabled,
     required this.hasPremiumAccess,
     required this.debugAccessBypassEnabled,
@@ -49,6 +50,7 @@ class AppSettings {
 
   final AppTimerOption defaultTimer;
   final bool notificationsEnabled;
+  final bool stealthNotificationsEnabled;
   final bool biometricLockEnabled;
   final bool hasPremiumAccess;
   final bool debugAccessBypassEnabled;
@@ -62,6 +64,7 @@ class AppSettings {
   AppSettings copyWith({
     AppTimerOption? defaultTimer,
     bool? notificationsEnabled,
+    bool? stealthNotificationsEnabled,
     bool? biometricLockEnabled,
     bool? hasPremiumAccess,
     bool? debugAccessBypassEnabled,
@@ -80,6 +83,8 @@ class AppSettings {
     return AppSettings(
       defaultTimer: defaultTimer ?? this.defaultTimer,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      stealthNotificationsEnabled:
+          stealthNotificationsEnabled ?? this.stealthNotificationsEnabled,
       biometricLockEnabled: biometricLockEnabled ?? this.biometricLockEnabled,
       hasPremiumAccess: hasPremiumAccess ?? this.hasPremiumAccess,
       debugAccessBypassEnabled: debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
@@ -96,6 +101,7 @@ class AppSettings {
     return AppSettings(
       defaultTimer: AppTimerOption.twentyFourHours,
       notificationsEnabled: true,
+      stealthNotificationsEnabled: false,
       biometricLockEnabled: false,
       hasPremiumAccess: false,
       debugAccessBypassEnabled: false,
@@ -134,6 +140,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
     return AppSettings(
       defaultTimer: fields[0] as AppTimerOption? ?? AppTimerOption.twentyFourHours,
       notificationsEnabled: fields[1] as bool? ?? true,
+      stealthNotificationsEnabled: fields[11] as bool? ?? false,
       biometricLockEnabled: fields[2] as bool? ?? false,
       lastUnlockTime: fields[3] as DateTime?,
       hasPremiumAccess: fields[4] as bool? ?? false,
@@ -149,11 +156,13 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.defaultTimer)
       ..writeByte(1)
       ..write(obj.notificationsEnabled)
+      ..writeByte(11)
+      ..write(obj.stealthNotificationsEnabled)
       ..writeByte(2)
       ..write(obj.biometricLockEnabled)
       ..writeByte(3)

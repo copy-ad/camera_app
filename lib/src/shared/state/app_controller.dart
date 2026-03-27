@@ -819,6 +819,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _notificationService.syncExpiryNotifications(
       _photos,
       enabled: _settings.notificationsEnabled,
+      stealthMode: _settings.stealthNotificationsEnabled,
     );
   }
 
@@ -879,6 +880,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       await _syncNotificationsForCurrentPhotos();
     } else {
       await _notificationService.cancelAll();
+    }
+    notifyListeners();
+  }
+
+  Future<void> updateStealthNotifications(bool enabled) async {
+    _settings = _settings.copyWith(stealthNotificationsEnabled: enabled);
+    await _settingsRepository.save(_settings);
+    if (_settings.notificationsEnabled) {
+      await _syncNotificationsForCurrentPhotos();
     }
     notifyListeners();
   }

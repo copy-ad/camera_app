@@ -1,153 +1,158 @@
 # TempCam
 
-TempCam is a private camera for people who want temporary photos and videos to disappear automatically unless they choose to keep them forever.
+TempCam is a Flutter mobile app for capturing or importing private photos and videos, storing them inside the app first, and deleting them later on a timer unless the user chooses to keep them.
 
-It is built for fast personal capture, temporary storage, and strong local privacy. The app is designed for moments that should stay on your phone, stay locked behind biometrics, and expire on your terms.
+The product direction is privacy-first and local-first:
 
-## Why Use TempCam
+- camera captures stay out of the main gallery by default
+- imported media can be moved into TempCam with a self-destruct timer
+- access can be protected with biometrics
+- expiry reminders and vault history stay on-device
 
-- Capture temp photos and videos without mixing them into your main gallery right away.
-- Store temporary media inside a locked in-app vault instead of leaving everything exposed in the phone gallery.
-- Decide how long each capture should live, then let TempCam remove it automatically.
-- Keep only the media that matters, and export only those items to the main gallery.
-- Protect access with fingerprint, Face ID, or device credentials.
+## Current Status
 
-TempCam is useful for:
+TempCam is an MVP with production-oriented platform wiring for:
 
-- personal private memories
-- confidential work snapshots
-- temporary reference photos
-- sensitive documents or notes
-- quick videos you do not want living forever in the main gallery
+- timed photo and video capture
+- private in-app vault browsing
+- import from device library into TempCam
+- biometric relock flow
+- local expiry notifications
+- store-managed yearly subscription access
 
-## Core Features
+Important implementation note:
 
-### Private Camera
+- media is stored in app-private storage on the device
+- the current codebase does not implement a custom encrypted media store or encrypted Hive boxes
 
-- Dedicated in-app camera for photos and videos
-- Front and back camera support
-- Tap to focus
-- Premium-style animated focus ring
-- Pinch to zoom
-- Flash controls for photo and video modes
-- Photo and video mode switching
-- Video recording timer
-- Live photo or video preview before setting the timer
-- Fast access camera-first workflow
+## Feature Summary
 
-### Temporary Vault
+### Capture
 
-- Captured photos and videos are stored inside TempCam first
-- Import existing device photos and videos into TempCam with a self-destruct timer
-- Temporary media does not automatically go to the phone gallery
-- Each item can expire automatically based on its timer
-- Expired items are cleaned up from the vault
-- Media stays in app-private storage until the user explicitly exports it
+- photo and video capture inside the app
+- front and back camera switching
+- tap to focus
+- pinch to zoom
+- flash controls
+- timer selection after capture
 
-### Flexible Expiry Timers
+### Vault
 
-- Set a timer for each photo
-- Set a timer for each video
-- Choose a default timer in Settings
-- If the user skips timer selection, the current default is applied automatically
-- Supported defaults include `24 Hours` and `7 Days`
+- private in-app gallery for photos and videos
+- filter by all, photos, or videos
+- item detail screen with playback or image preview
+- extend timer, delete now, or keep forever
+- multi-select delete
 
-### Keep Forever
+### Import
 
-- Any photo or video can be kept forever
-- Keeping forever removes expiry for that item
-- Keeping forever exports the item to the main phone gallery
-- Temporary items stay private until the user explicitly keeps them
+- import existing photos and videos into TempCam
+- Android import flow removes originals from the main gallery when the platform/provider allows deletion
+- iOS import uses `PHPicker` and requires iOS 14+
 
-### Secure Access
+### Privacy
 
-- Biometric app lock support
-- Direct biometric prompt when opening the app
-- Sensitive actions can require biometric confirmation
-- Temporary media remains inside app-private storage
-- Custom quick lock timeout for returning to TempCam after backgrounding
-- Optional instant session relocking with Session Privacy Mode
-- Protected recent-app preview so TempCam content is hidden when the app loses focus
-- Panic Exit for quickly closing TempCam in stressful moments
-
-### Private Gallery
-
-- View all temporary photos and videos in one internal gallery
-- Open photos in a dedicated detail view
-- Open private videos with in-app playback
-- Real video thumbnails in the vault
-- Filter vault items by `All`, `Photos`, or `Videos`
-- Multi-select items and delete them together
-- Extend timer, keep forever, or delete from the detail screen
+- biometric lock
+- quick relock timeout
+- session privacy mode
+- protected recent-app preview
+- panic exit
 
 ### Notifications
 
-- Local expiry reminders for temporary media
-- Notifications are scheduled from the current vault state
-- Notifications are updated when media is created, extended, deleted, kept forever, or expires
-- Notifications can be turned on or off from Settings
-- Stealth notification mode keeps lock-screen wording generic
-- Reminders are designed to appear about 10 minutes before auto-deletion
+- local reminders shortly before expiry
+- stealth wording option
 
-### Trusted History
+### Billing
 
-- TempCam keeps a local trust log for important vault actions
-- Keep Forever exports are recorded locally
-- Manual deletions are recorded locally
-- Auto-deletions after expiry are recorded locally
-- History stays on the device and helps users confirm what happened to sensitive media
+- one yearly subscription product
+- restore purchases
+- optional development bypass with `TEMPCAM_DISABLE_PAYMENTS`
 
-### Subscription Access
+## Platform Notes
 
-- Free app listing with store-managed yearly access
-- Google Play managed 15-day free trial offer for eligible users
-- One yearly subscription plan after the trial
-- Restore purchase support
-- Secure paywall with Privacy Policy and Terms access
+### Android
 
-### Settings And Control
+- `Keep Forever` exports media to `DCIM/TempCam`
+- import is handled through the native document picker bridge in `android/app/src/main/kotlin/com/tempcam/MainActivity.kt`
 
-- Default self-destruct timer controls
-- Notification controls
-- Stealth notification toggle
-- Biometric lock controls
-- Session Privacy Mode toggle
-- Quick lock timeout choices
-- Trusted vault history view
-- Panic Exit access from core screens
-- Launcher quick actions for opening Camera or Vault faster
+### iOS
 
-## Why Buy TempCam
+- import is handled through `PHPicker` in `ios/Runner/AppDelegate.swift`
+- legal links fall back to in-app sheets if hosted URLs are not supplied
+- `Keep Forever` is not yet exporting to the system Photos app in the current codebase
 
-TempCam is not just another camera app. It solves a very specific privacy problem:
+## Project Structure
 
-- the normal phone camera sends everything into the main gallery
-- most gallery apps are built to preserve media forever
-- sensitive moments often need the opposite behavior
+Key areas:
 
-Buying TempCam supports a tool that gives you:
+- `lib/src/shared/state/app_controller.dart`: app state, lifecycle, camera flow, import flow, vault actions
+- `lib/src/shared/repositories/`: persistence and vault history
+- `lib/src/shared/services/`: camera, storage, billing, biometrics, notifications
+- `lib/src/features/`: screens for camera, photos, lock, onboarding, settings, paywall
+- `android/app/src/main/kotlin/com/tempcam/MainActivity.kt`: Android media and external URL bridges
+- `ios/Runner/AppDelegate.swift`: iOS media import bridge
+- `docs/`: release notes, legal docs, and store-launch guides
 
-- private capture instead of public-by-default saving
-- temporary media instead of permanent clutter
-- biometric protection instead of open access
-- intentional control over what stays and what disappears
-- a separate secure workflow for sensitive photos and videos
+## Getting Started
 
-If you regularly capture things that should not stay visible in your main gallery, TempCam gives you a safer and more intentional workflow.
+### Prerequisites
 
-## What Makes TempCam Different
+- Flutter SDK compatible with `sdk: ">=3.4.0 <4.0.0"`
+- Android Studio for Android builds
+- Xcode for iOS builds
 
-- Temporary by default
-- Private by default
-- Local-first storage
-- Biometric protection
-- Protected recent-app previews
-- Trusted on-device history for export and deletion events
-- Manual keep-forever export
-- Photo and video support in the same secure vault
-- Panic Exit for fast privacy
-- Store-managed trial and yearly access flow
-- Import existing media into the temp vault when the normal camera was used by mistake
-- Launcher quick actions for faster access to Camera and Vault
+### Install
 
-TempCam is for people who want a camera that respects privacy first, not permanence first.
+```bash
+flutter pub get
+```
+
+### Run
+
+```bash
+flutter run
+```
+
+### Static Analysis
+
+```bash
+flutter analyze
+```
+
+### Android Debug Build
+
+```bash
+flutter build apk --debug
+```
+
+## Release Configuration
+
+TempCam expects these build-time values for release readiness:
+
+- `TEMPCAM_PRIVACY_POLICY_URL`
+- `TEMPCAM_SUBSCRIPTION_TERMS_URL`
+- `TEMPCAM_DISABLE_PAYMENTS`
+
+Example:
+
+```bash
+flutter build appbundle --release \
+  --dart-define=TEMPCAM_PRIVACY_POLICY_URL=https://example.com/privacy-policy.html \
+  --dart-define=TEMPCAM_SUBSCRIPTION_TERMS_URL=https://example.com/subscription-terms.html
+```
+
+## Repo Docs
+
+- [play_store_first_release.md](docs/play_store_first_release.md)
+- [legal_hosting_guide.md](docs/legal_hosting_guide.md)
+- [privacy_policy.md](docs/privacy_policy.md)
+- [subscription_terms.md](docs/subscription_terms.md)
+- [release_notes_1.2.1.md](docs/release_notes_1.2.1.md)
+
+## Suggested Next Improvements
+
+- add real at-rest encryption for vault metadata and media files
+- add automated tests for import, expiry cleanup, billing state, and lifecycle relock behavior
+- implement iOS Photos export for `Keep Forever`
+- centralize platform capability notes so README, onboarding, and store copy stay aligned

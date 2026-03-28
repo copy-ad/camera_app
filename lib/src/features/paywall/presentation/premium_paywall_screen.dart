@@ -229,30 +229,38 @@ class PremiumPaywallScreen extends StatelessWidget {
                                 mainAxisSpacing: 14,
                                 childAspectRatio: compact ? 2.2 : 0.88,
                                 physics: const NeverScrollableScrollPhysics(),
-                                children: const [
+                                children: [
                                   _FeatureCard(
                                     Icons.lock_clock_rounded,
                                     AppTheme.primary,
-                                    'Store Trial',
-                                    'The 15-day free trial is managed by Google Play or the App Store, so clearing app data will not restart it.',
+                                    l10n.tr('Store Trial'),
+                                    l10n.tr(
+                                      'The 15-day free trial is managed by Google Play or the App Store, so clearing app data will not restart it.',
+                                    ),
                                   ),
                                   _FeatureCard(
                                     Icons.calendar_month_rounded,
                                     AppTheme.secondary,
-                                    'Yearly Billing',
-                                    'One auto-renewing yearly subscription managed directly by Google Play or the App Store.',
+                                    l10n.tr('Yearly Billing'),
+                                    l10n.tr(
+                                      'One auto-renewing yearly subscription managed directly by Google Play or the App Store.',
+                                    ),
                                   ),
                                   _FeatureCard(
                                     Icons.fingerprint_rounded,
                                     AppTheme.primary,
-                                    'Secure Access',
-                                    'Once the subscription or trial is active, TempCam unlocks fully and can re-lock with biometrics.',
+                                    l10n.tr('Secure Access'),
+                                    l10n.tr(
+                                      'Once the subscription or trial is active, TempCam unlocks fully and can re-lock with biometrics.',
+                                    ),
                                   ),
                                   _FeatureCard(
                                     Icons.restore_rounded,
                                     AppTheme.secondary,
-                                    'Restore Support',
-                                    'Recover your yearly access from the App Store or Google Play on reinstall.',
+                                    l10n.tr('Restore Support'),
+                                    l10n.tr(
+                                      'Recover your yearly access from the App Store or Google Play on reinstall.',
+                                    ),
                                   ),
                                 ],
                               );
@@ -370,24 +378,32 @@ class PremiumPaywallScreen extends StatelessWidget {
                                           context: context,
                                           backgroundColor: Colors.transparent,
                                           isScrollControlled: true,
-                                          builder: (_) => const _LegalInfoSheet(
-                                            title: 'Privacy Policy',
+                                          builder: (_) => _LegalInfoSheet(
+                                            title: l10n.tr('Privacy Policy'),
                                             sections: [
                                               _LegalSection(
-                                                heading: 'What TempCam stores',
-                                                body:
-                                                    'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                                heading: l10n.tr(
+                                                  'What TempCam stores',
+                                                ),
+                                                body: l10n.tr(
+                                                  'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                                ),
                                               ),
                                               _LegalSection(
-                                                heading:
-                                                    'What TempCam does not do',
-                                                body:
-                                                    'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
+                                                heading: l10n.tr(
+                                                  'What TempCam does not do',
+                                                ),
+                                                body: l10n.tr(
+                                                  'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
+                                                ),
                                               ),
                                               _LegalSection(
-                                                heading: 'Before release',
-                                                body:
-                                                    'Set TEMPCAM_PRIVACY_POLICY_URL during your release build to open your hosted policy page from the app.',
+                                                heading: l10n.tr(
+                                                  'Before release',
+                                                ),
+                                                body: l10n.tr(
+                                                  'Set TEMPCAM_PRIVACY_POLICY_URL during your release build to open your hosted policy page from the app.',
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -395,7 +411,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                                       },
                                     );
                                   },
-                                  child: const Text('Privacy Policy'),
+                                  child: Text(l10n.tr('Privacy Policy')),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -407,28 +423,38 @@ class PremiumPaywallScreen extends StatelessWidget {
                                           context: context,
                                           backgroundColor: Colors.transparent,
                                           isScrollControlled: true,
-                                          builder: (_) => const _LegalInfoSheet(
-                                            title: 'Subscription Terms',
+                                          builder: (_) => _LegalInfoSheet(
+                                            title: l10n.tr(
+                                              'Subscription Terms',
+                                            ),
                                             sections: [
                                               _LegalSection(
-                                                heading: 'Plan',
-                                                body:
-                                                    'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                                heading: l10n.tr('Plan'),
+                                                body: l10n.tr(
+                                                  'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                                ),
                                               ),
                                               _LegalSection(
-                                                heading: 'Billing',
-                                                body:
-                                                    'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
+                                                heading: l10n.tr('Billing'),
+                                                body: l10n.tr(
+                                                  'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
+                                                ),
                                               ),
                                               _LegalSection(
-                                                heading: 'Managing access',
-                                                body:
-                                                    'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
+                                                heading: l10n.tr(
+                                                  'Managing access',
+                                                ),
+                                                body: l10n.tr(
+                                                  'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
+                                                ),
                                               ),
                                               _LegalSection(
-                                                heading: 'Release setup',
-                                                body:
-                                                    'Set TEMPCAM_SUBSCRIPTION_TERMS_URL during your release build to open your hosted terms page from the app.',
+                                                heading: l10n.tr(
+                                                  'Release setup',
+                                                ),
+                                                body: l10n.tr(
+                                                  'Set TEMPCAM_SUBSCRIPTION_TERMS_URL during your release build to open your hosted terms page from the app.',
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -436,7 +462,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                                       },
                                     );
                                   },
-                                  child: const Text('Terms'),
+                                  child: Text(l10n.tr('Terms')),
                                 ),
                               ],
                             ),
@@ -446,7 +472,14 @@ class PremiumPaywallScreen extends StatelessWidget {
                               !isTestAccess) ...[
                             const SizedBox(height: 8),
                             Text(
-                              'Access recorded until ${_formatExpiry(controller.premiumAccessExpiresAt!)}',
+                              l10n.tr(
+                                'Access recorded until {date}',
+                                {
+                                  'date': l10n.formatDate(
+                                    controller.premiumAccessExpiresAt!,
+                                  ),
+                                },
+                              ),
                               style: const TextStyle(
                                   fontSize: 11,
                                   color: AppTheme.onSurfaceVariant),
@@ -464,26 +497,6 @@ class PremiumPaywallScreen extends StatelessWidget {
       },
     );
   }
-
-  static String _formatExpiry(DateTime value) {
-    final month = _monthNames[value.month - 1];
-    return '$month ${value.day}, ${value.year}';
-  }
-
-  static const List<String> _monthNames = <String>[
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
 }
 
 class _FeatureCard extends StatelessWidget {

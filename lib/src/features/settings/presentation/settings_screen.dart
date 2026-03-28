@@ -342,7 +342,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _SettingsSectionLabel(l10n.tr('Trusted History')),
+                _SettingsSectionLabel(l10n.tr('Trusted Vault History')),
                 const SizedBox(height: 12),
                 _PremiumCard(
                   child: controller.vaultHistory.isEmpty

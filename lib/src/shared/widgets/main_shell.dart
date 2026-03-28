@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../features/camera/presentation/camera_screen.dart';
 import '../../features/photos/presentation/photos_screen.dart';
@@ -46,7 +47,8 @@ class _MainShellState extends State<MainShell> {
                     top: false,
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
                         color: AppTheme.background.withValues(alpha: 0.82),
                         borderRadius: BorderRadius.circular(AppTheme.radiusL),
@@ -101,16 +103,18 @@ class _MainShellState extends State<MainShell> {
     }
 
     _lastBackPressAt = now;
+    final l10n = context.l10n;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(content: Text('Press back again to exit TempCam')),
+        SnackBar(content: Text(l10n.tr('Press back again to exit TempCam'))),
       );
   }
 }
 
 class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.selected, required this.icon, required this.onTap});
+  const _NavIcon(
+      {required this.selected, required this.icon, required this.onTap});
 
   final bool selected;
   final IconData icon;
@@ -159,4 +163,3 @@ class _CenterLens extends StatelessWidget {
     );
   }
 }
-

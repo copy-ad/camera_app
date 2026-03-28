@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/premium_constants.dart';
 import '../../features/camera/presentation/timer_selection_sheet.dart';
+import '../../localization/app_localizations.dart';
 import '../models/app_settings.dart';
 import '../models/photo_record.dart';
 import '../models/vault_history_entry.dart';
@@ -181,6 +182,19 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
   bool get hasStoreManagedTrialOffer =>
       _billingService.hasStoreManagedTrialOffer;
+  Locale? get localeOverride =>
+      AppLocalizations.parseLocaleTag(_settings.localeTag);
+  Locale get activeLocale {
+    final override = localeOverride;
+    if (override != null) {
+      return override;
+    }
+    return AppLocalizations.resolveSupportedLocale(
+      WidgetsBinding.instance.platformDispatcher.locale,
+    );
+  }
+
+  AppLocalizations get l10n => AppLocalizations.fromLocale(activeLocale);
 
   bool get hasStoreSubscriptionAccess {
     return _settings.hasPremiumAccess;
@@ -279,6 +293,18 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _settings = _settings.copyWith(tourCompleted: false);
+    await _settingsRepository.save(_settings);
+    notifyListeners();
+  }
+
+  Future<void> updateLanguageTag(String? tag) async {
+    final normalizedTag = tag == null || tag.isEmpty ? null : tag;
+    if (_settings.localeTag == normalizedTag) {
+      return;
+    }
+    _settings = normalizedTag == null
+        ? _settings.copyWith(clearLocaleTag: true)
+        : _settings.copyWith(localeTag: normalizedTag);
     await _settingsRepository.save(_settings);
     notifyListeners();
   }
@@ -382,7 +408,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       await _refreshStoreEntitlementStatus();
       _isPurchasePending = false;
       notifyListeners();
-      return 'Restore request sent to the store.';
+      return l10n.tr('Restore request sent to the store.');
     } catch (_) {
       _isPurchasePending = false;
       notifyListeners();
@@ -406,7 +432,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _handleBillingEvent(BillingEvent event) async {
     if (event.status == BillingEventStatus.pending) {
       _isPurchasePending = true;
-      _billingStatusMessage = 'Waiting for store confirmation...';
+      _billingStatusMessage = l10n.tr('Waiting for store confirmation...');
       notifyListeners();
       return;
     }
@@ -433,8 +459,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _isPurchasePending = false;
         await _activatePremiumAccess(purchase);
         _billingStatusMessage = event.status == BillingEventStatus.restored
-            ? 'Your yearly subscription has been restored.'
-            : 'Yearly access unlocked. TempCam is ready to use.';
+            ? l10n.tr('Your yearly subscription has been restored.')
+            : l10n.tr('Yearly access unlocked. TempCam is ready to use.');
         notifyListeners();
       }
     }
@@ -669,7 +695,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> toggleFlash() async {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized) {
-      return 'Camera is unavailable.';
+      return l10n.tr('Camera is unavailable.');
     }
     try {
       final preferredModes = _isVideoMode
@@ -686,18 +712,18 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           _flashMode = candidate;
           notifyListeners();
           return switch (candidate) {
-            FlashMode.auto => 'Flash auto',
-            FlashMode.always => 'Flash on',
-            FlashMode.torch => 'Flash torch',
-            FlashMode.off => 'Flash off',
+            FlashMode.auto => l10n.tr('Flash auto'),
+            FlashMode.always => l10n.tr('Flash on'),
+            FlashMode.torch => l10n.tr('Flash torch'),
+            FlashMode.off => l10n.tr('Flash off'),
           };
         } catch (_) {
           continue;
         }
       }
-      return 'Flash is unavailable on this camera.';
+      return l10n.tr('Flash is unavailable on this camera.');
     } catch (_) {
-      return 'Flash is unavailable on this camera.';
+      return l10n.tr('Flash is unavailable on this camera.');
     }
   }
 
@@ -839,7 +865,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> toggleVideoRecording(BuildContext context) async {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized || _isCapturing) {
-      return 'Camera is unavailable.';
+      return l10n.tr('Camera is unavailable.');
     }
     try {
       if (_isRecordingVideo) {
@@ -875,7 +901,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         await refreshPhotos();
         _currentTabIndex = 0;
         notifyListeners();
-        return 'Video saved to TempCam';
+        return l10n.tr('Video saved to TempCam');
       }
       await controller.prepareForVideoRecording();
       await controller.startVideoRecording();
@@ -886,13 +912,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         notifyListeners();
       });
       notifyListeners();
-      return 'Recording started';
+      return l10n.tr('Recording started');
     } catch (_) {
       _isRecordingVideo = false;
       _recordingDurationTimer?.cancel();
       _recordingStartedAt = null;
       notifyListeners();
-      return 'Unable to use video recording right now.';
+      return l10n.tr('Unable to use video recording right now.');
     }
   }
 
@@ -931,9 +957,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     for (final item in expired) {
       await _recordVaultHistory(
         eventType: VaultHistoryEventType.autoDeleted,
-        title: item.isVideo ? 'Video auto-deleted' : 'Photo auto-deleted',
-        details:
-            '${item.isVideo ? 'Video' : 'Photo'} expired after ${item.timerLabel.toLowerCase()} and was removed from TempCam.',
+        title:
+            l10n.tr(item.isVideo ? 'Video auto-deleted' : 'Photo auto-deleted'),
+        details: l10n.tr(
+          '{media} expired after {timer} and was removed from TempCam.',
+          {
+            'media': l10n.tr(item.isVideo ? 'Video' : 'Photo'),
+            'timer': l10n.timerLabelFromString(item.timerLabel).toLowerCase(),
+          },
+        ),
       );
     }
   }
@@ -1044,7 +1076,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<String?> importMediaToVault(BuildContext context) async {
     if (_isCapturing || _isRecordingVideo) {
-      return 'Finish the current capture before importing media.';
+      return l10n.tr('Finish the current capture before importing media.');
     }
     List<_ImportedDeviceMedia> importedItems = const [];
     try {
@@ -1080,16 +1112,21 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       notifyListeners();
       final count = importedItems.length;
       if (failedOriginalDeletions > 0) {
-        return count == 1
-            ? '1 item imported into TempCam, but the original could not be removed from the main gallery.'
-            : '$count items imported into TempCam, but $failedOriginalDeletions original items could not be removed from the main gallery.';
+        return l10n.tr(
+          '{count} items imported into TempCam, but {failed} original items could not be removed from the main gallery.',
+          {
+            'count': '$count',
+            'failed': '$failedOriginalDeletions',
+          },
+        );
       }
-      return count == 1
-          ? '1 item moved into TempCam and removed from the main gallery.'
-          : '$count items moved into TempCam and removed from the main gallery.';
+      return l10n.tr(
+        '{count} items moved into TempCam and removed from the main gallery.',
+        {'count': '$count'},
+      );
     } catch (_) {
       await _consumeImportedMedia(importedItems, deleteOriginals: false);
-      return 'Unable to import media right now.';
+      return l10n.tr('Unable to import media right now.');
     }
   }
 
@@ -1224,9 +1261,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _photoRepository.deleteNow(record);
     await _recordVaultHistory(
       eventType: VaultHistoryEventType.deleted,
-      title: record.isVideo ? 'Video deleted now' : 'Photo deleted now',
-      details:
-          '${record.isVideo ? 'Video' : 'Photo'} removed manually before its timer ended.',
+      title:
+          l10n.tr(record.isVideo ? 'Video deleted now' : 'Photo deleted now'),
+      details: l10n.tr(
+        '{media} removed manually before its timer ended.',
+        {'media': l10n.tr(record.isVideo ? 'Video' : 'Photo')},
+      ),
     );
     await refreshPhotos();
   }
@@ -1240,9 +1280,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     for (final record in items) {
       await _recordVaultHistory(
         eventType: VaultHistoryEventType.deleted,
-        title: record.isVideo ? 'Video deleted now' : 'Photo deleted now',
-        details:
-            '${record.isVideo ? 'Video' : 'Photo'} removed manually before its timer ended.',
+        title:
+            l10n.tr(record.isVideo ? 'Video deleted now' : 'Photo deleted now'),
+        details: l10n.tr(
+          '{media} removed manually before its timer ended.',
+          {'media': l10n.tr(record.isVideo ? 'Video' : 'Photo')},
+        ),
       );
     }
     await refreshPhotos();
@@ -1251,19 +1294,22 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> keepPhotoForever(PhotoRecord record) async {
     final exportedPath = await _exportMediaToMainGallery(record);
     if (exportedPath == null) {
-      return 'Unable to export this item to the main gallery.';
+      return l10n.tr('Unable to export this item to the main gallery.');
     }
     await _photoRepository.keepForever(record);
     await _recordVaultHistory(
       eventType: VaultHistoryEventType.exported,
-      title: record.isVideo ? 'Video kept forever' : 'Photo kept forever',
-      details:
-          '${record.isVideo ? 'Video' : 'Photo'} exported to the main gallery and removed from TempCam expiry.',
+      title:
+          l10n.tr(record.isVideo ? 'Video kept forever' : 'Photo kept forever'),
+      details: l10n.tr(
+        '{media} exported to the main gallery and removed from TempCam expiry.',
+        {'media': l10n.tr(record.isVideo ? 'Video' : 'Photo')},
+      ),
     );
     await refreshPhotos();
     return record.isVideo
-        ? 'Video kept forever and exported.'
-        : 'Photo kept forever and exported.';
+        ? l10n.tr('Video kept forever and exported.')
+        : l10n.tr('Photo kept forever and exported.');
   }
 
   Future<void> extendPhoto(PhotoRecord record, AppTimerOption timer) async {
@@ -1305,6 +1351,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         return;
       }
       unawaited(_handleResume());
+    }
+  }
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    if (_settings.localeTag == null) {
+      notifyListeners();
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tempcam/src/core/constants/app_strings.dart';
 import 'package:tempcam/src/features/onboarding/presentation/app_tour_screen.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/shared/models/app_settings.dart';
 import 'package:tempcam/src/shared/models/vault_history_entry.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
@@ -27,6 +28,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final l10n = context.l10n;
         final bottomInset = MediaQuery.paddingOf(context).bottom;
         return Scaffold(
           body: SafeArea(
@@ -36,23 +38,66 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _SettingsHero(
                   isActive: controller.hasPremiumAccess,
-                  hasStoreManagedTrialOffer: controller.hasStoreManagedTrialOffer,
+                  hasStoreManagedTrialOffer:
+                      controller.hasStoreManagedTrialOffer,
                   priceLabel: controller.yearlyPriceLabel,
                   accessUntil: controller.premiumAccessExpiresAt,
                   onManageAccess: () => PremiumPaywallScreen.show(context),
                   onPanicExit: controller.panicExit,
                 ),
                 const SizedBox(height: 24),
-                const _SettingsSectionLabel('Capture Defaults'),
+                _SettingsSectionLabel(l10n.tr('Capture Defaults')),
                 const SizedBox(height: 12),
                 _PremiumCard(
                   child: Column(
                     children: [
                       _ActionRow(
+                        icon: Icons.language_rounded,
+                        title: l10n.tr('Language'),
+                        subtitle: l10n.tr(
+                          'Choose the app language. System Default follows your phone language.',
+                        ),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            value: controller.settings.localeTag,
+                            dropdownColor: AppTheme.surfaceHigh,
+                            borderRadius: BorderRadius.circular(18),
+                            items: <DropdownMenuItem<String?>>[
+                              DropdownMenuItem<String?>(
+                                value: null,
+                                child: Text(
+                                  l10n.tr('System Default'),
+                                  style: const TextStyle(
+                                    color: AppTheme.secondary,
+                                  ),
+                                ),
+                              ),
+                              ...AppLocalizations.supportedLanguages.map(
+                                (option) => DropdownMenuItem<String?>(
+                                  value: option.tag,
+                                  child: Text(
+                                    option.nativeName,
+                                    style: const TextStyle(
+                                      color: AppTheme.secondary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                            onChanged: (tag) =>
+                                controller.updateLanguageTag(tag),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      _ActionRow(
                         icon: Icons.schedule_rounded,
-                        title: 'Default Self-Destruct Timer',
-                        subtitle:
-                            'Choose how long new captures stay available by default.',
+                        title: l10n.tr('Default Self-Destruct Timer'),
+                        subtitle: l10n.tr(
+                          'Choose how long new captures stay available by default.',
+                        ),
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton<AppTimerOption>(
                             value: controller.settings.defaultTimer,
@@ -63,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
                                   (option) => DropdownMenuItem<AppTimerOption>(
                                     value: option,
                                     child: Text(
-                                      option.label,
+                                      l10n.timerLabel(option),
                                       style: const TextStyle(
                                         color: AppTheme.secondary,
                                       ),
@@ -89,8 +134,10 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       _ActionRow(
                         icon: Icons.notifications_active_rounded,
-                        title: 'Expiry Notifications',
-                        subtitle: 'Get warned before temporary media disappears.',
+                        title: l10n.tr('Expiry Notifications'),
+                        subtitle: l10n.tr(
+                          'Get warned before temporary media disappears.',
+                        ),
                         trailing: Switch.adaptive(
                           value: controller.settings.notificationsEnabled,
                           activeThumbColor: AppTheme.primary,
@@ -108,21 +155,22 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       _ActionRow(
                         icon: Icons.notifications_none_rounded,
-                        title: 'Stealth Notifications',
-                        subtitle:
-                            'Hide photo and video wording in reminders for a quieter lock-screen presence.',
+                        title: l10n.tr('Stealth Notifications'),
+                        subtitle: l10n.tr(
+                          'Hide photo and video wording in reminders for a quieter lock-screen presence.',
+                        ),
                         trailing: Switch.adaptive(
-                          value: controller.settings.stealthNotificationsEnabled,
+                          value:
+                              controller.settings.stealthNotificationsEnabled,
                           activeThumbColor: AppTheme.primary,
                           onChanged: controller.settings.notificationsEnabled
                               ? (value) async {
                                   await _authenticateThen(
                                     context,
                                     controller,
-                                    () =>
-                                        controller.updateStealthNotifications(
-                                          value,
-                                        ),
+                                    () => controller.updateStealthNotifications(
+                                      value,
+                                    ),
                                   );
                                 }
                               : null,
@@ -132,17 +180,21 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const _SettingsSectionLabel('Security'),
+                _SettingsSectionLabel(l10n.tr('Security')),
                 const SizedBox(height: 12),
                 _PremiumCard(
                   child: Column(
                     children: [
                       _ActionRow(
                         icon: Icons.fingerprint_rounded,
-                        title: 'Biometric Lock',
+                        title: l10n.tr('Biometric Lock'),
                         subtitle: controller.biometricAvailable
-                            ? 'Protect app entry and sensitive actions with biometrics.'
-                            : 'Biometric protection is unavailable on this device.',
+                            ? l10n.tr(
+                                'Protect app entry and sensitive actions with biometrics.',
+                              )
+                            : l10n.tr(
+                                'Biometric protection is unavailable on this device.',
+                              ),
                         trailing: Switch.adaptive(
                           value: controller.settings.biometricLockEnabled,
                           activeThumbColor: AppTheme.primary,
@@ -162,24 +214,26 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       _ActionRow(
                         icon: Icons.lock_clock_rounded,
-                        title: 'Session Privacy Mode',
+                        title: l10n.tr('Session Privacy Mode'),
                         subtitle: controller.settings.biometricLockEnabled
-                            ? 'Lock TempCam immediately whenever the app loses focus.'
-                            : 'Enable Biometric Lock first to use instant session relocking.',
+                            ? l10n.tr(
+                                'Lock TempCam immediately whenever the app loses focus.',
+                              )
+                            : l10n.tr(
+                                'Enable Biometric Lock first to use instant session relocking.',
+                              ),
                         trailing: Switch.adaptive(
                           value: controller.settings.sessionPrivacyModeEnabled,
                           activeThumbColor: AppTheme.primary,
-                          onChanged:
-                              controller.biometricAvailable &&
+                          onChanged: controller.biometricAvailable &&
                                   controller.settings.biometricLockEnabled
                               ? (value) async {
                                   await _authenticateThen(
                                     context,
                                     controller,
-                                    () =>
-                                        controller.updateSessionPrivacyMode(
-                                          value,
-                                        ),
+                                    () => controller.updateSessionPrivacyMode(
+                                      value,
+                                    ),
                                   );
                                 }
                               : null,
@@ -190,10 +244,14 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       _ActionRow(
                         icon: Icons.timer_off_rounded,
-                        title: 'Quick Lock Timeout',
+                        title: l10n.tr('Quick Lock Timeout'),
                         subtitle: controller.settings.sessionPrivacyModeEnabled
-                            ? 'Session Privacy Mode locks instantly, so timeout is bypassed.'
-                            : 'Choose how long TempCam can stay in the background before it asks for biometrics again.',
+                            ? l10n.tr(
+                                'Session Privacy Mode locks instantly, so timeout is bypassed.',
+                              )
+                            : l10n.tr(
+                                'Choose how long TempCam can stay in the background before it asks for biometrics again.',
+                              ),
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton<QuickLockTimeoutOption>(
                             value: controller.settings.quickLockTimeout,
@@ -203,14 +261,14 @@ class SettingsScreen extends StatelessWidget {
                                 .map(
                                   (option) =>
                                       DropdownMenuItem<QuickLockTimeoutOption>(
-                                        value: option,
-                                        child: Text(
-                                          option.label,
-                                          style: const TextStyle(
-                                            color: AppTheme.secondary,
-                                          ),
-                                        ),
+                                    value: option,
+                                    child: Text(
+                                      l10n.quickLockTimeoutLabel(option),
+                                      style: const TextStyle(
+                                        color: AppTheme.secondary,
                                       ),
+                                    ),
+                                  ),
                                 )
                                 .toList(),
                             onChanged: controller.settings.biometricLockEnabled
@@ -238,16 +296,17 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const _SettingsSectionLabel('Help'),
+                _SettingsSectionLabel(l10n.tr('Help')),
                 const SizedBox(height: 12),
                 _PremiumCard(
                   child: Column(
                     children: [
                       _ActionRow(
                         icon: Icons.explore_rounded,
-                        title: 'Replay App Tour',
-                        subtitle:
-                            'Walk through camera, timers, vault, security, and settings again any time.',
+                        title: l10n.tr('Replay App Tour'),
+                        subtitle: l10n.tr(
+                          'Walk through camera, timers, vault, security, and settings again any time.',
+                        ),
                         trailing: FilledButton.tonal(
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.surfaceContainer,
@@ -264,9 +323,9 @@ class SettingsScreen extends StatelessWidget {
                             }
                             await controller.markTourCompleted();
                           },
-                          child: const Text(
-                            'Start',
-                            style: TextStyle(fontWeight: FontWeight.w800),
+                          child: Text(
+                            l10n.tr('Start'),
+                            style: const TextStyle(fontWeight: FontWeight.w800),
                           ),
                         ),
                       ),
@@ -274,7 +333,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const _SettingsSectionLabel('Trusted History'),
+                _SettingsSectionLabel(l10n.tr('Trusted History')),
                 const SizedBox(height: 12),
                 _PremiumCard(
                   child: controller.vaultHistory.isEmpty
@@ -287,28 +346,31 @@ class SettingsScreen extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(height: 24),
-                const _SettingsSectionLabel('Why People Use TempCam'),
+                _SettingsSectionLabel(l10n.tr('Why People Use TempCam')),
                 const SizedBox(height: 12),
-                const _PremiumCard(
+                _PremiumCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _FeatureBullet(
-                        title: 'Temporary by default',
-                        description:
-                            'Photos and videos auto-delete unless you decide to keep them forever.',
+                        title: l10n.tr('Temporary by default'),
+                        description: l10n.tr(
+                          'Photos and videos auto-delete unless you decide to keep them forever.',
+                        ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       _FeatureBullet(
-                        title: 'Private by design',
-                        description:
-                            'Temporary captures stay inside TempCam instead of appearing in the main gallery.',
+                        title: l10n.tr('Private by design'),
+                        description: l10n.tr(
+                          'Temporary captures stay inside TempCam instead of appearing in the main gallery.',
+                        ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       _FeatureBullet(
-                        title: 'Fast under pressure',
-                        description:
-                            'Open, capture, review, and protect sensitive moments with fewer steps.',
+                        title: l10n.tr('Fast under pressure'),
+                        description: l10n.tr(
+                          'Open, capture, review, and protect sensitive moments with fewer steps.',
+                        ),
                       ),
                     ],
                   ),
@@ -343,6 +405,7 @@ class _SettingsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
@@ -393,10 +456,10 @@ class _SettingsHero extends StatelessWidget {
                     ),
                     child: Text(
                       hasStoreManagedTrialOffer && !isActive
-                          ? 'FREE TRIAL'
+                          ? l10n.tr('FREE TRIAL')
                           : isActive
-                          ? 'ACTIVE'
-                          : 'REQUIRED',
+                              ? l10n.tr('ACTIVE')
+                              : l10n.tr('REQUIRED'),
                       style: TextStyle(
                         color: hasStoreManagedTrialOffer || isActive
                             ? const Color(0xFF3C2F00)
@@ -422,10 +485,10 @@ class _SettingsHero extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             isActive
-                ? 'Your access is live.'
+                ? l10n.tr('Your access is live.')
                 : hasStoreManagedTrialOffer
-                ? 'Start with 15 days free.'
-                : 'Yearly access powers TempCam.',
+                    ? l10n.tr('Start with 15 days free.')
+                    : l10n.tr('Yearly access powers TempCam.'),
             style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 28,
@@ -437,11 +500,20 @@ class _SettingsHero extends StatelessWidget {
           Text(
             isActive
                 ? accessUntil == null
-                      ? 'Your current subscription is active through the store.'
-                      : 'Access is recorded until ${_formatDate(accessUntil!)}.'
+                    ? l10n.tr(
+                        'Your current subscription is active through the store.')
+                    : l10n.tr(
+                        'Access is recorded until {date}.',
+                        {'date': l10n.formatDate(accessUntil!)},
+                      )
                 : hasStoreManagedTrialOffer
-                ? 'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.'
-                : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
+                    ? l10n.tr(
+                        'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.',
+                      )
+                    : l10n.tr(
+                        'A {price} yearly subscription keeps TempCam private, temporary, and fully unlocked.',
+                        {'price': priceLabel},
+                      ),
             style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,
@@ -457,55 +529,16 @@ class _SettingsHero extends StatelessWidget {
             onPressed: onManageAccess,
             child: Text(
               hasStoreManagedTrialOffer && !isActive
-                  ? 'View Yearly Plan'
+                  ? l10n.tr('View Yearly Plan')
                   : isActive
-                  ? 'Manage Access'
-                  : 'View Access Options',
+                      ? l10n.tr('Manage Access')
+                      : l10n.tr('View Access Options'),
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
         ],
       ),
     );
-  }
-
-  static String _formatDate(DateTime value) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[value.month - 1]} ${value.day}, ${value.year}';
-  }
-
-  static String _formatDateTime(DateTime value) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final hour = value.hour % 12 == 0 ? 12 : value.hour % 12;
-    final minute = value.minute.toString().padLeft(2, '0');
-    final suffix = value.hour >= 12 ? 'PM' : 'AM';
-    return '${months[value.month - 1]} ${value.day}, $hour:$minute $suffix';
   }
 }
 
@@ -626,10 +659,12 @@ class _SecurityNote extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 14),
-        const Expanded(
+        Expanded(
           child: Text(
-            'Temp media stays local to your device until you explicitly keep it forever. Recent-app previews are shielded, and sensitive actions stay protected behind biometric confirmation when enabled.',
-            style: TextStyle(
+            context.l10n.tr(
+              'Temp media stays local to your device until you explicitly keep it forever. Recent-app previews are shielded, and sensitive actions stay protected behind biometric confirmation when enabled.',
+            ),
+            style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,
             ),
@@ -652,9 +687,9 @@ class _SettingsFooter extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Text(
+          const Text(
             '${AppStrings.appName} v${AppStrings.versionName}',
             style: TextStyle(
               fontSize: 10,
@@ -662,11 +697,11 @@ class _SettingsFooter extends StatelessWidget {
               color: AppTheme.onSurfaceVariant,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
-            'LOCAL | TEMPORARY | PROTECTED',
+            context.l10n.tr('LOCAL | TEMPORARY | PROTECTED'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 10,
               letterSpacing: 2,
               color: AppTheme.onSurfaceVariant,
@@ -683,18 +718,20 @@ class _HistoryEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
+        const Icon(
           Icons.history_toggle_off_rounded,
           color: AppTheme.onSurfaceVariant,
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
-            'Keep Forever exports, manual deletions, and auto-deletions will appear here as a local trust log.',
-            style: TextStyle(
+            context.l10n.tr(
+              'Keep Forever exports, manual deletions, and auto-deletions will appear here as a local trust log.',
+            ),
+            style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,
             ),
@@ -766,7 +803,7 @@ class _HistoryRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _SettingsHero._formatDateTime(entry.occurredAt),
+                    context.l10n.formatDateTime(entry.occurredAt),
                     style: const TextStyle(
                       color: AppTheme.onSurfaceVariant,
                       fontSize: 11,

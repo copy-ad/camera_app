@@ -1,8 +1,9 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
 
@@ -13,6 +14,7 @@ class CameraScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final l10n = context.l10n;
         final camera = controller.cameraController;
         return Scaffold(
           body: Stack(
@@ -31,13 +33,13 @@ class CameraScreen extends StatelessWidget {
                   ),
                 ),
               if (controller.isSwitchingCamera)
-                const ColoredBox(
+                ColoredBox(
                   color: Colors.black,
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 28,
                           height: 28,
                           child: CircularProgressIndicator(
@@ -45,10 +47,10 @@ class CameraScreen extends StatelessWidget {
                             color: AppTheme.primary,
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
-                          'Switching camera...',
-                          style: TextStyle(
+                          l10n.tr('Switching camera...'),
+                          style: const TextStyle(
                             color: AppTheme.onSurfaceVariant,
                             fontSize: 12,
                             letterSpacing: 1.5,
@@ -85,7 +87,14 @@ class CameraScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Default ${controller.settings.defaultTimer.label}',
+                            l10n.tr(
+                              'Default {timer}',
+                              {
+                                'timer': l10n.timerLabel(
+                                  controller.settings.defaultTimer,
+                                ),
+                              },
+                            ),
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -115,7 +124,8 @@ class CameraScreen extends StatelessWidget {
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: _RecordingBadge(duration: controller.recordingDuration),
+                    child:
+                        _RecordingBadge(duration: controller.recordingDuration),
                   ),
                 ),
               Positioned(
@@ -174,7 +184,8 @@ class _InteractiveCameraViewport extends StatefulWidget {
       _InteractiveCameraViewportState();
 }
 
-class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> {
+class _InteractiveCameraViewportState
+    extends State<_InteractiveCameraViewport> {
   double _baseZoomLevel = 1.0;
   bool _isScaling = false;
 
@@ -231,7 +242,9 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
     Size viewportSize,
   ) {
     final previewSize = camera.value.previewSize;
-    if (previewSize == null || viewportSize.width <= 0 || viewportSize.height <= 0) {
+    if (previewSize == null ||
+        viewportSize.width <= 0 ||
+        viewportSize.height <= 0) {
       return const Offset(0.5, 0.5);
     }
 
@@ -255,8 +268,10 @@ class _InteractiveCameraViewportState extends State<_InteractiveCameraViewport> 
       offsetY = (scaledHeight - viewportSize.height) / 2;
     }
 
-    final normalizedDx = ((localPosition.dx + offsetX) / scaledWidth).clamp(0.0, 1.0);
-    final normalizedDy = ((localPosition.dy + offsetY) / scaledHeight).clamp(0.0, 1.0);
+    final normalizedDx =
+        ((localPosition.dx + offsetX) / scaledWidth).clamp(0.0, 1.0);
+    final normalizedDy =
+        ((localPosition.dy + offsetY) / scaledHeight).clamp(0.0, 1.0);
     return Offset(normalizedDx, normalizedDy);
   }
 }
@@ -363,9 +378,11 @@ class _ProFocusRing extends StatelessWidget {
             ),
             ...const [
               _FocusTick(alignment: Alignment.topCenter, width: 12, height: 2),
-              _FocusTick(alignment: Alignment.bottomCenter, width: 12, height: 2),
+              _FocusTick(
+                  alignment: Alignment.bottomCenter, width: 12, height: 2),
               _FocusTick(alignment: Alignment.centerLeft, width: 2, height: 12),
-              _FocusTick(alignment: Alignment.centerRight, width: 2, height: 12),
+              _FocusTick(
+                  alignment: Alignment.centerRight, width: 2, height: 12),
             ],
             Container(
               width: 8,
@@ -524,13 +541,13 @@ class _ModeSwitcher extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _ModeChip(
-            label: 'PHOTO',
+            label: context.l10n.tr('PHOTO'),
             selected: !controller.isVideoMode,
             onTap: controller.isVideoMode ? controller.toggleCaptureMode : null,
           ),
           const SizedBox(width: 6),
           _ModeChip(
-            label: 'VIDEO',
+            label: context.l10n.tr('VIDEO'),
             selected: controller.isVideoMode,
             onTap: controller.isVideoMode ? null : controller.toggleCaptureMode,
           ),

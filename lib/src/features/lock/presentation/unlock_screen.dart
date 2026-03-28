@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/glass_panel.dart';
@@ -39,6 +40,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -77,9 +79,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Vault Locked',
-                      style: TextStyle(
+                    Text(
+                      l10n.tr('Vault Locked'),
+                      style: const TextStyle(
                         fontFamily: 'Manrope',
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
@@ -88,8 +90,12 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     const SizedBox(height: 10),
                     Text(
                       widget.canUseBiometric
-                          ? 'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.'
-                          : 'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
+                          ? l10n.tr(
+                              'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.',
+                            )
+                          : l10n.tr(
+                              'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
+                            ),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: AppTheme.onSurfaceVariant,
@@ -108,8 +114,13 @@ class _UnlockScreenState extends State<UnlockScreen> {
                             borderRadius: BorderRadius.circular(22),
                           ),
                         ),
-                        onPressed: widget.isBusy ? null : () => widget.onUnlock(),
-                        child: Text(widget.isBusy ? 'Unlocking...' : 'Unlock TempCam'),
+                        onPressed:
+                            widget.isBusy ? null : () => widget.onUnlock(),
+                        child: Text(
+                          widget.isBusy
+                              ? l10n.tr('Unlocking...')
+                              : l10n.tr('Unlock TempCam'),
+                        ),
                       ),
                     ),
                   ],

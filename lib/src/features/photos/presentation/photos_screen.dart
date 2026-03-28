@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tempcam/src/core/constants/app_strings.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/features/photos/presentation/photo_detail_screen.dart';
 import 'package:tempcam/src/shared/models/photo_record.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
@@ -17,30 +18,6 @@ enum _GalleryFilter {
 
   const _GalleryFilter(this.label);
   final String label;
-}
-
-String _formatRemaining(DateTime? expiresAt, {required bool isKeptForever}) {
-  if (isKeptForever) {
-    return 'Forever';
-  }
-  if (expiresAt == null) {
-    return 'Expired';
-  }
-  final now = DateTime.now();
-  final difference = expiresAt.difference(now);
-  if (difference.isNegative) {
-    return 'Expired';
-  }
-  final days = difference.inDays;
-  final hours = difference.inHours.remainder(24);
-  final minutes = difference.inMinutes.remainder(60);
-  if (days > 0) {
-    return '${days}d ${hours}h';
-  }
-  if (difference.inHours > 0) {
-    return '${difference.inHours}h ${minutes}m';
-  }
-  return '${difference.inMinutes}m';
 }
 
 class PhotosScreen extends StatefulWidget {
@@ -67,6 +44,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final l10n = context.l10n;
         final visibleMedia = _filteredMedia(controller.photos);
         final selectedMedia = controller.photos
             .where((item) => _selectedIds.contains(item.id))
@@ -118,7 +96,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                         : 10,
                                   ),
                                   child: _FilterChipButton(
-                                    label: filter.label,
+                                    label: l10n.tr(filter.label),
                                     selected: isSelected,
                                     onTap: () {
                                       if (_filter == filter) {
@@ -162,9 +140,9 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Private Vault',
-                                    style: TextStyle(
+                                  Text(
+                                    l10n.tr('Private Vault'),
+                                    style: const TextStyle(
                                       fontFamily: 'Manrope',
                                       fontSize: 22,
                                       fontWeight: FontWeight.w800,
@@ -172,7 +150,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${visibleMedia.length} temp ${visibleMedia.length == 1 ? 'item' : 'items'} ready',
+                                    l10n.tr(
+                                      '{count} temp items ready',
+                                      {'count': '${visibleMedia.length}'},
+                                    ),
                                     style: const TextStyle(
                                       color: AppTheme.onSurfaceVariant,
                                     ),
@@ -259,9 +240,9 @@ class _PhotosScreenState extends State<PhotosScreen> {
             foregroundColor: const Color(0xFF002A55),
             onPressed: () => controller.setTab(1),
             icon: const Icon(Icons.camera_alt_rounded),
-            label: const Text(
-              'Capture',
-              style: TextStyle(fontWeight: FontWeight.w800),
+            label: Text(
+              l10n.tr('Capture'),
+              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
         );
@@ -344,9 +325,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
       ..showSnackBar(
         SnackBar(
           content: Text(
-            selectedMedia.length == 1
-                ? '1 item deleted from TempCam.'
-                : '${selectedMedia.length} items deleted from TempCam.',
+            context.l10n.tr(
+              '{count} items deleted from TempCam.',
+              {'count': '${selectedMedia.length}'},
+            ),
           ),
         ),
       );
@@ -448,9 +430,9 @@ class _GalleryHero extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Every temporary moment, in one calm vault.',
-            style: TextStyle(
+          Text(
+            context.l10n.tr('Every temporary moment, in one calm vault.'),
+            style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 28,
               fontWeight: FontWeight.w800,
@@ -458,9 +440,11 @@ class _GalleryHero extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Browse all temp photos and videos, focus on what is expiring, and clean up quickly when you need to.',
-            style: TextStyle(
+          Text(
+            context.l10n.tr(
+              'Browse all temp photos and videos, focus on what is expiring, and clean up quickly when you need to.',
+            ),
+            style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.4,
             ),
@@ -471,15 +455,15 @@ class _GalleryHero extends StatelessWidget {
             runSpacing: 10,
             children: [
               _HeroMetric(
-                  label: 'All Media',
+                  label: context.l10n.tr('All Media'),
                   value: totalCount.toString(),
                   accent: AppTheme.primary),
               _HeroMetric(
-                  label: 'Photos',
+                  label: context.l10n.tr('Photos'),
                   value: photoCount.toString(),
                   accent: AppTheme.secondary),
               _HeroMetric(
-                  label: 'Videos',
+                  label: context.l10n.tr('Videos'),
                   value: videoCount.toString(),
                   accent: AppTheme.tertiary),
             ],
@@ -598,10 +582,10 @@ class _SelectionToggleButton extends StatelessWidget {
       onPressed: onTap,
       child: Text(
         selectionMode && selectedCount > 0
-            ? 'Done ($selectedCount)'
+            ? context.l10n.tr('Done ({count})', {'count': '$selectedCount'})
             : selectionMode
-                ? 'Done'
-                : 'Select',
+                ? context.l10n.tr('Done')
+                : context.l10n.tr('Select'),
         style: const TextStyle(fontWeight: FontWeight.w800),
       ),
     );
@@ -643,8 +627,11 @@ class _SelectionBar extends StatelessWidget {
           Expanded(
             child: Text(
               selectedCount == 0
-                  ? 'Choose items to delete.'
-                  : '$selectedCount items selected for deletion.',
+                  ? context.l10n.tr('Choose items to delete.')
+                  : context.l10n.tr(
+                      '{count} items selected for deletion.',
+                      {'count': '$selectedCount'},
+                    ),
               style: const TextStyle(
                 color: AppTheme.onSurface,
                 fontWeight: FontWeight.w600,
@@ -654,7 +641,7 @@ class _SelectionBar extends StatelessWidget {
           const SizedBox(width: 12),
           TextButton(
             onPressed: onCancel,
-            child: const Text('Cancel'),
+            child: Text(context.l10n.tr('Cancel')),
           ),
           const SizedBox(width: 6),
           FilledButton(
@@ -663,7 +650,7 @@ class _SelectionBar extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
             onPressed: onDelete,
-            child: const Text('Delete'),
+            child: Text(context.l10n.tr('Delete')),
           ),
         ],
       ),
@@ -685,11 +672,11 @@ class _ExpiringSoonStrip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(bottom: 14),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 14),
           child: Text(
-            'Expiring Soon',
-            style: TextStyle(
+            context.l10n.tr('Expiring Soon'),
+            style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -755,7 +742,9 @@ class _ExpiringCard extends StatelessWidget {
             Positioned(
               top: 14,
               left: 14,
-              child: _MediaPill(label: item.isVideo ? 'VIDEO' : 'PHOTO'),
+              child: _MediaPill(
+                label: context.l10n.tr(item.isVideo ? 'VIDEO' : 'PHOTO'),
+              ),
             ),
             Positioned(
               left: 14,
@@ -782,8 +771,10 @@ class _ExpiringCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      _formatRemaining(item.expiresAt,
-                          isKeptForever: item.isKeptForever),
+                      context.l10n.formatRemaining(
+                        item.expiresAt,
+                        isKeptForever: item.isKeptForever,
+                      ),
                       style: const TextStyle(
                         color: Color(0xFF3C2F00),
                         fontWeight: FontWeight.w800,
@@ -862,8 +853,11 @@ class _VaultTile extends StatelessWidget {
                       Positioned(
                         top: 10,
                         left: 10,
-                        child:
-                            _MediaPill(label: item.isVideo ? 'VIDEO' : 'PHOTO'),
+                        child: _MediaPill(
+                          label: context.l10n.tr(
+                            item.isVideo ? 'VIDEO' : 'PHOTO',
+                          ),
+                        ),
                       ),
                       Positioned(
                         top: 10,
@@ -905,7 +899,10 @@ class _VaultTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        item.isKeptForever ? 'Kept Forever' : item.timerLabel,
+                        item.isKeptForever
+                            ? context.l10n.tr('Kept Forever')
+                            : context.l10n
+                                .timerLabelFromString(item.timerLabel),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -925,8 +922,10 @@ class _VaultTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _formatRemaining(item.expiresAt,
-                      isKeptForever: item.isKeptForever),
+                  context.l10n.formatRemaining(
+                    item.expiresAt,
+                    isKeptForever: item.isKeptForever,
+                  ),
                   style: TextStyle(
                     color: item.isKeptForever
                         ? AppTheme.secondary
@@ -1064,17 +1063,20 @@ class _EmptyVaultState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = switch (filter) {
-      _GalleryFilter.all => 'Your vault is empty',
-      _GalleryFilter.photos => 'No temp photos yet',
-      _GalleryFilter.videos => 'No temp videos yet',
+      _GalleryFilter.all => context.l10n.tr('Your vault is empty'),
+      _GalleryFilter.photos => context.l10n.tr('No temp photos yet'),
+      _GalleryFilter.videos => context.l10n.tr('No temp videos yet'),
     };
     final subtitle = switch (filter) {
-      _GalleryFilter.all =>
-        'Capture a photo or video and it will appear here with its self-destruct timer.',
-      _GalleryFilter.photos =>
-        'This filter only shows temp photos stored inside TempCam.',
-      _GalleryFilter.videos =>
-        'This filter only shows temp videos stored inside TempCam.',
+      _GalleryFilter.all => context.l10n.tr(
+          'Capture a photo or video and it will appear here with its self-destruct timer.',
+        ),
+      _GalleryFilter.photos => context.l10n.tr(
+          'This filter only shows temp photos stored inside TempCam.',
+        ),
+      _GalleryFilter.videos => context.l10n.tr(
+          'This filter only shows temp videos stored inside TempCam.',
+        ),
     };
 
     return Center(

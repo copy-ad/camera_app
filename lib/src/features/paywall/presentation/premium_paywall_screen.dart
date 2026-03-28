@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../../core/constants/legal_links.dart';
 import '../../../core/constants/premium_constants.dart';
@@ -56,6 +57,7 @@ class PremiumPaywallScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final l10n = context.l10n;
         const bool isTestAccess = PremiumConstants.paymentsTemporarilyDisabled;
         final bool isActive = controller.hasPremiumAccess;
         final bool hasStoreTrial = controller.hasStoreManagedTrialOffer;
@@ -65,51 +67,76 @@ class PremiumPaywallScreen extends StatelessWidget {
             ? PremiumConstants.fallbackYearlyPlanLabel
             : '${controller.yearlyPriceLabel} / year';
         final String title = isTestAccess
-            ? 'Payments Disabled Temporarily'
+            ? l10n.tr('Payments Disabled Temporarily')
             : requiredForAccess
-                ? 'Access Required'
+                ? l10n.tr('Access Required')
                 : isActive
-                    ? 'Manage TempCam Access'
-                    : 'Unlock TempCam';
+                    ? l10n.tr('Manage TempCam Access')
+                    : l10n.tr('Unlock TempCam');
         final String description = isTestAccess
-            ? 'This build bypasses subscriptions so you can test TempCam on your phone before store upload.'
+            ? l10n.tr(
+                'This build bypasses subscriptions so you can test TempCam on your phone before store upload.',
+              )
             : requiredForAccess
                 ? hasStoreTrial
-                    ? 'Start the Google Play or App Store managed 15-day free trial, or restore your yearly access to open TempCam.'
-                    : 'Buy or restore yearly access to open TempCam. If your store account is eligible, the platform may apply the 15-day free trial during checkout.'
+                    ? l10n.tr(
+                        'Start the Google Play or App Store managed 15-day free trial, or restore your yearly access to open TempCam.',
+                      )
+                    : l10n.tr(
+                        'Buy or restore yearly access to open TempCam. If your store account is eligible, the platform may apply the 15-day free trial during checkout.',
+                      )
                 : isActive
-                    ? 'Your subscription is handled directly by the App Store or Google Play with one yearly plan.'
+                    ? l10n.tr(
+                        'Your subscription is handled directly by the App Store or Google Play with one yearly plan.',
+                      )
                     : hasStoreTrial
-                        ? 'Start your secure store-managed 15-day free trial, then continue with one yearly plan.'
-                        : 'Start or restore yearly access. If your store account is eligible, the platform may apply the 15-day free trial during checkout.';
+                        ? l10n.tr(
+                            'Start your secure store-managed 15-day free trial, then continue with one yearly plan.',
+                          )
+                        : l10n.tr(
+                            'Start or restore yearly access. If your store account is eligible, the platform may apply the 15-day free trial during checkout.',
+                          );
         final String badgeText = isTestAccess
-            ? 'PAYMENT OFF'
+            ? l10n.tr('PAYMENT OFF')
             : hasStoreTrial
-                ? '15 DAYS FREE'
+                ? l10n.tr('15 DAYS FREE')
                 : isActive
-                ? 'ACTIVE'
-                : 'YEARLY ACCESS';
+                    ? l10n.tr('ACTIVE')
+                    : l10n.tr('YEARLY ACCESS');
         final String buttonText = isTestAccess
-            ? 'Payment Disabled For Testing'
+            ? l10n.tr('Payment Disabled For Testing')
             : hasStoreTrial
-                ? 'Start 15 Days Free'
+                ? l10n.tr('Start 15 Days Free')
                 : isActive
-                ? 'Access Active'
-                : isBusy
-                    ? 'Connecting To Store...'
-                    : 'Buy 1 Year For ${controller.yearlyPriceLabel}';
-        const String footerText = isTestAccess
-            ? 'Disable TEMPCAM_DISABLE_PAYMENTS before uploading to the store.'
-            : 'Auto-renewing yearly subscription. Cancel anytime in Google Play or App Store subscriptions.';
+                    ? l10n.tr('Access Active')
+                    : isBusy
+                        ? l10n.tr('Connecting To Store...')
+                        : l10n.tr(
+                            'Buy 1 Year For {price}',
+                            {'price': controller.yearlyPriceLabel},
+                          );
+        final String footerText = isTestAccess
+            ? l10n.tr(
+                'Disable TEMPCAM_DISABLE_PAYMENTS before uploading to the store.',
+              )
+            : l10n.tr(
+                'Auto-renewing yearly subscription. Cancel anytime in Google Play or App Store subscriptions.',
+              );
         final String pricingCaption = isTestAccess
-            ? 'Store billing is currently bypassed by a temporary app-wide test switch.'
+            ? l10n.tr(
+                'Store billing is currently bypassed by a temporary app-wide test switch.',
+              )
             : hasStoreTrial
-                ? 'If eligible, checkout starts with the store-managed 15-day free trial and then renews yearly.'
+                ? l10n.tr(
+                    'If eligible, checkout starts with the store-managed 15-day free trial and then renews yearly.',
+                  )
                 : isActive
-                ? 'Your yearly subscription is active.'
-                : controller.yearlySubscriptionProduct == null
-                    ? 'Fallback price shown until the store catalog loads.'
-                    : 'Directly billed and renewed by the platform store.';
+                    ? l10n.tr('Your yearly subscription is active.')
+                    : controller.yearlySubscriptionProduct == null
+                        ? l10n.tr(
+                            'Fallback price shown until the store catalog loads.')
+                        : l10n.tr(
+                            'Directly billed and renewed by the platform store.');
 
         return Scaffold(
           body: Stack(
@@ -128,7 +155,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                   builder: (context, constraints) => SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.maxHeight - 42),
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight - 42),
                       child: Column(
                         children: [
                           Row(
@@ -136,15 +164,18 @@ class PremiumPaywallScreen extends StatelessWidget {
                               if (!requiredForAccess)
                                 IconButton(
                                   onPressed: () => Navigator.of(context).pop(),
-                                  icon: const Icon(Icons.close_rounded, color: AppTheme.primary),
+                                  icon: const Icon(Icons.close_rounded,
+                                      color: AppTheme.primary),
                                 )
                               else
                                 const SizedBox(width: 48),
                               const Spacer(),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primary.withValues(alpha: 0.16),
+                                  color:
+                                      AppTheme.primary.withValues(alpha: 0.16),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
@@ -163,7 +194,8 @@ class PremiumPaywallScreen extends StatelessWidget {
                           const CircleAvatar(
                             radius: 28,
                             backgroundColor: AppTheme.surfaceHighest,
-                            child: Icon(Icons.verified_user_rounded, color: AppTheme.secondary),
+                            child: Icon(Icons.verified_user_rounded,
+                                color: AppTheme.secondary),
                           ),
                           const SizedBox(height: 18),
                           Text(
@@ -234,26 +266,30 @@ class PremiumPaywallScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppTheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(18),
-                                border: Border.all(color: AppTheme.outlineVariant.withValues(alpha: 0.2)),
+                                border: Border.all(
+                                    color: AppTheme.outlineVariant
+                                        .withValues(alpha: 0.2)),
                               ),
                               child: Text(
                                 controller.billingStatusMessage!,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(color: AppTheme.onSurfaceVariant, height: 1.4),
+                                style: const TextStyle(
+                                    color: AppTheme.onSurfaceVariant,
+                                    height: 1.4),
                               ),
                             ),
                             const SizedBox(height: 12),
                           ],
                           _PricingCard(
-                            title: 'Annual Access',
+                            title: l10n.tr('Annual Access'),
                             subtitle: priceLine,
                             caption: pricingCaption,
                             selected: true,
                             badge: isTestAccess
-                                ? 'Testing'
+                                ? l10n.tr('Testing')
                                 : hasStoreTrial
-                                    ? 'Trial Then Yearly'
-                                    : 'Only Plan',
+                                    ? l10n.tr('Trial Then Yearly')
+                                    : l10n.tr('Only Plan'),
                           ),
                           const SizedBox(height: 18),
                           SizedBox(
@@ -262,15 +298,20 @@ class PremiumPaywallScreen extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppTheme.primary,
                                 foregroundColor: const Color(0xFF002A55),
-                                padding: const EdgeInsets.symmetric(vertical: 18),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(999)),
                               ),
                               onPressed: isTestAccess || isActive || isBusy
                                   ? null
                                   : () async {
-                                      final message = await context.read<AppController>().purchasePremiumSubscription();
+                                      final message = await context
+                                          .read<AppController>()
+                                          .purchasePremiumSubscription();
                                       if (message != null && context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(content: Text(message)),
                                         );
                                       }
@@ -286,10 +327,10 @@ class PremiumPaywallScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             footerText,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 11,
                               letterSpacing: 1.5,
                               color: AppTheme.onSurfaceVariant,
@@ -306,14 +347,18 @@ class PremiumPaywallScreen extends StatelessWidget {
                                   onPressed: isBusy
                                       ? null
                                       : () async {
-                                          final message = await context.read<AppController>().restorePremiumPurchases();
-                                          if (message != null && context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                          final message = await context
+                                              .read<AppController>()
+                                              .restorePremiumPurchases();
+                                          if (message != null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               SnackBar(content: Text(message)),
                                             );
                                           }
                                         },
-                                  child: const Text('Restore Purchase'),
+                                  child: Text(l10n.tr('Restore Purchase')),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -330,15 +375,19 @@ class PremiumPaywallScreen extends StatelessWidget {
                                             sections: [
                                               _LegalSection(
                                                 heading: 'What TempCam stores',
-                                                body: 'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
+                                                body:
+                                                    'Temp photos and videos are stored locally on the device inside TempCam until they expire, are deleted, or are kept forever by the user.',
                                               ),
                                               _LegalSection(
-                                                heading: 'What TempCam does not do',
-                                                body: 'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
+                                                heading:
+                                                    'What TempCam does not do',
+                                                body:
+                                                    'TempCam does not upload your temporary media to a cloud service inside the app flow. Subscription billing is handled by the platform store.',
                                               ),
                                               _LegalSection(
                                                 heading: 'Before release',
-                                                body: 'Set TEMPCAM_PRIVACY_POLICY_URL during your release build to open your hosted policy page from the app.',
+                                                body:
+                                                    'Set TEMPCAM_PRIVACY_POLICY_URL during your release build to open your hosted policy page from the app.',
                                               ),
                                             ],
                                           ),
@@ -363,19 +412,23 @@ class PremiumPaywallScreen extends StatelessWidget {
                                             sections: [
                                               _LegalSection(
                                                 heading: 'Plan',
-                                                body: 'TempCam offers one auto-renewing yearly subscription for access to the app.',
+                                                body:
+                                                    'TempCam offers one auto-renewing yearly subscription for access to the app.',
                                               ),
                                               _LegalSection(
                                                 heading: 'Billing',
-                                                body: 'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
+                                                body:
+                                                    'Payment is charged by Google Play or the App Store at confirmation of purchase. Subscriptions renew automatically unless canceled before the renewal date.',
                                               ),
                                               _LegalSection(
                                                 heading: 'Managing access',
-                                                body: 'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
+                                                body:
+                                                    'Users can restore purchases after reinstall and can manage or cancel subscriptions from their platform subscription settings.',
                                               ),
                                               _LegalSection(
                                                 heading: 'Release setup',
-                                                body: 'Set TEMPCAM_SUBSCRIPTION_TERMS_URL during your release build to open your hosted terms page from the app.',
+                                                body:
+                                                    'Set TEMPCAM_SUBSCRIPTION_TERMS_URL during your release build to open your hosted terms page from the app.',
                                               ),
                                             ],
                                           ),
@@ -388,11 +441,15 @@ class PremiumPaywallScreen extends StatelessWidget {
                               ],
                             ),
                           ],
-                          if (controller.premiumAccessExpiresAt != null && isActive && !isTestAccess) ...[
+                          if (controller.premiumAccessExpiresAt != null &&
+                              isActive &&
+                              !isTestAccess) ...[
                             const SizedBox(height: 8),
                             Text(
                               'Access recorded until ${_formatExpiry(controller.premiumAccessExpiresAt!)}',
-                              style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceVariant),
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppTheme.onSurfaceVariant),
                             ),
                           ],
                         ],
@@ -645,7 +702,8 @@ class _LegalInfoSheet extends StatelessWidget {
             const SizedBox(height: 18),
             ...sections.map(
               (section) => Padding(
-                padding: EdgeInsets.only(bottom: section == sections.last ? 0 : 16),
+                padding:
+                    EdgeInsets.only(bottom: section == sections.last ? 0 : 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

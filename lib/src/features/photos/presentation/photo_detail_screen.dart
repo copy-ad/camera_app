@@ -1,43 +1,15 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tempcam/src/features/camera/presentation/timer_selection_sheet.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/shared/models/app_settings.dart';
 import 'package:tempcam/src/shared/models/photo_record.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
 import 'package:video_player/video_player.dart';
-
-String _formatRemaining(DateTime? expiresAt, {required bool isKeptForever}) {
-  if (isKeptForever) {
-    return 'Forever';
-  }
-  if (expiresAt == null) {
-    return 'Expired';
-  }
-  final now = DateTime.now();
-  final difference = expiresAt.difference(now);
-  if (difference.isNegative) {
-    return 'Expired';
-  }
-  final days = difference.inDays;
-  final hours = difference.inHours.remainder(24);
-  final minutes = difference.inMinutes.remainder(60);
-  if (days > 0) {
-    return '${days}d ${hours}h';
-  }
-  if (difference.inHours > 0) {
-    return '${difference.inHours}h ${minutes}m';
-  }
-  return '${difference.inMinutes}m';
-}
-
-String _formatTimestamp(DateTime value) {
-  return DateFormat('MMM d, yyyy • h:mm a').format(value);
-}
 
 class PhotoDetailScreen extends StatefulWidget {
   const PhotoDetailScreen({super.key, required this.photoId});
@@ -49,7 +21,8 @@ class PhotoDetailScreen extends StatefulWidget {
 }
 
 class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   bool _chromeVisible = false;
 
   @override
@@ -64,8 +37,9 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       builder: (context, controller, _) {
         final photo = controller.byId(widget.photoId);
         if (photo == null) {
-          return const Scaffold(
-            body: Center(child: Text('Media no longer exists.')),
+          return Scaffold(
+            body:
+                Center(child: Text(context.l10n.tr('Media no longer exists.'))),
           );
         }
         return Scaffold(
@@ -121,7 +95,8 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                         if (!context.mounted || !ok) {
                           return;
                         }
-                        final message = await controller.keepPhotoForever(photo);
+                        final message =
+                            await controller.keepPhotoForever(photo);
                         if (!context.mounted || message == null) {
                           return;
                         }
@@ -375,7 +350,11 @@ class _PhotoDetailChrome extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xAA131313), Colors.transparent, Color(0xE6131313)],
+              colors: [
+                Color(0xAA131313),
+                Colors.transparent,
+                Color(0xE6131313)
+              ],
               stops: [0, .32, 1],
             ),
           ),
@@ -390,7 +369,9 @@ class _PhotoDetailChrome extends StatelessWidget {
                     _TopCircle(icon: Icons.arrow_back_rounded, onTap: onBack),
                     const Spacer(),
                     _TopCircle(
-                      icon: photo.isVideo ? Icons.videocam_rounded : Icons.photo_rounded,
+                      icon: photo.isVideo
+                          ? Icons.videocam_rounded
+                          : Icons.photo_rounded,
                     ),
                   ],
                 ),
@@ -398,7 +379,8 @@ class _PhotoDetailChrome extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceContainer.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(999),
@@ -406,11 +388,15 @@ class _PhotoDetailChrome extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.verified_user_rounded, size: 14, color: AppTheme.secondary),
+                        const Icon(Icons.verified_user_rounded,
+                            size: 14, color: AppTheme.secondary),
                         const SizedBox(width: 6),
                         Text(
-                          photo.isVideo ? 'Private Video' : 'Private Photo',
-                          style: const TextStyle(fontSize: 10, letterSpacing: 2),
+                          context.l10n.tr(
+                            photo.isVideo ? 'Private Video' : 'Private Photo',
+                          ),
+                          style:
+                              const TextStyle(fontSize: 10, letterSpacing: 2),
                         ),
                       ],
                     ),
@@ -423,7 +409,8 @@ class _PhotoDetailChrome extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceContainer.withValues(alpha: 0.74),
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: AppTheme.outlineVariant.withValues(alpha: 0.2)),
+                    border: Border.all(
+                        color: AppTheme.outlineVariant.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -431,13 +418,19 @@ class _PhotoDetailChrome extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Expiring in',
-                              style: TextStyle(fontSize: 10, letterSpacing: 2, color: AppTheme.onSurfaceVariant),
+                            Text(
+                              context.l10n.tr('Expiring in'),
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  letterSpacing: 2,
+                                  color: AppTheme.onSurfaceVariant),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _formatRemaining(photo.expiresAt, isKeptForever: photo.isKeptForever),
+                              context.l10n.formatRemaining(
+                                photo.expiresAt,
+                                isKeptForever: photo.isKeptForever,
+                              ),
                               style: const TextStyle(
                                 fontFamily: 'Manrope',
                                 fontSize: 28,
@@ -458,15 +451,21 @@ class _PhotoDetailChrome extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              'Created',
-                              style: TextStyle(fontSize: 10, letterSpacing: 2, color: AppTheme.onSurfaceVariant),
+                            Text(
+                              context.l10n.tr('Created'),
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  letterSpacing: 2,
+                                  color: AppTheme.onSurfaceVariant),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _formatTimestamp(photo.createdAt),
+                              context.l10n.formatDateTime(photo.createdAt),
                               textAlign: TextAlign.right,
-                              style: const TextStyle(fontFamily: 'Manrope', fontSize: 15, fontWeight: FontWeight.w700),
+                              style: const TextStyle(
+                                  fontFamily: 'Manrope',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700),
                             ),
                           ],
                         ),
@@ -480,7 +479,8 @@ class _PhotoDetailChrome extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
                   decoration: const BoxDecoration(
                     color: Color(0xEE0E0E0E),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(28)),
                   ),
                   child: Column(
                     children: [
@@ -492,12 +492,15 @@ class _PhotoDetailChrome extends StatelessWidget {
                                 foregroundColor: AppTheme.onSurface,
                                 backgroundColor: AppTheme.surfaceHigh,
                                 side: BorderSide.none,
-                                padding: const EdgeInsets.symmetric(vertical: 18),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18)),
                               ),
                               onPressed: onExtend,
-                              icon: const Icon(Icons.update_rounded, color: AppTheme.secondary),
-                              label: const Text('Extend Timer'),
+                              icon: const Icon(Icons.update_rounded,
+                                  color: AppTheme.secondary),
+                              label: Text(context.l10n.tr('Extend Timer')),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -506,12 +509,20 @@ class _PhotoDetailChrome extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppTheme.primary,
                                 foregroundColor: const Color(0xFF003061),
-                                padding: const EdgeInsets.symmetric(vertical: 18),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18)),
                               ),
                               onPressed: onKeepForever,
                               icon: const Icon(Icons.auto_delete_rounded),
-                              label: Text(hasPremiumAccess ? 'Keep Forever' : 'Premium Only'),
+                              label: Text(
+                                context.l10n.tr(
+                                  hasPremiumAccess
+                                      ? 'Keep Forever'
+                                      : 'Premium Only',
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -519,8 +530,12 @@ class _PhotoDetailChrome extends StatelessWidget {
                       const SizedBox(height: 14),
                       TextButton.icon(
                         onPressed: onDelete,
-                        icon: const Icon(Icons.delete_forever_rounded, color: AppTheme.error),
-                        label: const Text('Delete Now', style: TextStyle(color: AppTheme.error)),
+                        icon: const Icon(Icons.delete_forever_rounded,
+                            color: AppTheme.error),
+                        label: Text(
+                          context.l10n.tr('Delete Now'),
+                          style: const TextStyle(color: AppTheme.error),
+                        ),
                       ),
                     ],
                   ),

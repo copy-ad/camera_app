@@ -6,6 +6,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:tempcam/src/features/lock/presentation/unlock_screen.dart';
 import 'package:tempcam/src/features/onboarding/presentation/app_tour_screen.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
 import 'package:tempcam/src/shared/widgets/main_shell.dart';
@@ -23,12 +24,13 @@ class _TempCamRootState extends State<TempCamRoot> {
   bool _isShowingTrialDialog = false;
   bool _isShowingTour = false;
   bool _quickActionsReady = false;
+  String? _quickActionsLocaleTag;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _configureQuickActions();
+      _configureQuickActions(context);
     });
   }
 
@@ -36,6 +38,14 @@ class _TempCamRootState extends State<TempCamRoot> {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final l10n = context.l10n;
+        final localeTag =
+            AppLocalizations.localeTag(Localizations.localeOf(context));
+        if (_quickActionsReady && _quickActionsLocaleTag != localeTag) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _configureQuickActions(context);
+          });
+        }
         if (controller.didFinishBootstrap &&
             controller.shouldShowTrialStartedNotice &&
             !_isShowingTrialDialog) {
@@ -50,9 +60,9 @@ class _TempCamRootState extends State<TempCamRoot> {
               context: navigator.context,
               barrierDismissible: false,
               builder: (_) => _TrialStartedDialog(
-                hasStoreManagedTrialOffer:
-                    controller.hasStoreManagedTrialOffer,
+                hasStoreManagedTrialOffer: controller.hasStoreManagedTrialOffer,
                 priceLabel: controller.yearlyPriceLabel,
+                l10n: l10n,
               ),
             );
             if (!mounted) {
@@ -109,40 +119,46 @@ class _TempCamRootState extends State<TempCamRoot> {
     );
   }
 
-  Future<void> _configureQuickActions() async {
-    if (!mounted || _quickActionsReady) {
+  Future<void> _configureQuickActions(BuildContext context) async {
+    if (!mounted) {
       return;
     }
-    _quickActionsReady = true;
+    final l10n = context.l10n;
+    final localeTag =
+        AppLocalizations.localeTag(Localizations.localeOf(context));
     try {
-      await _quickActions.initialize((shortcutType) {
-        if (!mounted) {
-          return;
-        }
-        final controller = context.read<AppController>();
-        switch (shortcutType) {
-          case 'open_camera':
-            controller.openCameraQuickAction();
+      if (!_quickActionsReady) {
+        await _quickActions.initialize((shortcutType) {
+          if (!mounted) {
             return;
-          case 'open_vault':
-            controller.openVaultQuickAction();
-            return;
-          default:
-            return;
-        }
-      });
-      await _quickActions.setShortcutItems(const <ShortcutItem>[
+          }
+          final controller = context.read<AppController>();
+          switch (shortcutType) {
+            case 'open_camera':
+              controller.openCameraQuickAction();
+              return;
+            case 'open_vault':
+              controller.openVaultQuickAction();
+              return;
+            default:
+              return;
+          }
+        });
+      }
+      await _quickActions.setShortcutItems(<ShortcutItem>[
         ShortcutItem(
           type: 'open_camera',
-          localizedTitle: 'Open Camera',
+          localizedTitle: l10n.tr('Open Camera'),
           icon: 'icon_camera_shortcut',
         ),
         ShortcutItem(
           type: 'open_vault',
-          localizedTitle: 'Open Vault',
+          localizedTitle: l10n.tr('Open Vault'),
           icon: 'icon_vault_shortcut',
         ),
       ]);
+      _quickActionsReady = true;
+      _quickActionsLocaleTag = localeTag;
     } catch (_) {}
   }
 }
@@ -169,16 +185,16 @@ class _RecentsPrivacyShield extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
-              child: const Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.shield_moon_rounded,
                     color: AppTheme.primary,
                     size: 36,
                   ),
-                  SizedBox(height: 12),
-                  Text(
+                  const SizedBox(height: 12),
+                  const Text(
                     'TEMPCAM',
                     style: TextStyle(
                       color: AppTheme.primary,
@@ -187,10 +203,10 @@ class _RecentsPrivacyShield extends StatelessWidget {
                       letterSpacing: 3,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'Protected Preview',
-                    style: TextStyle(
+                    context.l10n.tr('Protected Preview'),
+                    style: const TextStyle(
                       color: AppTheme.onSurfaceVariant,
                       letterSpacing: 1.2,
                     ),
@@ -209,10 +225,12 @@ class _TrialStartedDialog extends StatelessWidget {
   const _TrialStartedDialog({
     required this.hasStoreManagedTrialOffer,
     required this.priceLabel,
+    required this.l10n,
   });
 
   final bool hasStoreManagedTrialOffer;
   final String priceLabel;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
@@ -246,14 +264,15 @@ class _TrialStartedDialog extends StatelessWidget {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppTheme.secondary.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text(
-                    '15 DAYS FREE',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.tr('15 DAYS FREE'),
+                    style: const TextStyle(
                       color: Color(0xFF342700),
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
@@ -263,9 +282,9 @@ class _TrialStartedDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 18),
-            const Text(
-              'Start with a secure free trial.',
-              style: TextStyle(
+            Text(
+              l10n.tr('Start with a secure free trial.'),
+              style: const TextStyle(
                 fontFamily: 'Manrope',
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
@@ -275,8 +294,12 @@ class _TrialStartedDialog extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               hasStoreManagedTrialOffer
-                  ? 'Google Play will start your 15-day free trial when you begin the yearly subscription. This trial is tied to the store account, so clearing app data will not restart it.'
-                  : 'If your Google Play account is eligible, the store will offer a 15-day free trial when you begin the yearly subscription. This trial is tied to the store account, so clearing app data will not restart it.',
+                  ? l10n.tr(
+                      'Google Play will start your 15-day free trial when you begin the yearly subscription. This trial is tied to the store account, so clearing app data will not restart it.',
+                    )
+                  : l10n.tr(
+                      'If your Google Play account is eligible, the store will offer a 15-day free trial when you begin the yearly subscription. This trial is tied to the store account, so clearing app data will not restart it.',
+                    ),
               style: const TextStyle(
                 color: AppTheme.onSurfaceVariant,
                 height: 1.45,
@@ -291,7 +314,10 @@ class _TrialStartedDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'After the trial ends, Google Play continues the subscription at $priceLabel per year unless the user cancels in time.',
+                l10n.tr(
+                  'After the trial ends, Google Play continues the subscription at {price} per year unless the user cancels in time.',
+                  {'price': priceLabel},
+                ),
                 style: const TextStyle(
                   color: AppTheme.onSurface,
                   height: 1.4,
@@ -308,9 +334,9 @@ class _TrialStartedDialog extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  'Continue To Access',
-                  style: TextStyle(
+                child: Text(
+                  l10n.tr('Continue To Access'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w800,
                   ),
                 ),

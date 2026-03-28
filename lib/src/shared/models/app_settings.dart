@@ -66,6 +66,7 @@ class AppSettings {
     this.premiumAccessExpiresAt,
     this.premiumProductId,
     this.premiumLastValidatedAt,
+    this.localeTag,
   });
 
   final AppTimerOption defaultTimer;
@@ -83,6 +84,7 @@ class AppSettings {
   final DateTime? premiumAccessExpiresAt;
   final String? premiumProductId;
   final DateTime? premiumLastValidatedAt;
+  final String? localeTag;
 
   AppSettings copyWith({
     AppTimerOption? defaultTimer,
@@ -105,6 +107,8 @@ class AppSettings {
     bool clearPremiumProductId = false,
     DateTime? premiumLastValidatedAt,
     bool clearPremiumLastValidatedAt = false,
+    String? localeTag,
+    bool clearLocaleTag = false,
   }) {
     return AppSettings(
       defaultTimer: defaultTimer ?? this.defaultTimer,
@@ -116,14 +120,24 @@ class AppSettings {
           sessionPrivacyModeEnabled ?? this.sessionPrivacyModeEnabled,
       quickLockTimeout: quickLockTimeout ?? this.quickLockTimeout,
       hasPremiumAccess: hasPremiumAccess ?? this.hasPremiumAccess,
-      debugAccessBypassEnabled: debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
-      lastUnlockTime: clearLastUnlockTime ? null : lastUnlockTime ?? this.lastUnlockTime,
-      trialStartedAt: clearTrialStartedAt ? null : trialStartedAt ?? this.trialStartedAt,
+      debugAccessBypassEnabled:
+          debugAccessBypassEnabled ?? this.debugAccessBypassEnabled,
+      lastUnlockTime:
+          clearLastUnlockTime ? null : lastUnlockTime ?? this.lastUnlockTime,
+      trialStartedAt:
+          clearTrialStartedAt ? null : trialStartedAt ?? this.trialStartedAt,
       trialNoticeShown: trialNoticeShown ?? this.trialNoticeShown,
       tourCompleted: tourCompleted ?? this.tourCompleted,
-      premiumAccessExpiresAt: clearPremiumAccessExpiresAt ? null : premiumAccessExpiresAt ?? this.premiumAccessExpiresAt,
-      premiumProductId: clearPremiumProductId ? null : premiumProductId ?? this.premiumProductId,
-      premiumLastValidatedAt: clearPremiumLastValidatedAt ? null : premiumLastValidatedAt ?? this.premiumLastValidatedAt,
+      premiumAccessExpiresAt: clearPremiumAccessExpiresAt
+          ? null
+          : premiumAccessExpiresAt ?? this.premiumAccessExpiresAt,
+      premiumProductId: clearPremiumProductId
+          ? null
+          : premiumProductId ?? this.premiumProductId,
+      premiumLastValidatedAt: clearPremiumLastValidatedAt
+          ? null
+          : premiumLastValidatedAt ?? this.premiumLastValidatedAt,
+      localeTag: clearLocaleTag ? null : localeTag ?? this.localeTag,
     );
   }
 
@@ -140,6 +154,7 @@ class AppSettings {
       trialStartedAt: DateTime.now(),
       trialNoticeShown: false,
       tourCompleted: false,
+      localeTag: null,
     );
   }
 }
@@ -159,7 +174,8 @@ class AppTimerOptionAdapter extends TypeAdapter<AppTimerOption> {
   }
 }
 
-class QuickLockTimeoutOptionAdapter extends TypeAdapter<QuickLockTimeoutOption> {
+class QuickLockTimeoutOptionAdapter
+    extends TypeAdapter<QuickLockTimeoutOption> {
   @override
   final int typeId = 3;
 
@@ -186,7 +202,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       fields[reader.readByte()] = reader.read();
     }
     return AppSettings(
-      defaultTimer: fields[0] as AppTimerOption? ?? AppTimerOption.twentyFourHours,
+      defaultTimer:
+          fields[0] as AppTimerOption? ?? AppTimerOption.twentyFourHours,
       notificationsEnabled: fields[1] as bool? ?? true,
       stealthNotificationsEnabled: fields[11] as bool? ?? false,
       biometricLockEnabled: fields[2] as bool? ?? false,
@@ -202,13 +219,14 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       trialStartedAt: fields[9] as DateTime? ?? DateTime.now(),
       trialNoticeShown: fields[10] as bool? ?? false,
       tourCompleted: fields[14] as bool? ?? false,
+      localeTag: fields[15] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.defaultTimer)
       ..writeByte(1)
@@ -238,6 +256,8 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(10)
       ..write(obj.trialNoticeShown)
       ..writeByte(14)
-      ..write(obj.tourCompleted);
+      ..write(obj.tourCompleted)
+      ..writeByte(15)
+      ..write(obj.localeTag);
   }
 }

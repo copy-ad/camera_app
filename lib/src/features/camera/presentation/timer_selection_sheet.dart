@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../../shared/models/app_settings.dart';
 import '../../../shared/models/photo_record.dart';
@@ -50,6 +51,7 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return SafeArea(
       top: false,
       child: Container(
@@ -110,14 +112,14 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                           border: Border.all(
                               color: Colors.white.withValues(alpha: 0.08)),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.open_in_full_rounded,
+                            const Icon(Icons.open_in_full_rounded,
                                 size: 14, color: Colors.white),
-                            SizedBox(width: 6),
-                            Text('Tap to view',
-                                style: TextStyle(
+                            const SizedBox(width: 6),
+                            Text(l10n.tr('Tap to view'),
+                                style: const TextStyle(
                                     fontSize: 10,
                                     letterSpacing: 1.2,
                                     fontWeight: FontWeight.w700)),
@@ -125,16 +127,16 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                         ),
                       ),
                     ),
-                    const Positioned(
+                    Positioned(
                       bottom: 20,
                       left: 18,
                       child: Row(
                         children: [
-                          Icon(Icons.verified_user_rounded,
+                          const Icon(Icons.verified_user_rounded,
                               size: 16, color: AppTheme.primary),
-                          SizedBox(width: 6),
-                          Text('Private Preview',
-                              style: TextStyle(
+                          const SizedBox(width: 6),
+                          Text(l10n.tr('Private Preview'),
+                              style: const TextStyle(
                                   fontSize: 10,
                                   letterSpacing: 2,
                                   fontWeight: FontWeight.w600)),
@@ -146,16 +148,17 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Set Self-Destruct Timer',
-                style: TextStyle(
+            Text(l10n.tr('Set Self-Destruct Timer'),
+                style: const TextStyle(
                     fontFamily: 'Manrope',
                     fontSize: 24,
                     fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text(
               widget.hasPremiumAccess
-                  ? 'Choose when this capture evaporates from the vault.'
-                  : '7 day timers are available with Premium.',
+                  ? l10n
+                      .tr('Choose when this capture evaporates from the vault.')
+                  : l10n.tr('7 day timers are available with Premium.'),
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.onSurfaceVariant),
             ),
@@ -175,9 +178,10 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                   onTap: () {
                     if (isLocked) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Unlock Premium to use the 7 day timer.')),
+                        SnackBar(
+                            content: Text(
+                          l10n.tr('Unlock Premium to use the 7 day timer.'),
+                        )),
                       );
                       return;
                     }
@@ -203,7 +207,7 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                       children: [
                         Flexible(
                           child: Text(
-                            option.label,
+                            l10n.timerLabel(option),
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontWeight: isSelected
@@ -243,16 +247,16 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                       borderRadius: BorderRadius.circular(20)),
                 ),
                 onPressed: () => Navigator.of(context).pop(selected),
-                child: const Text('Apply Timer',
-                    style: TextStyle(
+                child: Text(l10n.tr('Apply Timer'),
+                    style: const TextStyle(
                         fontFamily: 'Manrope',
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1)),
               ),
             ),
             const SizedBox(height: 12),
-            const Text('Defaults to 24 hours if skipped.',
-                style: TextStyle(
+            Text(l10n.tr('Defaults to 24 hours if skipped.'),
+                style: const TextStyle(
                     fontSize: 10,
                     letterSpacing: 2,
                     color: AppTheme.onSurfaceVariant)),
@@ -324,6 +328,7 @@ class _MediaPreviewDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(16),
@@ -361,8 +366,12 @@ class _MediaPreviewDialog extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   mediaType == MediaType.video
-                      ? 'Review this private video before setting its timer.'
-                      : 'Review this private photo before setting its timer.',
+                      ? l10n.tr(
+                          'Review this private video before setting its timer.',
+                        )
+                      : l10n.tr(
+                          'Review this private photo before setting its timer.',
+                        ),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: AppTheme.onSurfaceVariant),
                 ),

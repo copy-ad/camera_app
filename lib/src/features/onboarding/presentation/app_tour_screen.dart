@@ -34,7 +34,7 @@ class _AppTourScreenState extends State<AppTourScreen> {
       badge: 'CAMERA',
       title: 'Capture quickly with the private camera.',
       description:
-          'Use photo or video mode, tap to focus, pinch to zoom, control flash, and review the encrypted preview before you apply the timer.',
+          'Use photo or video mode, tap to focus, pinch to zoom, control flash, and review the private preview before you apply the timer.',
       icon: Icons.camera_alt_rounded,
     ),
     _TourPageData(
@@ -48,7 +48,7 @@ class _AppTourScreenState extends State<AppTourScreen> {
       badge: 'VAULT',
       title: 'The vault keeps temp media private first.',
       description:
-          'Browse photos and videos in the encrypted vault, filter by type, import existing media into TempCam, extend timers, or delete items when you need to.',
+          'Browse photos and videos in the private vault, filter by type, import existing media into TempCam, extend timers, or delete items when you need to.',
       icon: Icons.lock_rounded,
     ),
     _TourPageData(

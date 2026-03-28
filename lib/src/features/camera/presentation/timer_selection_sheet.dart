@@ -61,7 +61,12 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 52, height: 4, decoration: BoxDecoration(color: AppTheme.surfaceHighest, borderRadius: BorderRadius.circular(999))),
+            Container(
+                width: 52,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: AppTheme.surfaceHighest,
+                    borderRadius: BorderRadius.circular(999))),
             const SizedBox(height: 22),
             InkWell(
               borderRadius: BorderRadius.circular(24),
@@ -71,7 +76,10 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                 height: 188,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF3A3A3A), Color(0xFF131313)]),
+                  gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF3A3A3A), Color(0xFF131313)]),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
@@ -94,18 +102,25 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                       top: 16,
                       right: 16,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 7),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.34),
                           borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.08)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.open_in_full_rounded, size: 14, color: Colors.white),
+                            Icon(Icons.open_in_full_rounded,
+                                size: 14, color: Colors.white),
                             SizedBox(width: 6),
-                            Text('Tap to view', style: TextStyle(fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700)),
+                            Text('Tap to view',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
@@ -115,9 +130,14 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                       left: 18,
                       child: Row(
                         children: [
-                          Icon(Icons.verified_user_rounded, size: 16, color: AppTheme.primary),
+                          Icon(Icons.verified_user_rounded,
+                              size: 16, color: AppTheme.primary),
                           SizedBox(width: 6),
-                          Text('Encrypted Preview', style: TextStyle(fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w600)),
+                          Text('Private Preview',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
@@ -126,10 +146,16 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Set Self-Destruct Timer', style: TextStyle(fontFamily: 'Manrope', fontSize: 24, fontWeight: FontWeight.w700)),
+            const Text('Set Self-Destruct Timer',
+                style: TextStyle(
+                    fontFamily: 'Manrope',
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text(
-              widget.hasPremiumAccess ? 'Choose when this capture evaporates from the vault.' : '7 day timers are available with Premium.',
+              widget.hasPremiumAccess
+                  ? 'Choose when this capture evaporates from the vault.'
+                  : '7 day timers are available with Premium.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.onSurfaceVariant),
             ),
@@ -142,13 +168,16 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
               childAspectRatio: 2.25,
               physics: const NeverScrollableScrollPhysics(),
               children: AppTimerOption.captureOptions.map((option) {
-                final isLocked = option.requiresPremium && !widget.hasPremiumAccess;
+                final isLocked =
+                    option.requiresPremium && !widget.hasPremiumAccess;
                 final isSelected = option == selected;
                 return InkWell(
                   onTap: () {
                     if (isLocked) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Unlock Premium to use the 7 day timer.')),
+                        const SnackBar(
+                            content:
+                                Text('Unlock Premium to use the 7 day timer.')),
                       );
                       return;
                     }
@@ -158,9 +187,16 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppTheme.secondary : AppTheme.surfaceHigh,
+                      color: isSelected
+                          ? AppTheme.secondary
+                          : AppTheme.surfaceHigh,
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: isSelected ? const [BoxShadow(color: Color(0x44E9C349), blurRadius: 16)] : const [],
+                      boxShadow: isSelected
+                          ? const [
+                              BoxShadow(
+                                  color: Color(0x44E9C349), blurRadius: 16)
+                            ]
+                          : const [],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -170,14 +206,24 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                             option.label,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              color: isSelected ? const Color(0xFF3C2F00) : isLocked ? AppTheme.onSurfaceVariant : AppTheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color: isSelected
+                                  ? const Color(0xFF3C2F00)
+                                  : isLocked
+                                      ? AppTheme.onSurfaceVariant
+                                      : AppTheme.onSurface,
                             ),
                           ),
                         ),
                         if (isLocked) ...[
                           const SizedBox(width: 6),
-                          Icon(Icons.lock_rounded, size: 16, color: isSelected ? const Color(0xFF3C2F00) : AppTheme.onSurfaceVariant),
+                          Icon(Icons.lock_rounded,
+                              size: 16,
+                              color: isSelected
+                                  ? const Color(0xFF3C2F00)
+                                  : AppTheme.onSurfaceVariant),
                         ],
                       ],
                     ),
@@ -193,14 +239,23 @@ class _TimerSelectionSheetState extends State<TimerSelectionSheet> {
                   backgroundColor: AppTheme.primary,
                   foregroundColor: const Color(0xFF003061),
                   padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                 ),
                 onPressed: () => Navigator.of(context).pop(selected),
-                child: const Text('Apply Timer', style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w800, letterSpacing: 1)),
+                child: const Text('Apply Timer',
+                    style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1)),
               ),
             ),
             const SizedBox(height: 12),
-            const Text('Defaults to 24 hours if skipped.', style: TextStyle(fontSize: 10, letterSpacing: 2, color: AppTheme.onSurfaceVariant)),
+            const Text('Defaults to 24 hours if skipped.',
+                style: TextStyle(
+                    fontSize: 10,
+                    letterSpacing: 2,
+                    color: AppTheme.onSurfaceVariant)),
           ],
         ),
       ),
@@ -292,7 +347,10 @@ class _MediaPreviewDialog extends StatelessWidget {
                     child: AspectRatio(
                       aspectRatio: 9 / 16,
                       child: mediaType == MediaType.video
-                          ? _SheetVideoPreview(filePath: filePath, autoplay: true, showControls: true)
+                          ? _SheetVideoPreview(
+                              filePath: filePath,
+                              autoplay: true,
+                              showControls: true)
                           : Image.file(
                               File(filePath),
                               fit: BoxFit.contain,
@@ -302,7 +360,9 @@ class _MediaPreviewDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  mediaType == MediaType.video ? 'Review this encrypted video before setting its timer.' : 'Review this encrypted photo before setting its timer.',
+                  mediaType == MediaType.video
+                      ? 'Review this private video before setting its timer.'
+                      : 'Review this private photo before setting its timer.',
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: AppTheme.onSurfaceVariant),
                 ),
@@ -427,7 +487,9 @@ class _SheetVideoPreviewState extends State<_SheetVideoPreview> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                controller.value.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                controller.value.isPlaying
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
                 color: Colors.white,
                 size: 34,
               ),

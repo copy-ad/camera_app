@@ -29,6 +29,10 @@ import UniformTypeIdentifiers
 
   private func handleMediaGalleryCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
+    case "saveVideoToGallery":
+      saveVideoToGallery(call, result: result)
+    case "saveImageToGallery":
+      saveImageToGallery(call, result: result)
     case "pickImportableMedia":
       presentImportPicker(result: result)
     case "consumeImportedMedia":
@@ -274,6 +278,7 @@ import UniformTypeIdentifiers
       return
     }
 
+    let deleteOriginals = arguments["deleteOriginals"] as? Bool ?? true
     let items = arguments["items"] as? [[String: Any]] ?? []
     let tempPaths = items.compactMap { $0["tempPath"] as? String }
     let assetIdentifiers = items.compactMap { item -> String? in
@@ -283,9 +288,15 @@ import UniformTypeIdentifiers
       return sourceHandle
     }
 
-    guard !assetIdentifiers.isEmpty else {
+    guard deleteOriginals else {
       cleanupImportedTempFiles(tempPaths)
       result(["failedOriginalDeletes": 0])
+      return
+    }
+
+    guard !assetIdentifiers.isEmpty else {
+      cleanupImportedTempFiles(tempPaths)
+      result(["failedOriginalDeletes": items.count])
       return
     }
 
@@ -334,6 +345,126 @@ import UniformTypeIdentifiers
     } else {
       cleanupImportedTempFiles(tempPaths)
       result(["failedOriginalDeletes": assetIdentifiers.count])
+    }
+  }
+
+  private func saveImageToGallery(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard
+      let arguments = call.arguments as? [String: Any],
+      let sourcePath = arguments["sourcePath"] as? String,
+      !sourcePath.isEmpty
+    else {
+      result(FlutterError(code: "bad_args", message: "sourcePath is required.", details: nil))
+      return
+    }
+
+    let sourceURL = URL(fileURLWithPath: sourcePath)
+    guard FileManager.default.fileExists(atPath: sourceURL.path) else {
+      result(
+        FlutterError(code: "save_failed", message: "Image file was not found.", details: nil)
+      )
+      return
+    }
+
+    requestPhotoLibraryWriteAccess { granted in
+      guard granted else {
+        DispatchQueue.main.async {
+          result(
+            FlutterError(
+              code: "save_failed",
+              message: "Photo Library access was not granted.",
+              details: nil
+            )
+          )
+        }
+        return
+      }
+
+      var localIdentifier: String?
+      PHPhotoLibrary.shared().performChanges({
+        let request = PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: sourceURL)
+        localIdentifier = request?.placeholderForCreatedAsset?.localIdentifier
+      }) { success, error in
+        DispatchQueue.main.async {
+          if success {
+            result(localIdentifier ?? sourcePath)
+          } else {
+            result(
+              FlutterError(
+                code: "save_failed",
+                message: error?.localizedDescription ?? "Unable to save the image to Photos.",
+                details: nil
+              )
+            )
+          }
+        }
+      }
+    }
+  }
+
+  private func saveVideoToGallery(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard
+      let arguments = call.arguments as? [String: Any],
+      let sourcePath = arguments["sourcePath"] as? String,
+      !sourcePath.isEmpty
+    else {
+      result(FlutterError(code: "bad_args", message: "sourcePath is required.", details: nil))
+      return
+    }
+
+    let sourceURL = URL(fileURLWithPath: sourcePath)
+    guard FileManager.default.fileExists(atPath: sourceURL.path) else {
+      result(
+        FlutterError(code: "save_failed", message: "Video file was not found.", details: nil)
+      )
+      return
+    }
+
+    requestPhotoLibraryWriteAccess { granted in
+      guard granted else {
+        DispatchQueue.main.async {
+          result(
+            FlutterError(
+              code: "save_failed",
+              message: "Photo Library access was not granted.",
+              details: nil
+            )
+          )
+        }
+        return
+      }
+
+      var localIdentifier: String?
+      PHPhotoLibrary.shared().performChanges({
+        let request = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: sourceURL)
+        localIdentifier = request?.placeholderForCreatedAsset?.localIdentifier
+      }) { success, error in
+        DispatchQueue.main.async {
+          if success {
+            result(localIdentifier ?? sourcePath)
+          } else {
+            result(
+              FlutterError(
+                code: "save_failed",
+                message: error?.localizedDescription ?? "Unable to save the video to Photos.",
+                details: nil
+              )
+            )
+          }
+        }
+      }
+    }
+  }
+
+  private func requestPhotoLibraryWriteAccess(_ completion: @escaping (Bool) -> Void) {
+    if #available(iOS 14, *) {
+      PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+        completion(status == .authorized || status == .limited)
+      }
+    } else {
+      PHPhotoLibrary.requestAuthorization { status in
+        completion(status == .authorized)
+      }
     }
   }
 

@@ -159,6 +159,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun consumeImportedMedia(call: MethodCall, result: MethodChannel.Result) {
         val rawItems = call.argument<List<*>>("items") ?: emptyList<Any>()
+        val deleteOriginals = call.argument<Boolean>("deleteOriginals") ?: true
         var failedOriginalDeletes = 0
 
         for (rawItem in rawItems) {
@@ -167,9 +168,11 @@ class MainActivity : FlutterFragmentActivity() {
             val tempPath = item["tempPath"]?.toString()
 
             if (!sourceHandle.isNullOrBlank()) {
-                val deleted = deleteOriginalFromHandle(sourceHandle)
-                if (!deleted) {
-                    failedOriginalDeletes += 1
+                if (deleteOriginals) {
+                    val deleted = deleteOriginalFromHandle(sourceHandle)
+                    if (!deleted) {
+                        failedOriginalDeletes += 1
+                    }
                 }
                 releasePersistedPermission(sourceHandle)
             }

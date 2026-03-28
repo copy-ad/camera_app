@@ -30,6 +30,8 @@
 	<string>TempCam needs microphone access to record audio with temporary private videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>TempCam needs photo library access so you can import existing photos and videos into your temporary private vault.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TempCam needs permission to save media to your Photos library when you choose Keep Forever.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

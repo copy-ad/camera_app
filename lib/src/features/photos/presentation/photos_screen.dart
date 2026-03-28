@@ -75,8 +75,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
             .where((item) => !item.isKeptForever)
             .take(3)
             .toList(growable: false);
-        final photoCount = controller.photos.where((item) => item.isPhoto).length;
-        final videoCount = controller.photos.where((item) => item.isVideo).length;
+        final photoCount =
+            controller.photos.where((item) => item.isPhoto).length;
+        final videoCount =
+            controller.photos.where((item) => item.isVideo).length;
 
         return Scaffold(
           body: RefreshIndicator(
@@ -111,7 +113,9 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 final isSelected = filter == _filter;
                                 return Padding(
                                   padding: EdgeInsets.only(
-                                    right: filter == _GalleryFilter.values.last ? 0 : 10,
+                                    right: filter == _GalleryFilter.values.last
+                                        ? 0
+                                        : 10,
                                   ),
                                   child: _FilterChipButton(
                                     label: filter.label,
@@ -159,7 +163,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
-                                    'Encrypted Vault',
+                                    'Private Vault',
                                     style: TextStyle(
                                       fontFamily: 'Manrope',
                                       fontSize: 22,
@@ -238,7 +242,8 @@ class _PhotosScreenState extends State<PhotosScreen> {
                         },
                         childCount: visibleMedia.length,
                       ),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 14,
                         mainAxisSpacing: 14,
@@ -394,7 +399,8 @@ class _GalleryHero extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
                   color: AppTheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
@@ -464,9 +470,18 @@ class _GalleryHero extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              _HeroMetric(label: 'All Media', value: totalCount.toString(), accent: AppTheme.primary),
-              _HeroMetric(label: 'Photos', value: photoCount.toString(), accent: AppTheme.secondary),
-              _HeroMetric(label: 'Videos', value: videoCount.toString(), accent: AppTheme.tertiary),
+              _HeroMetric(
+                  label: 'All Media',
+                  value: totalCount.toString(),
+                  accent: AppTheme.primary),
+              _HeroMetric(
+                  label: 'Photos',
+                  value: photoCount.toString(),
+                  accent: AppTheme.secondary),
+              _HeroMetric(
+                  label: 'Videos',
+                  value: videoCount.toString(),
+                  accent: AppTheme.tertiary),
             ],
           ),
         ],
@@ -501,10 +516,13 @@ class _HeroMetric extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(color: accent, fontSize: 20, fontWeight: FontWeight.w800),
+            style: TextStyle(
+                color: accent, fontSize: 20, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: AppTheme.onSurfaceVariant, fontSize: 12)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppTheme.onSurfaceVariant, fontSize: 12)),
         ],
       ),
     );
@@ -536,7 +554,9 @@ class _FilterChipButton extends StatelessWidget {
             color: selected ? AppTheme.primary : AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: selected ? AppTheme.primary : Colors.white.withValues(alpha: 0.05),
+              color: selected
+                  ? AppTheme.primary
+                  : Colors.white.withValues(alpha: 0.05),
             ),
             boxShadow: selected ? AppTheme.softGlow : const [],
           ),
@@ -568,14 +588,20 @@ class _SelectionToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton.tonal(
       style: FilledButton.styleFrom(
-        backgroundColor: selectionMode ? AppTheme.secondary : AppTheme.surfaceContainer,
-        foregroundColor: selectionMode ? const Color(0xFF3C2F00) : AppTheme.onSurface,
+        backgroundColor:
+            selectionMode ? AppTheme.secondary : AppTheme.surfaceContainer,
+        foregroundColor:
+            selectionMode ? const Color(0xFF3C2F00) : AppTheme.onSurface,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       onPressed: onTap,
       child: Text(
-        selectionMode && selectedCount > 0 ? 'Done ($selectedCount)' : selectionMode ? 'Done' : 'Select',
+        selectionMode && selectedCount > 0
+            ? 'Done ($selectedCount)'
+            : selectionMode
+                ? 'Done'
+                : 'Select',
         style: const TextStyle(fontWeight: FontWeight.w800),
       ),
     );
@@ -749,13 +775,15 @@ class _ExpiringCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.secondary,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      _formatRemaining(item.expiresAt, isKeptForever: item.isKeptForever),
+                      _formatRemaining(item.expiresAt,
+                          isKeptForever: item.isKeptForever),
                       style: const TextStyle(
                         color: Color(0xFF3C2F00),
                         fontWeight: FontWeight.w800,
@@ -801,7 +829,9 @@ class _VaultTile extends StatelessWidget {
             color: AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(26),
             border: Border.all(
-              color: selected ? AppTheme.primary : Colors.white.withValues(alpha: 0.06),
+              color: selected
+                  ? AppTheme.primary
+                  : Colors.white.withValues(alpha: 0.06),
               width: selected ? 1.6 : 1,
             ),
             boxShadow: selected ? AppTheme.softGlow : const [],
@@ -832,7 +862,8 @@ class _VaultTile extends StatelessWidget {
                       Positioned(
                         top: 10,
                         left: 10,
-                        child: _MediaPill(label: item.isVideo ? 'VIDEO' : 'PHOTO'),
+                        child:
+                            _MediaPill(label: item.isVideo ? 'VIDEO' : 'PHOTO'),
                       ),
                       Positioned(
                         top: 10,
@@ -844,16 +875,24 @@ class _VaultTile extends StatelessWidget {
                             width: 26,
                             height: 26,
                             decoration: BoxDecoration(
-                              color: selected ? AppTheme.primary : Colors.black.withValues(alpha: 0.28),
+                              color: selected
+                                  ? AppTheme.primary
+                                  : Colors.black.withValues(alpha: 0.28),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: selected ? AppTheme.primary : Colors.white.withValues(alpha: 0.28),
+                                color: selected
+                                    ? AppTheme.primary
+                                    : Colors.white.withValues(alpha: 0.28),
                               ),
                             ),
                             child: Icon(
-                              selected ? Icons.check_rounded : Icons.circle_outlined,
+                              selected
+                                  ? Icons.check_rounded
+                                  : Icons.circle_outlined,
                               size: 16,
-                              color: selected ? const Color(0xFF003061) : Colors.white,
+                              color: selected
+                                  ? const Color(0xFF003061)
+                                  : Colors.white,
                             ),
                           ),
                         ),
@@ -869,22 +908,29 @@ class _VaultTile extends StatelessWidget {
                         item.isKeptForever ? 'Kept Forever' : item.timerLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 15),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      item.isVideo ? Icons.play_circle_fill_rounded : Icons.photo_rounded,
-                      color: item.isVideo ? AppTheme.tertiary : AppTheme.primary,
+                      item.isVideo
+                          ? Icons.play_circle_fill_rounded
+                          : Icons.photo_rounded,
+                      color:
+                          item.isVideo ? AppTheme.tertiary : AppTheme.primary,
                       size: 18,
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _formatRemaining(item.expiresAt, isKeptForever: item.isKeptForever),
+                  _formatRemaining(item.expiresAt,
+                      isKeptForever: item.isKeptForever),
                   style: TextStyle(
-                    color: item.isKeptForever ? AppTheme.secondary : AppTheme.onSurfaceVariant,
+                    color: item.isKeptForever
+                        ? AppTheme.secondary
+                        : AppTheme.onSurfaceVariant,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -926,7 +972,8 @@ class _VideoThumbnailView extends StatefulWidget {
 }
 
 class _VideoThumbnailViewState extends State<_VideoThumbnailView> {
-  static final Map<String, Future<Uint8List?>> _cache = <String, Future<Uint8List?>>{};
+  static final Map<String, Future<Uint8List?>> _cache =
+      <String, Future<Uint8List?>>{};
 
   late final Future<Uint8List?> _thumbnailFuture = _cache.putIfAbsent(
     widget.filePath,
@@ -1022,9 +1069,12 @@ class _EmptyVaultState extends StatelessWidget {
       _GalleryFilter.videos => 'No temp videos yet',
     };
     final subtitle = switch (filter) {
-      _GalleryFilter.all => 'Capture a photo or video and it will appear here with its self-destruct timer.',
-      _GalleryFilter.photos => 'This filter only shows temp photos stored inside TempCam.',
-      _GalleryFilter.videos => 'This filter only shows temp videos stored inside TempCam.',
+      _GalleryFilter.all =>
+        'Capture a photo or video and it will appear here with its self-destruct timer.',
+      _GalleryFilter.photos =>
+        'This filter only shows temp photos stored inside TempCam.',
+      _GalleryFilter.videos =>
+        'This filter only shows temp videos stored inside TempCam.',
     };
 
     return Center(
@@ -1041,7 +1091,8 @@ class _EmptyVaultState extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
               ),
-              child: const Icon(Icons.photo_library_outlined, color: AppTheme.outline, size: 40),
+              child: const Icon(Icons.photo_library_outlined,
+                  color: AppTheme.outline, size: 40),
             ),
             const SizedBox(height: 22),
             Text(

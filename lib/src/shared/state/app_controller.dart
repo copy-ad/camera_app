@@ -897,7 +897,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<String?> _exportMediaToMainGallery(PhotoRecord record) async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return record.filePath;
     }
     try {
@@ -1046,12 +1046,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (_isCapturing || _isRecordingVideo) {
       return 'Finish the current capture before importing media.';
     }
+    List<_ImportedDeviceMedia> importedItems = const [];
     try {
-      final importedItems = await _pickImportableMedia();
+      importedItems = await _pickImportableMedia();
       if (importedItems.isEmpty) {
         return null;
       }
       if (!context.mounted) {
+        await _consumeImportedMedia(importedItems, deleteOriginals: false);
         return null;
       }
       final selected = await TimerSelectionSheet.show(
@@ -1062,6 +1064,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         previewMediaType: importedItems.first.mediaType,
       );
       if (!context.mounted) {
+        await _consumeImportedMedia(importedItems, deleteOriginals: false);
         return null;
       }
       final timer = selected ?? settings.defaultTimer;
@@ -1071,7 +1074,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         timer: timer,
       );
       final failedOriginalDeletions =
-          await _consumeImportedMedia(importedItems);
+          await _consumeImportedMedia(importedItems, deleteOriginals: true);
       await refreshPhotos();
       _currentTabIndex = 0;
       notifyListeners();
@@ -1085,6 +1088,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           ? '1 item moved into TempCam and removed from the main gallery.'
           : '$count items moved into TempCam and removed from the main gallery.';
     } catch (_) {
+      await _consumeImportedMedia(importedItems, deleteOriginals: false);
       return 'Unable to import media right now.';
     }
   }
@@ -1114,7 +1118,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         .toList(growable: false);
   }
 
-  Future<int> _consumeImportedMedia(List<_ImportedDeviceMedia> items) async {
+  Future<int> _consumeImportedMedia(
+    List<_ImportedDeviceMedia> items, {
+    required bool deleteOriginals,
+  }) async {
     if (items.isEmpty) {
       return 0;
     }
@@ -1125,6 +1132,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         await _mediaGalleryChannel.invokeMethod<Map<dynamic, dynamic>>(
       'consumeImportedMedia',
       <String, dynamic>{
+        'deleteOriginals': deleteOriginals,
         'items':
             items.map((item) => item.toChannelMap()).toList(growable: false),
       },

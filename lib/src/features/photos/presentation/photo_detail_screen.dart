@@ -76,6 +76,11 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                       hasPremiumAccess: controller.hasPremiumAccess,
                       onBack: () => Navigator.of(context).pop(),
                       onExtend: () async {
+                        final unlocked =
+                            await controller.promptForPremiumAccess(context);
+                        if (!context.mounted || !unlocked) {
+                          return;
+                        }
                         final timer = await TimerSelectionSheet.show(
                           context,
                           AppTimerOption.twentyFourHours,

@@ -12,6 +12,18 @@ import 'package:tempcam/src/shared/theme/app_theme.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _unlockAccessThen(
+    BuildContext context,
+    AppController controller,
+    Future<void> Function() action,
+  ) async {
+    final unlocked = await controller.promptForPremiumAccess(context);
+    if (!context.mounted || !unlocked) {
+      return;
+    }
+    await action();
+  }
+
   Future<void> _authenticateThen(
     BuildContext context,
     AppController controller,
@@ -126,10 +138,14 @@ class SettingsScreen extends StatelessWidget {
                               if (option == null) {
                                 return;
                               }
-                              await _authenticateThen(
+                              await _unlockAccessThen(
                                 context,
                                 controller,
-                                () => controller.updateDefaultTimer(option),
+                                () => _authenticateThen(
+                                  context,
+                                  controller,
+                                  () => controller.updateDefaultTimer(option),
+                                ),
                               );
                             },
                           ),
@@ -148,10 +164,14 @@ class SettingsScreen extends StatelessWidget {
                           value: controller.settings.notificationsEnabled,
                           activeThumbColor: AppTheme.primary,
                           onChanged: (value) async {
-                            await _authenticateThen(
+                            await _unlockAccessThen(
                               context,
                               controller,
-                              () => controller.updateNotifications(value),
+                              () => _authenticateThen(
+                                context,
+                                controller,
+                                () => controller.updateNotifications(value),
+                              ),
                             );
                           },
                         ),
@@ -171,11 +191,16 @@ class SettingsScreen extends StatelessWidget {
                           activeThumbColor: AppTheme.primary,
                           onChanged: controller.settings.notificationsEnabled
                               ? (value) async {
-                                  await _authenticateThen(
+                                  await _unlockAccessThen(
                                     context,
                                     controller,
-                                    () => controller.updateStealthNotifications(
-                                      value,
+                                    () => _authenticateThen(
+                                      context,
+                                      controller,
+                                      () =>
+                                          controller.updateStealthNotifications(
+                                        value,
+                                      ),
                                     ),
                                   );
                                 }
@@ -206,10 +231,15 @@ class SettingsScreen extends StatelessWidget {
                           activeThumbColor: AppTheme.primary,
                           onChanged: controller.biometricAvailable
                               ? (value) async {
-                                  await _authenticateThen(
+                                  await _unlockAccessThen(
                                     context,
                                     controller,
-                                    () => controller.updateBiometricLock(value),
+                                    () => _authenticateThen(
+                                      context,
+                                      controller,
+                                      () =>
+                                          controller.updateBiometricLock(value),
+                                    ),
                                   );
                                 }
                               : null,
@@ -234,11 +264,15 @@ class SettingsScreen extends StatelessWidget {
                           onChanged: controller.biometricAvailable &&
                                   controller.settings.biometricLockEnabled
                               ? (value) async {
-                                  await _authenticateThen(
+                                  await _unlockAccessThen(
                                     context,
                                     controller,
-                                    () => controller.updateSessionPrivacyMode(
-                                      value,
+                                    () => _authenticateThen(
+                                      context,
+                                      controller,
+                                      () => controller.updateSessionPrivacyMode(
+                                        value,
+                                      ),
                                     ),
                                   );
                                 }
@@ -285,11 +319,15 @@ class SettingsScreen extends StatelessWidget {
                                     if (option == null) {
                                       return;
                                     }
-                                    await _authenticateThen(
+                                    await _unlockAccessThen(
                                       context,
                                       controller,
-                                      () => controller.updateQuickLockTimeout(
-                                        option,
+                                      () => _authenticateThen(
+                                        context,
+                                        controller,
+                                        () => controller.updateQuickLockTimeout(
+                                          option,
+                                        ),
                                       ),
                                     );
                                   }
@@ -464,13 +502,9 @@ class _SettingsHero extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      hasStoreManagedTrialOffer && !isActive
-                          ? l10n.tr('FREE TRIAL')
-                          : isActive
-                              ? l10n.tr('ACTIVE')
-                              : l10n.tr('REQUIRED'),
+                      isActive ? l10n.tr('ACTIVE') : l10n.tr('EXPLORE'),
                       style: TextStyle(
-                        color: hasStoreManagedTrialOffer || isActive
+                        color: isActive
                             ? const Color(0xFF3C2F00)
                             : AppTheme.onSurface,
                         fontWeight: FontWeight.w800,
@@ -495,9 +529,9 @@ class _SettingsHero extends StatelessWidget {
           Text(
             isActive
                 ? l10n.tr('Your access is live.')
-                : hasStoreManagedTrialOffer
-                    ? l10n.tr('Start with 15 days free.')
-                    : l10n.tr('Yearly access powers TempCam.'),
+                : l10n.tr(
+                    'Explore TempCam first. Unlock temporary saving when you are ready.',
+                  ),
             style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 28,
@@ -517,10 +551,10 @@ class _SettingsHero extends StatelessWidget {
                       )
                 : hasStoreManagedTrialOffer
                     ? l10n.tr(
-                        'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.',
+                        'You can browse the full app now. Enroll through Google Play or the App Store when you want to save captures with timers, import media, and unlock the private protection flow.',
                       )
                     : l10n.tr(
-                        'A {price} yearly subscription keeps TempCam private, temporary, and fully unlocked.',
+                        'You can browse the full app now. A {price} yearly subscription unlocks temporary saving, timer-based storage, imports, and private protection features.',
                         {'price': priceLabel},
                       ),
             style: const TextStyle(
@@ -537,11 +571,9 @@ class _SettingsHero extends StatelessWidget {
             ),
             onPressed: onManageAccess,
             child: Text(
-              hasStoreManagedTrialOffer && !isActive
-                  ? l10n.tr('View Yearly Plan')
-                  : isActive
-                      ? l10n.tr('Manage Access')
-                      : l10n.tr('View Access Options'),
+              isActive
+                  ? l10n.tr('Manage Access')
+                  : l10n.tr('Unlock Temporary Saving'),
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),

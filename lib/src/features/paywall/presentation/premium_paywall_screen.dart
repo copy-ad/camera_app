@@ -68,41 +68,31 @@ class PremiumPaywallScreen extends StatelessWidget {
             : '${controller.yearlyPriceLabel} / year';
         final String title = isTestAccess
             ? l10n.tr('Payments Disabled Temporarily')
-            : requiredForAccess
-                ? l10n.tr('Access Required')
-                : isActive
-                    ? l10n.tr('Manage TempCam Access')
-                    : l10n.tr('Unlock TempCam');
+            : isActive
+                ? l10n.tr('Manage TempCam Access')
+                : l10n.tr('Unlock Temporary Saving');
         final String description = isTestAccess
             ? l10n.tr(
                 'This build bypasses subscriptions so you can test TempCam on your phone before store upload.',
               )
-            : requiredForAccess
-                ? hasStoreTrial
+            : isActive
+                ? l10n.tr(
+                    'Your subscription is handled directly by the App Store or Google Play with one yearly plan.',
+                  )
+                : hasStoreTrial
                     ? l10n.tr(
-                        'Start the Google Play or App Store managed 15-day free trial, or restore your yearly access to open TempCam.',
+                        'Explore the full app first. Start the secure store-managed 15-day trial when you are ready to save captures with timers, import media, and turn on private protection features.',
                       )
                     : l10n.tr(
-                        'Buy or restore yearly access to open TempCam. If your store account is eligible, the platform may apply the 15-day free trial during checkout.',
-                      )
-                : isActive
-                    ? l10n.tr(
-                        'Your subscription is handled directly by the App Store or Google Play with one yearly plan.',
-                      )
-                    : hasStoreTrial
-                        ? l10n.tr(
-                            'Start your secure store-managed 15-day free trial, then continue with one yearly plan.',
-                          )
-                        : l10n.tr(
-                            'Start or restore yearly access. If your store account is eligible, the platform may apply the 15-day free trial during checkout.',
-                          );
+                        'Explore the full app first. Start or restore yearly access when you are ready to save captures with timers, import media, and turn on private protection features.',
+                      );
         final String badgeText = isTestAccess
             ? l10n.tr('PAYMENT OFF')
-            : hasStoreTrial
-                ? l10n.tr('15 DAYS FREE')
-                : isActive
-                    ? l10n.tr('ACTIVE')
-                    : l10n.tr('YEARLY ACCESS');
+            : isActive
+                ? l10n.tr('ACTIVE')
+                : hasStoreTrial
+                    ? l10n.tr('15 DAYS FREE')
+                    : l10n.tr('UNLOCK SAVE');
         final String buttonText = isTestAccess
             ? l10n.tr('Payment Disabled For Testing')
             : hasStoreTrial
@@ -112,7 +102,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                     : isBusy
                         ? l10n.tr('Connecting To Store...')
                         : l10n.tr(
-                            'Buy 1 Year For {price}',
+                            'Unlock 1 Year For {price}',
                             {'price': controller.yearlyPriceLabel},
                           );
         final String footerText = isTestAccess
@@ -128,7 +118,7 @@ class PremiumPaywallScreen extends StatelessWidget {
               )
             : hasStoreTrial
                 ? l10n.tr(
-                    'If eligible, checkout starts with the store-managed 15-day free trial and then renews yearly.',
+                    'If eligible, checkout starts with the store-managed 15-day free trial and then renews yearly after temporary saving is unlocked.',
                   )
                 : isActive
                     ? l10n.tr('Your yearly subscription is active.')
@@ -136,7 +126,7 @@ class PremiumPaywallScreen extends StatelessWidget {
                         ? l10n.tr(
                             'Fallback price shown until the store catalog loads.')
                         : l10n.tr(
-                            'Directly billed and renewed by the platform store.');
+                            'Directly billed and renewed by the platform store when you unlock saving.');
 
         return Scaffold(
           body: Stack(
@@ -233,31 +223,31 @@ class PremiumPaywallScreen extends StatelessWidget {
                                   _FeatureCard(
                                     Icons.lock_clock_rounded,
                                     AppTheme.primary,
-                                    l10n.tr('Store Trial'),
+                                    l10n.tr('Timed Saving'),
                                     l10n.tr(
-                                      'The 15-day free trial is managed by Google Play or the App Store, so clearing app data will not restart it.',
+                                      'Apply self-destruct timers and keep temporary captures inside TempCam after you enroll.',
                                     ),
                                   ),
                                   _FeatureCard(
                                     Icons.calendar_month_rounded,
                                     AppTheme.secondary,
-                                    l10n.tr('Yearly Billing'),
+                                    l10n.tr('Store Managed'),
                                     l10n.tr(
-                                      'One auto-renewing yearly subscription managed directly by Google Play or the App Store.',
+                                      'One yearly subscription, with the 15-day trial handled by Google Play or the App Store when eligible.',
                                     ),
                                   ),
                                   _FeatureCard(
                                     Icons.fingerprint_rounded,
                                     AppTheme.primary,
-                                    l10n.tr('Secure Access'),
+                                    l10n.tr('Private Protection'),
                                     l10n.tr(
-                                      'Once the subscription or trial is active, TempCam unlocks fully and can re-lock with biometrics.',
+                                      'Biometric lock, session privacy mode, and private retention controls stay aligned with your active access.',
                                     ),
                                   ),
                                   _FeatureCard(
                                     Icons.restore_rounded,
                                     AppTheme.secondary,
-                                    l10n.tr('Restore Support'),
+                                    l10n.tr('Restore Access'),
                                     l10n.tr(
                                       'Recover your yearly access from the App Store or Google Play on reinstall.',
                                     ),

@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/premium_constants.dart';
 import '../../features/camera/presentation/timer_selection_sheet.dart';
+import '../../features/paywall/presentation/premium_paywall_screen.dart';
 import '../../localization/app_localizations.dart';
 import '../models/app_settings.dart';
 import '../models/photo_record.dart';
@@ -213,6 +214,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     return hasStoreSubscriptionAccess;
   }
+
+  bool get canSaveTemporaryMedia => hasPremiumAccess;
 
   DateTime? get premiumAccessExpiresAt => _settings.premiumAccessExpiresAt;
 
@@ -419,6 +422,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> enableDevelopmentAccessBypass() async {}
 
   Future<void> disableDevelopmentAccessBypass() async {}
+
+  Future<bool> promptForPremiumAccess(BuildContext context) async {
+    if (hasPremiumAccess || !context.mounted) {
+      return hasPremiumAccess;
+    }
+    await PremiumPaywallScreen.show(context);
+    return hasPremiumAccess;
+  }
 
   Future<void> _syncExistingStorePurchases() async {
     if (!_isStoreAvailable || PremiumConstants.paymentsTemporarilyDisabled) {
@@ -883,6 +894,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         if (!context.mounted) {
           return null;
         }
+        if (!hasPremiumAccess) {
+          final unlocked = await promptForPremiumAccess(context);
+          if (!context.mounted) {
+            await _discardTransientFile(file.path);
+            return null;
+          }
+          if (!unlocked) {
+            await _discardTransientFile(file.path);
+            return null;
+          }
+        }
         final selected = await TimerSelectionSheet.show(
           context,
           settings.defaultTimer,
@@ -1018,6 +1040,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (!context.mounted) {
         return;
       }
+      if (!hasPremiumAccess) {
+        final unlocked = await promptForPremiumAccess(context);
+        if (!context.mounted) {
+          await _discardTransientFile(file.path);
+          return;
+        }
+        if (!unlocked) {
+          await _discardTransientFile(file.path);
+          return;
+        }
+      }
       final selected = await TimerSelectionSheet.show(
         context,
         settings.defaultTimer,
@@ -1077,6 +1110,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> importMediaToVault(BuildContext context) async {
     if (_isCapturing || _isRecordingVideo) {
       return l10n.tr('Finish the current capture before importing media.');
+    }
+    if (!await promptForPremiumAccess(context)) {
+      return null;
     }
     List<_ImportedDeviceMedia> importedItems = const [];
     try {
@@ -1212,6 +1248,15 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     _settings = _settings.copyWith(sessionPrivacyModeEnabled: enabled);
     await _settingsRepository.save(_settings);
     notifyListeners();
+  }
+
+  Future<void> _discardTransientFile(String path) async {
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {}
   }
 
   Future<bool> unlockApp() async {

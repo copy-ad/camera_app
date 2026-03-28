@@ -27,300 +27,296 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        final bottomInset = MediaQuery.paddingOf(context).bottom;
         return Scaffold(
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
-            children: [
-              _SettingsHero(
-                isActive: controller.hasPremiumAccess,
-                hasStoreManagedTrialOffer: controller.hasStoreManagedTrialOffer,
-                priceLabel: controller.yearlyPriceLabel,
-                accessUntil: controller.premiumAccessExpiresAt,
-                onManageAccess: () => PremiumPaywallScreen.show(context),
-                onPanicExit: controller.panicExit,
-              ),
-              const SizedBox(height: 24),
-              const _SettingsSectionLabel('Capture Defaults'),
-              const SizedBox(height: 12),
-              _PremiumCard(
-                child: Column(
-                  children: [
-                    _ActionRow(
-                      icon: Icons.schedule_rounded,
-                      title: 'Default Self-Destruct Timer',
-                      subtitle: 'Choose how long new captures stay available by default.',
-                      trailing: DropdownButtonHideUnderline(
-                        child: DropdownButton<AppTimerOption>(
-                          value: controller.settings.defaultTimer,
-                          dropdownColor: AppTheme.surfaceHigh,
-                          borderRadius: BorderRadius.circular(18),
-                          items: AppTimerOption.settingsDefaults
-                              .map(
-                                (option) => DropdownMenuItem<AppTimerOption>(
-                                  value: option,
-                                  child: Text(
-                                    option.label,
-                                    style: const TextStyle(color: AppTheme.secondary),
+          body: SafeArea(
+            bottom: false,
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(20, 12, 20, bottomInset + 92),
+              children: [
+                _SettingsHero(
+                  isActive: controller.hasPremiumAccess,
+                  hasStoreManagedTrialOffer: controller.hasStoreManagedTrialOffer,
+                  priceLabel: controller.yearlyPriceLabel,
+                  accessUntil: controller.premiumAccessExpiresAt,
+                  onManageAccess: () => PremiumPaywallScreen.show(context),
+                  onPanicExit: controller.panicExit,
+                ),
+                const SizedBox(height: 24),
+                const _SettingsSectionLabel('Capture Defaults'),
+                const SizedBox(height: 12),
+                _PremiumCard(
+                  child: Column(
+                    children: [
+                      _ActionRow(
+                        icon: Icons.schedule_rounded,
+                        title: 'Default Self-Destruct Timer',
+                        subtitle:
+                            'Choose how long new captures stay available by default.',
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton<AppTimerOption>(
+                            value: controller.settings.defaultTimer,
+                            dropdownColor: AppTheme.surfaceHigh,
+                            borderRadius: BorderRadius.circular(18),
+                            items: AppTimerOption.settingsDefaults
+                                .map(
+                                  (option) => DropdownMenuItem<AppTimerOption>(
+                                    value: option,
+                                    child: Text(
+                                      option.label,
+                                      style: const TextStyle(
+                                        color: AppTheme.secondary,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (option) async {
-                            if (option == null) {
-                              return;
-                            }
+                                )
+                                .toList(),
+                            onChanged: (option) async {
+                              if (option == null) {
+                                return;
+                              }
+                              await _authenticateThen(
+                                context,
+                                controller,
+                                () => controller.updateDefaultTimer(option),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      _ActionRow(
+                        icon: Icons.notifications_active_rounded,
+                        title: 'Expiry Notifications',
+                        subtitle: 'Get warned before temporary media disappears.',
+                        trailing: Switch.adaptive(
+                          value: controller.settings.notificationsEnabled,
+                          activeThumbColor: AppTheme.primary,
+                          onChanged: (value) async {
                             await _authenticateThen(
                               context,
                               controller,
-                              () => controller.updateDefaultTimer(option),
+                              () => controller.updateNotifications(value),
                             );
                           },
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0x33414755), height: 1),
-                    const SizedBox(height: 14),
-                    _ActionRow(
-                      icon: Icons.notifications_active_rounded,
-                      title: 'Expiry Notifications',
-                      subtitle: 'Get warned before temporary media disappears.',
-                      trailing: Switch.adaptive(
-                        value: controller.settings.notificationsEnabled,
-                        activeThumbColor: AppTheme.primary,
-                        onChanged: (value) async {
-                          await _authenticateThen(
-                            context,
-                            controller,
-                            () => controller.updateNotifications(value),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0x33414755), height: 1),
-                    const SizedBox(height: 14),
-                    _ActionRow(
-                      icon: Icons.notifications_none_rounded,
-                      title: 'Stealth Notifications',
-                      subtitle:
-                          'Hide photo and video wording in reminders for a quieter lock-screen presence.',
-                      trailing: Switch.adaptive(
-                        value: controller.settings.stealthNotificationsEnabled,
-                        activeThumbColor: AppTheme.primary,
-                        onChanged: controller.settings.notificationsEnabled
-                            ? (value) async {
-                                await _authenticateThen(
-                                  context,
-                                  controller,
-                                  () => controller.updateStealthNotifications(value),
-                                );
-                              }
-                            : null,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const _SettingsSectionLabel('Security'),
-              const SizedBox(height: 12),
-              _PremiumCard(
-                child: Column(
-                  children: [
-                    _ActionRow(
-                      icon: Icons.fingerprint_rounded,
-                      title: 'Biometric Lock',
-                      subtitle: controller.biometricAvailable
-                          ? 'Protect app entry and sensitive actions with biometrics.'
-                          : 'Biometric protection is unavailable on this device.',
-                      trailing: Switch.adaptive(
-                        value: controller.settings.biometricLockEnabled,
-                        activeThumbColor: AppTheme.primary,
-                        onChanged: controller.biometricAvailable
-                            ? (value) async {
-                                await _authenticateThen(
-                                  context,
-                                  controller,
-                                  () => controller.updateBiometricLock(value),
-                                );
-                              }
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0x33414755), height: 1),
-                    const SizedBox(height: 14),
-                    _ActionRow(
-                      icon: Icons.lock_clock_rounded,
-                      title: 'Session Privacy Mode',
-                      subtitle: controller.settings.biometricLockEnabled
-                          ? 'Lock TempCam immediately whenever the app loses focus.'
-                          : 'Enable Biometric Lock first to use instant session relocking.',
-                      trailing: Switch.adaptive(
-                        value: controller.settings.sessionPrivacyModeEnabled,
-                        activeThumbColor: AppTheme.primary,
-                        onChanged: controller.biometricAvailable &&
-                                controller.settings.biometricLockEnabled
-                            ? (value) async {
-                                await _authenticateThen(
-                                  context,
-                                  controller,
-                                  () => controller.updateSessionPrivacyMode(value),
-                                );
-                              }
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0x33414755), height: 1),
-                    const SizedBox(height: 14),
-                    _ActionRow(
-                      icon: Icons.timer_off_rounded,
-                      title: 'Quick Lock Timeout',
-                      subtitle: controller.settings.sessionPrivacyModeEnabled
-                          ? 'Session Privacy Mode locks instantly, so timeout is bypassed.'
-                          : 'Choose how long TempCam can stay in the background before it asks for biometrics again.',
-                      trailing: DropdownButtonHideUnderline(
-                        child: DropdownButton<QuickLockTimeoutOption>(
-                          value: controller.settings.quickLockTimeout,
-                          dropdownColor: AppTheme.surfaceHigh,
-                          borderRadius: BorderRadius.circular(18),
-                          items: QuickLockTimeoutOption.valuesForSettings
-                              .map(
-                                (option) =>
-                                    DropdownMenuItem<QuickLockTimeoutOption>(
-                                  value: option,
-                                  child: Text(
-                                    option.label,
-                                    style: const TextStyle(
-                                      color: AppTheme.secondary,
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: controller.settings.biometricLockEnabled
-                              ? (option) async {
-                                  if (option == null) {
-                                    return;
-                                  }
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      _ActionRow(
+                        icon: Icons.notifications_none_rounded,
+                        title: 'Stealth Notifications',
+                        subtitle:
+                            'Hide photo and video wording in reminders for a quieter lock-screen presence.',
+                        trailing: Switch.adaptive(
+                          value: controller.settings.stealthNotificationsEnabled,
+                          activeThumbColor: AppTheme.primary,
+                          onChanged: controller.settings.notificationsEnabled
+                              ? (value) async {
                                   await _authenticateThen(
                                     context,
                                     controller,
                                     () =>
-                                        controller.updateQuickLockTimeout(option),
+                                        controller.updateStealthNotifications(
+                                          value,
+                                        ),
                                   );
                                 }
                               : null,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Divider(color: Color(0x33414755), height: 1),
-                    const SizedBox(height: 14),
-                    const _SecurityNote(),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const _SettingsSectionLabel('Help'),
-              const SizedBox(height: 12),
-              _PremiumCard(
-                child: Column(
-                  children: [
-                    _ActionRow(
-                      icon: Icons.explore_rounded,
-                      title: 'Replay App Tour',
-                      subtitle:
-                          'Walk through camera, timers, vault, security, and settings again any time.',
-                      trailing: FilledButton.tonal(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.surfaceContainer,
-                          foregroundColor: AppTheme.onSurface,
-                        ),
-                        onPressed: () async {
-                          await controller.reopenTour();
-                          if (!context.mounted) {
-                            return;
-                          }
-                          await AppTourScreen.show(context);
-                          if (!context.mounted) {
-                            return;
-                          }
-                          await controller.markTourCompleted();
-                        },
-                        child: const Text(
-                          'Start',
-                          style: TextStyle(fontWeight: FontWeight.w800),
+                const SizedBox(height: 24),
+                const _SettingsSectionLabel('Security'),
+                const SizedBox(height: 12),
+                _PremiumCard(
+                  child: Column(
+                    children: [
+                      _ActionRow(
+                        icon: Icons.fingerprint_rounded,
+                        title: 'Biometric Lock',
+                        subtitle: controller.biometricAvailable
+                            ? 'Protect app entry and sensitive actions with biometrics.'
+                            : 'Biometric protection is unavailable on this device.',
+                        trailing: Switch.adaptive(
+                          value: controller.settings.biometricLockEnabled,
+                          activeThumbColor: AppTheme.primary,
+                          onChanged: controller.biometricAvailable
+                              ? (value) async {
+                                  await _authenticateThen(
+                                    context,
+                                    controller,
+                                    () => controller.updateBiometricLock(value),
+                                  );
+                                }
+                              : null,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const _SettingsSectionLabel('Trusted History'),
-              const SizedBox(height: 12),
-              _PremiumCard(
-                child: controller.vaultHistory.isEmpty
-                    ? const _HistoryEmptyState()
-                    : Column(
-                        children: controller.vaultHistory
-                            .take(6)
-                            .map((entry) => _HistoryRow(entry: entry))
-                            .toList(),
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      _ActionRow(
+                        icon: Icons.lock_clock_rounded,
+                        title: 'Session Privacy Mode',
+                        subtitle: controller.settings.biometricLockEnabled
+                            ? 'Lock TempCam immediately whenever the app loses focus.'
+                            : 'Enable Biometric Lock first to use instant session relocking.',
+                        trailing: Switch.adaptive(
+                          value: controller.settings.sessionPrivacyModeEnabled,
+                          activeThumbColor: AppTheme.primary,
+                          onChanged:
+                              controller.biometricAvailable &&
+                                  controller.settings.biometricLockEnabled
+                              ? (value) async {
+                                  await _authenticateThen(
+                                    context,
+                                    controller,
+                                    () =>
+                                        controller.updateSessionPrivacyMode(
+                                          value,
+                                        ),
+                                  );
+                                }
+                              : null,
+                        ),
                       ),
-              ),
-              const SizedBox(height: 24),
-              const _SettingsSectionLabel('Why People Use TempCam'),
-              const SizedBox(height: 12),
-              const _PremiumCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _FeatureBullet(
-                      title: 'Temporary by default',
-                      description: 'Photos and videos auto-delete unless you decide to keep them forever.',
-                    ),
-                    SizedBox(height: 12),
-                    _FeatureBullet(
-                      title: 'Private by design',
-                      description: 'Temporary captures stay inside TempCam instead of appearing in the main gallery.',
-                    ),
-                    SizedBox(height: 12),
-                    _FeatureBullet(
-                      title: 'Fast under pressure',
-                      description: 'Open, capture, review, and protect sensitive moments with fewer steps.',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Center(
-                child: Column(
-                  children: [
-                    Text(
-                      '${AppStrings.appName} v${AppStrings.versionName}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        letterSpacing: 2,
-                        color: AppTheme.onSurfaceVariant,
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      _ActionRow(
+                        icon: Icons.timer_off_rounded,
+                        title: 'Quick Lock Timeout',
+                        subtitle: controller.settings.sessionPrivacyModeEnabled
+                            ? 'Session Privacy Mode locks instantly, so timeout is bypassed.'
+                            : 'Choose how long TempCam can stay in the background before it asks for biometrics again.',
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton<QuickLockTimeoutOption>(
+                            value: controller.settings.quickLockTimeout,
+                            dropdownColor: AppTheme.surfaceHigh,
+                            borderRadius: BorderRadius.circular(18),
+                            items: QuickLockTimeoutOption.valuesForSettings
+                                .map(
+                                  (option) =>
+                                      DropdownMenuItem<QuickLockTimeoutOption>(
+                                        value: option,
+                                        child: Text(
+                                          option.label,
+                                          style: const TextStyle(
+                                            color: AppTheme.secondary,
+                                          ),
+                                        ),
+                                      ),
+                                )
+                                .toList(),
+                            onChanged: controller.settings.biometricLockEnabled
+                                ? (option) async {
+                                    if (option == null) {
+                                      return;
+                                    }
+                                    await _authenticateThen(
+                                      context,
+                                      controller,
+                                      () => controller.updateQuickLockTimeout(
+                                        option,
+                                      ),
+                                    );
+                                  }
+                                : null,
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'LOCAL • TEMPORARY • PROTECTED',
-                      style: TextStyle(
-                        fontSize: 10,
-                        letterSpacing: 2,
-                        color: AppTheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: 14),
+                      const Divider(color: Color(0x33414755), height: 1),
+                      const SizedBox(height: 14),
+                      const _SecurityNote(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                const _SettingsSectionLabel('Help'),
+                const SizedBox(height: 12),
+                _PremiumCard(
+                  child: Column(
+                    children: [
+                      _ActionRow(
+                        icon: Icons.explore_rounded,
+                        title: 'Replay App Tour',
+                        subtitle:
+                            'Walk through camera, timers, vault, security, and settings again any time.',
+                        trailing: FilledButton.tonal(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppTheme.surfaceContainer,
+                            foregroundColor: AppTheme.onSurface,
+                          ),
+                          onPressed: () async {
+                            await controller.reopenTour();
+                            if (!context.mounted) {
+                              return;
+                            }
+                            await AppTourScreen.show(context);
+                            if (!context.mounted) {
+                              return;
+                            }
+                            await controller.markTourCompleted();
+                          },
+                          child: const Text(
+                            'Start',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const _SettingsSectionLabel('Trusted History'),
+                const SizedBox(height: 12),
+                _PremiumCard(
+                  child: controller.vaultHistory.isEmpty
+                      ? const _HistoryEmptyState()
+                      : Column(
+                          children: controller.vaultHistory
+                              .take(6)
+                              .map((entry) => _HistoryRow(entry: entry))
+                              .toList(),
+                        ),
+                ),
+                const SizedBox(height: 24),
+                const _SettingsSectionLabel('Why People Use TempCam'),
+                const SizedBox(height: 12),
+                const _PremiumCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _FeatureBullet(
+                        title: 'Temporary by default',
+                        description:
+                            'Photos and videos auto-delete unless you decide to keep them forever.',
+                      ),
+                      SizedBox(height: 12),
+                      _FeatureBullet(
+                        title: 'Private by design',
+                        description:
+                            'Temporary captures stay inside TempCam instead of appearing in the main gallery.',
+                      ),
+                      SizedBox(height: 12),
+                      _FeatureBullet(
+                        title: 'Fast under pressure',
+                        description:
+                            'Open, capture, review, and protect sensitive moments with fewer steps.',
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const _SettingsFooter(),
+              ],
+            ),
           ),
         );
       },
@@ -364,7 +360,10 @@ class _SettingsHero extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
@@ -382,7 +381,10 @@ class _SettingsHero extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: isActive
                           ? AppTheme.secondary.withValues(alpha: 0.94)
@@ -393,8 +395,8 @@ class _SettingsHero extends StatelessWidget {
                       hasStoreManagedTrialOffer && !isActive
                           ? 'FREE TRIAL'
                           : isActive
-                              ? 'ACTIVE'
-                              : 'REQUIRED',
+                          ? 'ACTIVE'
+                          : 'REQUIRED',
                       style: TextStyle(
                         color: hasStoreManagedTrialOffer || isActive
                             ? const Color(0xFF3C2F00)
@@ -422,8 +424,8 @@ class _SettingsHero extends StatelessWidget {
             isActive
                 ? 'Your access is live.'
                 : hasStoreManagedTrialOffer
-                    ? 'Start with 15 days free.'
-                    : 'Yearly access powers TempCam.',
+                ? 'Start with 15 days free.'
+                : 'Yearly access powers TempCam.',
             style: const TextStyle(
               fontFamily: 'Manrope',
               fontSize: 28,
@@ -435,11 +437,11 @@ class _SettingsHero extends StatelessWidget {
           Text(
             isActive
                 ? accessUntil == null
-                    ? 'Your current subscription is active through the store.'
-                    : 'Access is recorded until ${_formatDate(accessUntil!)}.'
+                      ? 'Your current subscription is active through the store.'
+                      : 'Access is recorded until ${_formatDate(accessUntil!)}.'
                 : hasStoreManagedTrialOffer
-                    ? 'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.'
-                    : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
+                ? 'Google Play or the App Store can start a secure 15-day free trial for eligible accounts before yearly billing begins.'
+                : 'A $priceLabel yearly subscription keeps TempCam private, temporary, and fully unlocked.',
             style: const TextStyle(
               color: AppTheme.onSurfaceVariant,
               height: 1.45,
@@ -457,8 +459,8 @@ class _SettingsHero extends StatelessWidget {
               hasStoreManagedTrialOffer && !isActive
                   ? 'View Yearly Plan'
                   : isActive
-                      ? 'Manage Access'
-                      : 'View Access Options',
+                  ? 'Manage Access'
+                  : 'View Access Options',
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
@@ -468,12 +470,38 @@ class _SettingsHero extends StatelessWidget {
   }
 
   static String _formatDate(DateTime value) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[value.month - 1]} ${value.day}, ${value.year}';
   }
 
   static String _formatDateTime(DateTime value) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final hour = value.hour % 12 == 0 ? 12 : value.hour % 12;
     final minute = value.minute.toString().padLeft(2, '0');
     final suffix = value.hour >= 12 ? 'PM' : 'AM';
@@ -592,7 +620,10 @@ class _SecurityNote extends StatelessWidget {
             color: AppTheme.secondary.withValues(alpha: 0.16),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.verified_user_rounded, color: AppTheme.secondary),
+          child: const Icon(
+            Icons.verified_user_rounded,
+            color: AppTheme.secondary,
+          ),
         ),
         const SizedBox(width: 14),
         const Expanded(
@@ -605,6 +636,44 @@ class _SecurityNote extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SettingsFooter extends StatelessWidget {
+  const _SettingsFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainer.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: const Column(
+        children: [
+          Text(
+            '${AppStrings.appName} v${AppStrings.versionName}',
+            style: TextStyle(
+              fontSize: 10,
+              letterSpacing: 2,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'LOCAL | TEMPORARY | PROTECTED',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 10,
+              letterSpacing: 2,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

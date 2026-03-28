@@ -66,53 +66,67 @@ class CameraScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: 178,
-                child: Center(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: controller.hasPremiumAccess
-                        ? null
-                        : () => controller.promptForPremiumAccess(context),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceHigh.withValues(alpha: 0.82),
-                        borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.sizeOf(context).width - 40,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              controller.hasPremiumAccess
-                                  ? Icons.timer_rounded
-                                  : Icons.lock_clock_rounded,
-                              color: AppTheme.secondary,
-                              size: 16,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(999),
+                        onTap: controller.hasPremiumAccess
+                            ? null
+                            : () => controller.promptForPremiumAccess(context),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceHigh.withValues(alpha: 0.82),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              controller.hasPremiumAccess
-                                  ? l10n.tr(
-                                      'Default {timer}',
-                                      {
-                                        'timer': l10n.timerLabel(
-                                          controller.settings.defaultTimer,
-                                        ),
-                                      },
-                                    )
-                                  : l10n.tr(
-                                      'Explore camera now. Unlock to save with a timer.',
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  controller.hasPremiumAccess
+                                      ? Icons.timer_rounded
+                                      : Icons.lock_clock_rounded,
+                                  color: AppTheme.secondary,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    controller.hasPremiumAccess
+                                        ? l10n.tr(
+                                            'Default {timer}',
+                                            {
+                                              'timer': l10n.timerLabel(
+                                                controller
+                                                    .settings.defaultTimer,
+                                              ),
+                                            },
+                                          )
+                                        : l10n.tr(
+                                            'Explore camera now. Unlock to save with a timer.',
+                                          ),
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    softWrap: true,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.2,
                                     ),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2,
-                              ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

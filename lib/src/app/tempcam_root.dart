@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:tempcam/src/features/lock/presentation/unlock_screen.dart';
+import 'package:tempcam/src/features/onboarding/presentation/app_tour_screen.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
@@ -20,6 +21,7 @@ class TempCamRoot extends StatefulWidget {
 class _TempCamRootState extends State<TempCamRoot> {
   final QuickActions _quickActions = const QuickActions();
   bool _isShowingTrialDialog = false;
+  bool _isShowingTour = false;
   bool _quickActionsReady = false;
 
   @override
@@ -58,6 +60,26 @@ class _TempCamRootState extends State<TempCamRoot> {
             }
             await appController.markTrialStartedNoticeSeen();
             _isShowingTrialDialog = false;
+          });
+        }
+
+        if (controller.didFinishBootstrap &&
+            controller.shouldShowAppTour &&
+            !_isShowingTrialDialog &&
+            !_isShowingTour &&
+            !controller.isLocked) {
+          _isShowingTour = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (!mounted) {
+              return;
+            }
+            final appController = context.read<AppController>();
+            await AppTourScreen.show(context);
+            if (!mounted) {
+              return;
+            }
+            await appController.markTourCompleted();
+            _isShowingTour = false;
           });
         }
 

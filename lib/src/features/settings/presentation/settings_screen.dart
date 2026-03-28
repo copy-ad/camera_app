@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tempcam/src/core/constants/app_strings.dart';
+import 'package:tempcam/src/features/onboarding/presentation/app_tour_screen.dart';
 import 'package:tempcam/src/features/paywall/presentation/premium_paywall_screen.dart';
 import 'package:tempcam/src/shared/models/app_settings.dart';
 import 'package:tempcam/src/shared/models/vault_history_entry.dart';
@@ -219,6 +220,42 @@ class SettingsScreen extends StatelessWidget {
                     const Divider(color: Color(0x33414755), height: 1),
                     const SizedBox(height: 14),
                     const _SecurityNote(),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              const _SettingsSectionLabel('Help'),
+              const SizedBox(height: 12),
+              _PremiumCard(
+                child: Column(
+                  children: [
+                    _ActionRow(
+                      icon: Icons.explore_rounded,
+                      title: 'Replay App Tour',
+                      subtitle:
+                          'Walk through camera, timers, vault, security, and settings again any time.',
+                      trailing: FilledButton.tonal(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppTheme.surfaceContainer,
+                          foregroundColor: AppTheme.onSurface,
+                        ),
+                        onPressed: () async {
+                          await controller.reopenTour();
+                          if (!context.mounted) {
+                            return;
+                          }
+                          await AppTourScreen.show(context);
+                          if (!context.mounted) {
+                            return;
+                          }
+                          await controller.markTourCompleted();
+                        },
+                        child: const Text(
+                          'Start',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

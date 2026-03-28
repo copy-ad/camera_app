@@ -127,6 +127,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       !hasStoreSubscriptionAccess &&
       !_settings.trialNoticeShown;
 
+  bool get shouldShowAppTour => !_settings.tourCompleted;
+
   bool get hasPremiumAccess {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
       return true;
@@ -191,6 +193,24 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _settings = _settings.copyWith(trialNoticeShown: true);
+    await _settingsRepository.save(_settings);
+    notifyListeners();
+  }
+
+  Future<void> markTourCompleted() async {
+    if (_settings.tourCompleted) {
+      return;
+    }
+    _settings = _settings.copyWith(tourCompleted: true);
+    await _settingsRepository.save(_settings);
+    notifyListeners();
+  }
+
+  Future<void> reopenTour() async {
+    if (!_settings.tourCompleted) {
+      return;
+    }
+    _settings = _settings.copyWith(tourCompleted: false);
     await _settingsRepository.save(_settings);
     notifyListeners();
   }

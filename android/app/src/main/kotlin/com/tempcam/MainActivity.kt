@@ -1,25 +1,33 @@
 package com.tempcam
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.UUID
 
 class MainActivity : FlutterFragmentActivity() {
     companion object {
         private const val MEDIA_GALLERY_CHANNEL = "tempcam/media_gallery"
         private const val SYSTEM_CHANNEL = "tempcam/system"
+        private const val PICK_IMPORTABLE_MEDIA_REQUEST_CODE = 4107
     }
+
+    private var pendingImportResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -29,6 +37,8 @@ class MainActivity : FlutterFragmentActivity() {
             MEDIA_GALLERY_CHANNEL,
         ).setMethodCallHandler { call, result ->
             when (call.method) {
+                "pickImportableMedia" -> launchImportableMediaPicker(result)
+                "consumeImportedMedia" -> consumeImportedMedia(call, result)
                 "saveVideoToGallery" -> {
                     val sourcePath = call.argument<String>("sourcePath")
                     val displayName = call.argument<String>("displayName")
@@ -80,6 +90,208 @@ class MainActivity : FlutterFragmentActivity() {
                 }
                 else -> result.notImplemented()
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode != PICK_IMPORTABLE_MEDIA_REQUEST_CODE) {
+            super.onActivityResult(requestCode, resultCode, data)
+            return
+        }
+
+        val result = pendingImportResult
+        pendingImportResult = null
+        if (result == null) {
+            super.onActivityResult(requestCode, resultCode, data)
+            return
+        }
+
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            result.success(emptyList<Map<String, Any?>>())
+            return
+        }
+
+        try {
+            val persistedFlags = data.flags and
+                (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            val pickedItems = mutableListOf<Map<String, Any?>>()
+            for (uri in extractUris(data)) {
+                if (persistedFlags != 0) {
+                    try {
+                        contentResolver.takePersistableUriPermission(uri, persistedFlags)
+                    } catch (_: SecurityException) {
+                        // Some providers do not grant persistable permissions. We can still
+                        // import the temporary copy and attempt deletion later when possible.
+                    }
+                }
+                pickedItems.add(createImportedMediaPayload(uri))
+            }
+            result.success(pickedItems)
+        } catch (exception: Exception) {
+            result.error("pick_failed", exception.message, null)
+        }
+    }
+
+    private fun launchImportableMediaPicker(result: MethodChannel.Result) {
+        if (pendingImportResult != null) {
+            result.error("picker_active", "Another media import is already in progress.", null)
+            return
+        }
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "video/*"))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        }
+
+        pendingImportResult = result
+        try {
+            startActivityForResult(intent, PICK_IMPORTABLE_MEDIA_REQUEST_CODE)
+        } catch (exception: Exception) {
+            pendingImportResult = null
+            result.error("picker_unavailable", exception.message, null)
+        }
+    }
+
+    private fun consumeImportedMedia(call: MethodCall, result: MethodChannel.Result) {
+        val rawItems = call.argument<List<*>>("items") ?: emptyList<Any>()
+        var failedOriginalDeletes = 0
+
+        for (rawItem in rawItems) {
+            val item = rawItem as? Map<*, *> ?: continue
+            val sourceHandle = item["sourceHandle"]?.toString()
+            val tempPath = item["tempPath"]?.toString()
+
+            if (!sourceHandle.isNullOrBlank()) {
+                val deleted = deleteOriginalFromHandle(sourceHandle)
+                if (!deleted) {
+                    failedOriginalDeletes += 1
+                }
+                releasePersistedPermission(sourceHandle)
+            }
+
+            if (!tempPath.isNullOrBlank()) {
+                deleteTempFile(tempPath)
+            }
+        }
+
+        result.success(
+            mapOf(
+                "failedOriginalDeletes" to failedOriginalDeletes,
+            ),
+        )
+    }
+
+    private fun extractUris(data: Intent): List<Uri> {
+        val uris = mutableListOf<Uri>()
+        val clipData = data.clipData
+        if (clipData != null) {
+            for (index in 0 until clipData.itemCount) {
+                clipData.getItemAt(index).uri?.let(uris::add)
+            }
+        } else {
+            data.data?.let(uris::add)
+        }
+        return uris.distinctBy { it.toString() }
+    }
+
+    private fun createImportedMediaPayload(uri: Uri): Map<String, Any?> {
+        val tempPath = copyUriToCache(uri)
+        return mapOf(
+            "tempPath" to tempPath,
+            "sourceHandle" to uri.toString(),
+            "mediaType" to inferMediaType(uri),
+        )
+    }
+
+    private fun copyUriToCache(uri: Uri): String {
+        val fileName = fileNameForUri(uri)
+        val targetDir = File(cacheDir, "imported_media/${UUID.randomUUID()}").apply {
+            mkdirs()
+        }
+        val targetFile = File(targetDir, fileName)
+        contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(targetFile).use { output ->
+                input.copyTo(output)
+            }
+        } ?: error("Unable to read the selected media.")
+        return targetFile.absolutePath
+    }
+
+    private fun fileNameForUri(uri: Uri): String {
+        val displayName = queryDisplayName(uri)
+        if (!displayName.isNullOrBlank()) {
+            return displayName
+        }
+
+        val extension = extensionForUri(uri)
+        val suffix = if (extension.isNullOrBlank()) "" else ".$extension"
+        return "tempcam_import_${System.currentTimeMillis()}$suffix"
+    }
+
+    private fun queryDisplayName(uri: Uri): String? {
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val columnIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (columnIndex >= 0) {
+                    return cursor.getString(columnIndex)
+                }
+            }
+        }
+        return null
+    }
+
+    private fun extensionForUri(uri: Uri): String? {
+        val mimeType = contentResolver.getType(uri) ?: return null
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+    }
+
+    private fun inferMediaType(uri: Uri): String {
+        val mimeType = contentResolver.getType(uri)
+        if (mimeType?.startsWith("video/") == true) {
+            return "video"
+        }
+        return "photo"
+    }
+
+    private fun deleteOriginalFromHandle(handle: String): Boolean {
+        val uri = Uri.parse(handle)
+        return try {
+            if (DocumentsContract.isDocumentUri(this, uri)) {
+                DocumentsContract.deleteDocument(contentResolver, uri)
+            } else {
+                contentResolver.delete(uri, null, null) > 0
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun releasePersistedPermission(handle: String) {
+        val uri = Uri.parse(handle)
+        try {
+            contentResolver.releasePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+            )
+        } catch (_: Exception) {
+            // The provider may not have granted persistable access.
+        }
+    }
+
+    private fun deleteTempFile(path: String) {
+        try {
+            val file = File(path)
+            if (file.exists()) {
+                file.delete()
+            }
+            file.parentFile?.delete()
+        } catch (_: Exception) {
+            // Temp cleanup is best-effort only.
         }
     }
 

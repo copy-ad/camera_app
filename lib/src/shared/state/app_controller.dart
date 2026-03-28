@@ -20,8 +20,68 @@ import '../services/billing_service.dart';
 import '../services/camera_service.dart';
 import '../services/notification_service.dart';
 
+class _ImportedDeviceMedia {
+  const _ImportedDeviceMedia({
+    required this.tempPath,
+    required this.mediaType,
+    this.sourceHandle,
+  });
+
+  final String tempPath;
+  final MediaType mediaType;
+  final String? sourceHandle;
+
+  Map<String, dynamic> toChannelMap() {
+    return <String, dynamic>{
+      'tempPath': tempPath,
+      'mediaType': mediaType.name,
+      'sourceHandle': sourceHandle,
+    };
+  }
+
+  static _ImportedDeviceMedia? fromMap(dynamic value) {
+    if (value is! Map) {
+      return null;
+    }
+    final map = value.cast<Object?, Object?>();
+    final tempPath = map['tempPath']?.toString();
+    if (tempPath == null || tempPath.isEmpty) {
+      return null;
+    }
+    final mediaTypeName = map['mediaType']?.toString();
+    final mediaType = MediaType.values.firstWhere(
+      (item) => item.name == mediaTypeName,
+      orElse: () => _fallbackMediaTypeFromPath(tempPath),
+    );
+    final sourceHandle = map['sourceHandle']?.toString();
+    return _ImportedDeviceMedia(
+      tempPath: tempPath,
+      mediaType: mediaType,
+      sourceHandle:
+          sourceHandle == null || sourceHandle.isEmpty ? null : sourceHandle,
+    );
+  }
+
+  static MediaType _fallbackMediaTypeFromPath(String path) {
+    final lowerPath = path.toLowerCase();
+    const videoExtensions = {
+      '.mp4',
+      '.mov',
+      '.m4v',
+      '.avi',
+      '.mkv',
+      '.webm',
+      '.3gp',
+    };
+    return videoExtensions.any(lowerPath.endsWith)
+        ? MediaType.video
+        : MediaType.photo;
+  }
+}
+
 class AppController extends ChangeNotifier with WidgetsBindingObserver {
-  static const MethodChannel _mediaGalleryChannel = MethodChannel('tempcam/media_gallery');
+  static const MethodChannel _mediaGalleryChannel =
+      MethodChannel('tempcam/media_gallery');
   AppController({
     required SettingsRepository settingsRepository,
     required PhotoRepository photoRepository,
@@ -107,16 +167,20 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   bool get isVideoMode => _isVideoMode;
   FlashMode get flashMode => _flashMode;
   bool get isFlashEnabled => _flashMode != FlashMode.off;
-  Duration get recordingDuration => _recordingStartedAt == null ? Duration.zero : DateTime.now().difference(_recordingStartedAt!);
+  Duration get recordingDuration => _recordingStartedAt == null
+      ? Duration.zero
+      : DateTime.now().difference(_recordingStartedAt!);
   bool get isStoreAvailable => _isStoreAvailable;
   bool get isStoreLoading => _isStoreLoading;
   bool get isPurchasePending => _isPurchasePending;
   bool get isSwitchingCamera => _isSwitchingCamera;
   bool get isPreviewShieldActive => _isPreviewShieldActive;
-  bool get isUsingDevelopmentBypass => PremiumConstants.paymentsTemporarilyDisabled;
+  bool get isUsingDevelopmentBypass =>
+      PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
-  bool get hasStoreManagedTrialOffer => _billingService.hasStoreManagedTrialOffer;
+  bool get hasStoreManagedTrialOffer =>
+      _billingService.hasStoreManagedTrialOffer;
 
   bool get hasStoreSubscriptionAccess {
     return _settings.hasPremiumAccess;
@@ -138,7 +202,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   DateTime? get premiumAccessExpiresAt => _settings.premiumAccessExpiresAt;
 
-  String get yearlyPriceLabel => _yearlySubscriptionProduct?.price ?? PremiumConstants.fallbackYearlyPriceLabel;
+  String get yearlyPriceLabel =>
+      _yearlySubscriptionProduct?.price ??
+      PremiumConstants.fallbackYearlyPriceLabel;
 
   List<PhotoRecord> photosMatching(String query) {
     if (query.trim().isEmpty) {
@@ -146,7 +212,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     final q = query.toLowerCase();
     return _photos.where((item) {
-      return item.timerLabel.toLowerCase().contains(q) || item.createdAt.toIso8601String().toLowerCase().contains(q);
+      return item.timerLabel.toLowerCase().contains(q) ||
+          item.createdAt.toIso8601String().toLowerCase().contains(q);
     }).toList();
   }
 
@@ -182,8 +249,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       await Future<void>.delayed(const Duration(milliseconds: 700));
     } finally {
       _didFinishBootstrap = true;
-      _isLocked =
-          hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
+      _isLocked = hasPremiumAccess &&
+          _settings.biometricLockEnabled &&
+          _biometricAvailable;
       notifyListeners();
     }
   }
@@ -219,7 +287,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
       _isStoreAvailable = false;
       _isStoreLoading = false;
-      _billingStatusMessage = 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
+      _billingStatusMessage =
+          'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
       notifyListeners();
       return;
     }
@@ -230,7 +299,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _isStoreAvailable = await _billingService.initialize();
       _yearlySubscriptionProduct = _billingService.yearlyProduct;
       if (_isStoreAvailable && _yearlySubscriptionProduct == null) {
-        _billingStatusMessage = 'The yearly subscription is not available in this build yet.';
+        _billingStatusMessage =
+            'The yearly subscription is not available in this build yet.';
       } else if (_isStoreAvailable) {
         await _refreshStoreEntitlementStatus();
         if (!Platform.isAndroid) {
@@ -239,7 +309,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       }
     } catch (_) {
       _isStoreAvailable = false;
-      _billingStatusMessage = 'The App Store / Google Play billing service is unavailable right now.';
+      _billingStatusMessage =
+          'The App Store / Google Play billing service is unavailable right now.';
     } finally {
       _isStoreLoading = false;
       notifyListeners();
@@ -248,7 +319,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> refreshBillingCatalog() async {
     if (PremiumConstants.paymentsTemporarilyDisabled) {
-      _billingStatusMessage = 'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
+      _billingStatusMessage =
+          'Payments are disabled for this build via TEMPCAM_DISABLE_PAYMENTS.';
       notifyListeners();
       return;
     }
@@ -257,7 +329,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     try {
       _yearlySubscriptionProduct = await _billingService.refreshCatalog();
-      _billingStatusMessage = _yearlySubscriptionProduct == null ? 'No yearly subscription product was returned by the store.' : null;
+      _billingStatusMessage = _yearlySubscriptionProduct == null
+          ? 'No yearly subscription product was returned by the store.'
+          : null;
     } catch (_) {
       _billingStatusMessage = 'Unable to refresh products from the store.';
     } finally {
@@ -351,12 +425,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
-    if (event.status == BillingEventStatus.purchased || event.status == BillingEventStatus.restored) {
+    if (event.status == BillingEventStatus.purchased ||
+        event.status == BillingEventStatus.restored) {
       final purchase = event.purchase;
-      if (purchase != null && purchase.productID == PremiumConstants.yearlySubscriptionProductId) {
+      if (purchase != null &&
+          purchase.productID == PremiumConstants.yearlySubscriptionProductId) {
         _isPurchasePending = false;
         await _activatePremiumAccess(purchase);
-        _billingStatusMessage = event.status == BillingEventStatus.restored ? 'Your yearly subscription has been restored.' : 'Yearly access unlocked. TempCam is ready to use.';
+        _billingStatusMessage = event.status == BillingEventStatus.restored
+            ? 'Your yearly subscription has been restored.'
+            : 'Yearly access unlocked. TempCam is ready to use.';
         notifyListeners();
       }
     }
@@ -393,11 +471,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     var updated = false;
     if (!hasPremiumAccess) {
       if (_settings.defaultTimer.requiresPremium) {
-        _settings = _settings.copyWith(defaultTimer: AppTimerOption.twentyFourHours);
+        _settings =
+            _settings.copyWith(defaultTimer: AppTimerOption.twentyFourHours);
         updated = true;
       }
       if (_settings.biometricLockEnabled) {
-        _settings = _settings.copyWith(biometricLockEnabled: false, clearLastUnlockTime: true);
+        _settings = _settings.copyWith(
+            biometricLockEnabled: false, clearLastUnlockTime: true);
         updated = true;
       }
     }
@@ -549,7 +629,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> switchCamera() async {
-    if (_availableCameras.length < 2 || _cameraController == null || _isSwitchingCamera) {
+    if (_availableCameras.length < 2 ||
+        _cameraController == null ||
+        _isSwitchingCamera) {
       return;
     }
     _isSwitchingCamera = true;
@@ -594,9 +676,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           ? <FlashMode>[FlashMode.off, FlashMode.torch]
           : <FlashMode>[FlashMode.off, FlashMode.auto, FlashMode.always];
       final currentIndex = preferredModes.indexOf(_flashMode);
-      final nextIndex = currentIndex == -1 ? 0 : (currentIndex + 1) % preferredModes.length;
+      final nextIndex =
+          currentIndex == -1 ? 0 : (currentIndex + 1) % preferredModes.length;
       for (var offset = 0; offset < preferredModes.length; offset++) {
-        final candidate = preferredModes[(nextIndex + offset) % preferredModes.length];
+        final candidate =
+            preferredModes[(nextIndex + offset) % preferredModes.length];
         try {
           await controller.setFlashMode(candidate);
           _flashMode = candidate;
@@ -700,7 +784,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (controller == null || !controller.value.isInitialized) {
       return;
     }
-    final clampedZoom = zoomLevel.clamp(_minZoomLevel, _maxZoomLevel).toDouble();
+    final clampedZoom =
+        zoomLevel.clamp(_minZoomLevel, _maxZoomLevel).toDouble();
     try {
       await controller.setZoomLevel(clampedZoom);
       _currentZoomLevel = clampedZoom;
@@ -817,7 +902,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     try {
       final extension = record.isVideo ? '.mp4' : '.jpg';
-      final displayName = 'tempcam_${DateTime.now().millisecondsSinceEpoch}$extension';
+      final displayName =
+          'tempcam_${DateTime.now().millisecondsSinceEpoch}$extension';
       return await _mediaGalleryChannel.invokeMethod<String>(
         record.isVideo ? 'saveVideoToGallery' : 'saveImageToGallery',
         <String, dynamic>{
@@ -853,7 +939,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _refreshThumbnail() async {
-    _latestThumbnail = await _photoRepository.lastThumbnailFileFromSorted(_photos);
+    _latestThumbnail =
+        await _photoRepository.lastThumbnailFileFromSorted(_photos);
   }
 
   void _refreshVaultHistory() {
@@ -910,7 +997,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         return;
       }
       final appliedTimer = selected ?? settings.defaultTimer;
-      await _photoRepository.createFromCapture(sourcePath: file.path, timer: appliedTimer);
+      await _photoRepository.createFromCapture(
+          sourcePath: file.path, timer: appliedTimer);
       await refreshPhotos();
       _currentTabIndex = 0;
       notifyListeners();
@@ -959,10 +1047,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return 'Finish the current capture before importing media.';
     }
     try {
-      final pickedFiles = await _mediaPicker.pickMultipleMedia(
-        requestFullMetadata: false,
-      );
-      if (pickedFiles.isEmpty) {
+      final importedItems = await _pickImportableMedia();
+      if (importedItems.isEmpty) {
         return null;
       }
       if (!context.mounted) {
@@ -972,8 +1058,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         context,
         settings.defaultTimer,
         hasPremiumAccess: hasPremiumAccess,
-        previewFilePath: pickedFiles.first.path,
-        previewMediaType: _mediaTypeFromPath(pickedFiles.first.path),
+        previewFilePath: importedItems.first.tempPath,
+        previewMediaType: importedItems.first.mediaType,
       );
       if (!context.mounted) {
         return null;
@@ -981,19 +1067,76 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final timer = selected ?? settings.defaultTimer;
       await _photoRepository.importFromDevice(
         sourcePaths:
-            pickedFiles.map((file) => file.path).toList(growable: false),
+            importedItems.map((item) => item.tempPath).toList(growable: false),
         timer: timer,
       );
+      final failedOriginalDeletions =
+          await _consumeImportedMedia(importedItems);
       await refreshPhotos();
       _currentTabIndex = 0;
       notifyListeners();
-      final count = pickedFiles.length;
+      final count = importedItems.length;
+      if (failedOriginalDeletions > 0) {
+        return count == 1
+            ? '1 item imported into TempCam, but the original could not be removed from the main gallery.'
+            : '$count items imported into TempCam, but $failedOriginalDeletions original items could not be removed from the main gallery.';
+      }
       return count == 1
-          ? '1 item imported into TempCam.'
-          : '$count items imported into TempCam.';
+          ? '1 item moved into TempCam and removed from the main gallery.'
+          : '$count items moved into TempCam and removed from the main gallery.';
     } catch (_) {
       return 'Unable to import media right now.';
     }
+  }
+
+  Future<List<_ImportedDeviceMedia>> _pickImportableMedia() async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      final pickedFiles = await _mediaPicker.pickMultipleMedia(
+        requestFullMetadata: false,
+      );
+      return pickedFiles
+          .map(
+            (file) => _ImportedDeviceMedia(
+              tempPath: file.path,
+              mediaType: _mediaTypeFromPath(file.path),
+            ),
+          )
+          .toList(growable: false);
+    }
+    final rawItems = await _mediaGalleryChannel
+        .invokeMethod<List<dynamic>>('pickImportableMedia');
+    if (rawItems == null || rawItems.isEmpty) {
+      return const [];
+    }
+    return rawItems
+        .map(_ImportedDeviceMedia.fromMap)
+        .whereType<_ImportedDeviceMedia>()
+        .toList(growable: false);
+  }
+
+  Future<int> _consumeImportedMedia(List<_ImportedDeviceMedia> items) async {
+    if (items.isEmpty) {
+      return 0;
+    }
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      return 0;
+    }
+    final response =
+        await _mediaGalleryChannel.invokeMethod<Map<dynamic, dynamic>>(
+      'consumeImportedMedia',
+      <String, dynamic>{
+        'items':
+            items.map((item) => item.toChannelMap()).toList(growable: false),
+      },
+    );
+    final failed = response?['failedOriginalDeletes'];
+    if (failed is int) {
+      return failed;
+    }
+    if (failed is num) {
+      return failed.toInt();
+    }
+    return 0;
   }
 
   Future<void> updateBiometricLock(bool enabled) async {
@@ -1062,8 +1205,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> panicExit() async {
     _pausedAt = DateTime.now();
     _currentTabIndex = 1;
-    _isLocked =
-        hasPremiumAccess && _settings.biometricLockEnabled && _biometricAvailable;
+    _isLocked = hasPremiumAccess &&
+        _settings.biometricLockEnabled &&
+        _biometricAvailable;
     notifyListeners();
     await SystemNavigator.pop();
   }
@@ -1109,7 +1253,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           '${record.isVideo ? 'Video' : 'Photo'} exported to the main gallery and removed from TempCam expiry.',
     );
     await refreshPhotos();
-    return record.isVideo ? 'Video kept forever and exported.' : 'Photo kept forever and exported.';
+    return record.isVideo
+        ? 'Video kept forever and exported.'
+        : 'Photo kept forever and exported.';
   }
 
   Future<void> extendPhoto(PhotoRecord record, AppTimerOption timer) async {

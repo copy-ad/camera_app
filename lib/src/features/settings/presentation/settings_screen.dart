@@ -57,9 +57,12 @@ class SettingsScreen extends StatelessWidget {
                         subtitle: l10n.tr(
                           'Choose the app language. System Default follows your phone language.',
                         ),
+                        stackTrailingOnNarrow: true,
+                        trailingMinWidth: 132,
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton<String?>(
                             value: controller.settings.localeTag,
+                            isDense: true,
                             dropdownColor: AppTheme.surfaceHigh,
                             borderRadius: BorderRadius.circular(18),
                             items: <DropdownMenuItem<String?>>[
@@ -98,9 +101,12 @@ class SettingsScreen extends StatelessWidget {
                         subtitle: l10n.tr(
                           'Choose how long new captures stay available by default.',
                         ),
+                        stackTrailingOnNarrow: true,
+                        trailingMinWidth: 112,
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton<AppTimerOption>(
                             value: controller.settings.defaultTimer,
+                            isDense: true,
                             dropdownColor: AppTheme.surfaceHigh,
                             borderRadius: BorderRadius.circular(18),
                             items: AppTimerOption.settingsDefaults
@@ -252,9 +258,12 @@ class SettingsScreen extends StatelessWidget {
                             : l10n.tr(
                                 'Choose how long TempCam can stay in the background before it asks for biometrics again.',
                               ),
+                        stackTrailingOnNarrow: true,
+                        trailingMinWidth: 112,
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton<QuickLockTimeoutOption>(
                             value: controller.settings.quickLockTimeout,
+                            isDense: true,
                             dropdownColor: AppTheme.surfaceHigh,
                             borderRadius: BorderRadius.circular(18),
                             items: QuickLockTimeoutOption.valuesForSettings
@@ -587,53 +596,103 @@ class _ActionRow extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.trailing,
+    this.stackTrailingOnNarrow = false,
+    this.trailingMinWidth,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final Widget trailing;
+  final bool stackTrailingOnNarrow;
+  final double? trailingMinWidth;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppTheme.primary),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final shouldStackTrailing =
+            stackTrailingOnNarrow && constraints.maxWidth < 340;
+        final trailingWidget = trailingMinWidth == null
+            ? trailing
+            : ConstrainedBox(
+                constraints: BoxConstraints(minWidth: trailingMinWidth!),
+                child: trailing,
+              );
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: AppTheme.onSurfaceVariant,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        trailing,
-      ],
+              child: Icon(icon, color: AppTheme.primary),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: shouldStackTrailing
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          subtitle,
+                          style: const TextStyle(
+                            color: AppTheme.onSurfaceVariant,
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        trailingWidget,
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                subtitle,
+                                style: const TextStyle(
+                                  color: AppTheme.onSurfaceVariant,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: trailingWidget,
+                        ),
+                      ],
+                    ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

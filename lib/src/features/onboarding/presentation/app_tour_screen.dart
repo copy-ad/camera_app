@@ -53,7 +53,7 @@ class _AppTourScreenState extends State<AppTourScreen> {
         badge: l10n.tr('VAULT'),
         title: l10n.tr('The vault keeps temporary media organized.'),
         description: l10n.tr(
-          'Browse private photos and videos, see expiring items, open detected details again, import media into TempCam, extend timers, or delete items when you need to.',
+          'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.',
         ),
         icon: Icons.lock_rounded,
       ),
@@ -61,7 +61,7 @@ class _AppTourScreenState extends State<AppTourScreen> {
         badge: l10n.tr('SECURITY'),
         title: l10n.tr('Privacy protection stays ready under pressure.'),
         description: l10n.tr(
-          'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and Panic Exit for faster privacy when you need it.',
+          'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.',
         ),
         icon: Icons.fingerprint_rounded,
       ),

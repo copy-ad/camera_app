@@ -322,8 +322,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
       MaterialPageRoute<void>(
         builder: (_) => PhotoDetailScreen(
           photoId: item.id,
-          showDetectedDetailsOnOpen:
-              showDetectedDetailsOnOpen || item.hasDetectedDetails,
+          showDetectedDetailsOnOpen: showDetectedDetailsOnOpen,
         ),
       ),
     );

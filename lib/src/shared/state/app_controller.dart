@@ -8,6 +8,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/premium_constants.dart';
+import '../../features/camera/presentation/document_action_sheet.dart';
 import '../../features/camera/presentation/timer_selection_sheet.dart';
 import '../../features/paywall/presentation/premium_paywall_screen.dart';
 import '../../localization/app_localizations.dart';
@@ -1061,6 +1062,29 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           return;
         }
       }
+      final scanResult = await _documentScanService.scanPhoto(file.path);
+      if (!context.mounted) {
+        await _discardTransientFile(file.path);
+        return;
+      }
+      if (scanResult.hasData) {
+        final continueSaving = await _showDetectedDocumentActions(
+          context,
+          scanResult,
+        );
+        if (!context.mounted) {
+          await _discardTransientFile(file.path);
+          return;
+        }
+        if (!continueSaving) {
+          await _discardTransientFile(file.path);
+          return;
+        }
+      }
+      if (!context.mounted) {
+        await _discardTransientFile(file.path);
+        return;
+      }
       final selected = await TimerSelectionSheet.show(
         context,
         settings.defaultTimer,
@@ -1077,7 +1101,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         timer: appliedTimer,
       );
       await refreshPhotos();
-      await _analyzePhotoRecord(record, markPendingWhenDetected: true);
+      if (scanResult.hasData) {
+        await _persistDetectedDocumentResult(record, scanResult);
+      }
       _currentTabIndex = 0;
       notifyListeners();
     } finally {
@@ -1137,6 +1163,31 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         await _consumeImportedMedia(importedItems, deleteOriginals: false);
         return null;
       }
+      final firstScanResult = importedItems.first.mediaType == MediaType.photo
+          ? await _documentScanService.scanPhoto(importedItems.first.tempPath)
+          : const DocumentScanResult(phoneNumbers: [], addresses: []);
+      if (!context.mounted) {
+        await _consumeImportedMedia(importedItems, deleteOriginals: false);
+        return null;
+      }
+      if (firstScanResult.hasData) {
+        final continueSaving = await _showDetectedDocumentActions(
+          context,
+          firstScanResult,
+        );
+        if (!context.mounted) {
+          await _consumeImportedMedia(importedItems, deleteOriginals: false);
+          return null;
+        }
+        if (!continueSaving) {
+          await _consumeImportedMedia(importedItems, deleteOriginals: false);
+          return null;
+        }
+      }
+      if (!context.mounted) {
+        await _consumeImportedMedia(importedItems, deleteOriginals: false);
+        return null;
+      }
       final selected = await TimerSelectionSheet.show(
         context,
         settings.defaultTimer,
@@ -1157,10 +1208,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final failedOriginalDeletions =
           await _consumeImportedMedia(importedItems, deleteOriginals: true);
       await refreshPhotos();
-      await _analyzePhotoRecords(
-        importedRecords,
-        markPendingWhenDetected: true,
-      );
+      if (firstScanResult.hasData && importedRecords.isNotEmpty) {
+        await _persistDetectedDocumentResult(
+            importedRecords.first, firstScanResult);
+        await _analyzePhotoRecords(
+            importedRecords.skip(1).toList(growable: false));
+      } else {
+        await _analyzePhotoRecords(importedRecords);
+      }
       _currentTabIndex = 0;
       notifyListeners();
       final count = importedItems.length;
@@ -1539,6 +1594,58 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       title: title,
       details: details,
     );
+  }
+
+  Future<bool> _showDetectedDocumentActions(
+    BuildContext context,
+    DocumentScanResult result,
+  ) async {
+    return DocumentActionSheet.show(
+      context,
+      result: result,
+      onCallPhone: (phoneNumber) async {
+        final message = await callDetectedPhoneNumber(phoneNumber);
+        if (!context.mounted || message == null) {
+          return;
+        }
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(message)));
+      },
+      onAddToContacts: (phoneNumber) async {
+        final message = await addDetectedPhoneNumberToContacts(phoneNumber);
+        if (!context.mounted || message == null) {
+          return;
+        }
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(message)));
+      },
+      onOpenAddress: (address) async {
+        final message = await openDetectedAddress(address);
+        if (!context.mounted || message == null) {
+          return;
+        }
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(message)));
+      },
+    );
+  }
+
+  Future<void> _persistDetectedDocumentResult(
+    PhotoRecord record,
+    DocumentScanResult result,
+  ) async {
+    final updated = await _photoRepository.saveSmartScanResults(
+      id: record.id,
+      detectedPhoneNumbers: result.phoneNumbers,
+      detectedAddresses: result.addresses,
+    );
+    if (updated == null) {
+      return;
+    }
+    _replacePhotoInMemory(updated);
   }
 
   Future<void> _analyzePhotoRecord(

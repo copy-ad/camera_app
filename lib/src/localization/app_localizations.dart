@@ -311,6 +311,9 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Addresses': 'Addresses',
     'Detected phone number': 'Detected phone number',
     'Detected address': 'Detected address',
+    'Detected details before saving': 'Detected details before saving',
+    'Use the detected phone number or address first, then tap Temp Save to choose the timer.':
+        'Use the detected phone number or address first, then tap Temp Save to choose the timer.',
     'Extend Timer': 'Extend Timer',
     'Keep Forever': 'Keep Forever',
     'Premium Only': 'Premium Only',
@@ -318,6 +321,8 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Call': 'Call',
     'Add to Contacts': 'Add to Contacts',
     'Open in Maps': 'Open in Maps',
+    'Temp Save': 'Temp Save',
+    'Discard': 'Discard',
     'TempCam Contact': 'TempCam Contact',
     'Unable to open the phone dialer right now.':
         'Unable to open the phone dialer right now.',

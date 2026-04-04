@@ -324,6 +324,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Unable to open the contacts app right now.':
         'Unable to open the contacts app right now.',
     'Unable to open the map right now.': 'Unable to open the map right now.',
+    'Tap to view detected details': 'Tap to view detected details',
     'Media no longer exists.': 'Media no longer exists.',
     'WELCOME': 'WELCOME',
     'CAMERA': 'CAMERA',

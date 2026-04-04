@@ -157,6 +157,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   ProductDetails? _yearlySubscriptionProduct;
   DateTime? _pausedAt;
   int _cameraSetupToken = 0;
+  String? _pendingSmartScanPhotoId;
 
   AppSettings get settings => _settings;
   List<PhotoRecord> get photos => _photos;
@@ -189,6 +190,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       PremiumConstants.paymentsTemporarilyDisabled;
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
+  String? get pendingSmartScanPhotoId => _pendingSmartScanPhotoId;
   bool get hasStoreManagedTrialOffer =>
       _billingService.hasStoreManagedTrialOffer;
   Locale? get localeOverride =>
@@ -1075,7 +1077,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         timer: appliedTimer,
       );
       await refreshPhotos();
-      await _analyzePhotoRecord(record);
+      await _analyzePhotoRecord(record, markPendingWhenDetected: true);
       _currentTabIndex = 0;
       notifyListeners();
     } finally {
@@ -1155,7 +1157,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final failedOriginalDeletions =
           await _consumeImportedMedia(importedItems, deleteOriginals: true);
       await refreshPhotos();
-      await _analyzePhotoRecords(importedRecords);
+      await _analyzePhotoRecords(
+        importedRecords,
+        markPendingWhenDetected: true,
+      );
       _currentTabIndex = 0;
       notifyListeners();
       final count = importedItems.length;
@@ -1382,6 +1387,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _analyzePhotoRecord(photo);
   }
 
+  String? consumePendingSmartScanPhotoId() {
+    final value = _pendingSmartScanPhotoId;
+    _pendingSmartScanPhotoId = null;
+    return value;
+  }
+
   Future<String?> callDetectedPhoneNumber(String phoneNumber) async {
     final sanitized = phoneNumber.trim();
     if (sanitized.isEmpty) {
@@ -1530,7 +1541,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _analyzePhotoRecord(PhotoRecord record) async {
+  Future<void> _analyzePhotoRecord(
+    PhotoRecord record, {
+    bool markPendingWhenDetected = false,
+  }) async {
     if (record.isVideo || record.hasCompletedSmartScan) {
       return;
     }
@@ -1544,12 +1558,21 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (updated == null) {
       return;
     }
+    if (markPendingWhenDetected && updated.hasDetectedDetails) {
+      _pendingSmartScanPhotoId = updated.id;
+    }
     _replacePhotoInMemory(updated);
   }
 
-  Future<void> _analyzePhotoRecords(List<PhotoRecord> records) async {
+  Future<void> _analyzePhotoRecords(
+    List<PhotoRecord> records, {
+    bool markPendingWhenDetected = false,
+  }) async {
     for (final record in records) {
-      await _analyzePhotoRecord(record);
+      await _analyzePhotoRecord(
+        record,
+        markPendingWhenDetected: markPendingWhenDetected,
+      );
     }
   }
 

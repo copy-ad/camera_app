@@ -31,6 +31,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   _GalleryFilter _filter = _GalleryFilter.all;
   final Set<String> _selectedIds = <String>{};
   bool _selectionMode = false;
+  bool _pendingSmartOpenInFlight = false;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   Widget build(BuildContext context) {
     return Consumer<AppController>(
       builder: (context, controller, _) {
+        _schedulePendingSmartOpen(controller);
         final l10n = context.l10n;
         final visibleMedia = _filteredMedia(controller.photos);
         final selectedMedia = controller.photos
@@ -293,13 +295,36 @@ class _PhotosScreenState extends State<PhotosScreen> {
     _selectionMode = false;
   }
 
-  Future<void> _openMedia(PhotoRecord item) async {
+  void _schedulePendingSmartOpen(AppController controller) {
+    final pendingPhotoId = controller.pendingSmartScanPhotoId;
+    if (_pendingSmartOpenInFlight || pendingPhotoId == null) {
+      return;
+    }
+    _pendingSmartOpenInFlight = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final photoId = controller.consumePendingSmartScanPhotoId();
+      final photo = photoId == null ? null : controller.byId(photoId);
+      if (photo != null && mounted) {
+        await _openMedia(photo, showDetectedDetailsOnOpen: true);
+      }
+      _pendingSmartOpenInFlight = false;
+    });
+  }
+
+  Future<void> _openMedia(
+    PhotoRecord item, {
+    bool showDetectedDetailsOnOpen = false,
+  }) async {
     if (!mounted) {
       return;
     }
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => PhotoDetailScreen(photoId: item.id),
+        builder: (_) => PhotoDetailScreen(
+          photoId: item.id,
+          showDetectedDetailsOnOpen:
+              showDetectedDetailsOnOpen || item.hasDetectedDetails,
+        ),
       ),
     );
   }
@@ -958,6 +983,17 @@ class _VaultTile extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+                if (item.hasDetectedDetails) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    context.l10n.tr('Tap to view detected details'),
+                    style: const TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

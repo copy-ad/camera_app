@@ -12,9 +12,14 @@ import 'package:tempcam/src/shared/theme/app_theme.dart';
 import 'package:video_player/video_player.dart';
 
 class PhotoDetailScreen extends StatefulWidget {
-  const PhotoDetailScreen({super.key, required this.photoId});
+  const PhotoDetailScreen({
+    super.key,
+    required this.photoId,
+    this.showDetectedDetailsOnOpen = false,
+  });
 
   final String photoId;
+  final bool showDetectedDetailsOnOpen;
 
   @override
   State<PhotoDetailScreen> createState() => _PhotoDetailScreenState();
@@ -23,9 +28,10 @@ class PhotoDetailScreen extends StatefulWidget {
 class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   final TransformationController _transformationController =
       TransformationController();
-  bool _chromeVisible = false;
+  late bool _chromeVisible = widget.showDetectedDetailsOnOpen;
   bool _scanRequested = false;
   bool _phoneSheetPresented = false;
+  bool _addressSheetPresented = false;
 
   @override
   void dispose() {
@@ -46,6 +52,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         }
         _scheduleSmartScanIfNeeded(controller, photo);
         _schedulePhoneSheetIfNeeded(photo);
+        _scheduleAddressSheetIfNeeded(photo);
         return Scaffold(
           backgroundColor: Colors.black,
           body: GestureDetector(
@@ -171,6 +178,23 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       }
       final controller = context.read<AppController>();
       _showPhoneActions(controller, photo.detectedPhoneNumbers.first);
+    });
+  }
+
+  void _scheduleAddressSheetIfNeeded(PhotoRecord photo) {
+    if (_addressSheetPresented ||
+        photo.detectedPhoneNumbers.isNotEmpty ||
+        photo.detectedAddresses.isEmpty ||
+        !widget.showDetectedDetailsOnOpen) {
+      return;
+    }
+    _addressSheetPresented = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final controller = context.read<AppController>();
+      _showAddressActions(controller, photo.detectedAddresses.first);
     });
   }
 

@@ -10,4 +10,3 @@ class CameraService {
     return _cameras;
   }
 }
-

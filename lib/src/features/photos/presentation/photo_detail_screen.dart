@@ -24,6 +24,8 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   final TransformationController _transformationController =
       TransformationController();
   bool _chromeVisible = false;
+  bool _scanRequested = false;
+  bool _phoneSheetPresented = false;
 
   @override
   void dispose() {
@@ -42,6 +44,8 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                 Center(child: Text(context.l10n.tr('Media no longer exists.'))),
           );
         }
+        _scheduleSmartScanIfNeeded(controller, photo);
+        _schedulePhoneSheetIfNeeded(photo);
         return Scaffold(
           backgroundColor: Colors.black,
           body: GestureDetector(
@@ -119,6 +123,10 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                           Navigator.of(context).pop();
                         }
                       },
+                      onPhoneTap: (phoneNumber) =>
+                          _showPhoneActions(controller, phoneNumber),
+                      onAddressTap: (address) =>
+                          _showAddressActions(controller, address),
                     ),
                   ),
                 ),
@@ -137,6 +145,182 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       return;
     }
     setState(() => _chromeVisible = !_chromeVisible);
+  }
+
+  void _scheduleSmartScanIfNeeded(AppController controller, PhotoRecord photo) {
+    if (!photo.isPhoto || photo.hasCompletedSmartScan || _scanRequested) {
+      return;
+    }
+    _scanRequested = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      controller.ensurePhotoSmartScan(photo.id);
+    });
+  }
+
+  void _schedulePhoneSheetIfNeeded(PhotoRecord photo) {
+    if (_phoneSheetPresented || photo.detectedPhoneNumbers.isEmpty) {
+      return;
+    }
+    _phoneSheetPresented = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final controller = context.read<AppController>();
+      _showPhoneActions(controller, photo.detectedPhoneNumbers.first);
+    });
+  }
+
+  Future<void> _showPhoneActions(
+    AppController controller,
+    String phoneNumber,
+  ) async {
+    if (!mounted) {
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surfaceLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sheetContext.l10n.tr('Detected phone number'),
+                  style: const TextStyle(
+                    fontFamily: 'Manrope',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  phoneNumber,
+                  style: const TextStyle(
+                    color: AppTheme.onSurfaceVariant,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      await _runControllerAction(
+                        () => controller.callDetectedPhoneNumber(phoneNumber),
+                      );
+                    },
+                    icon: const Icon(Icons.call_rounded),
+                    label: Text(sheetContext.l10n.tr('Call')),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      await _runControllerAction(
+                        () => controller
+                            .addDetectedPhoneNumberToContacts(phoneNumber),
+                      );
+                    },
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    label: Text(sheetContext.l10n.tr('Add to Contacts')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddressActions(
+    AppController controller,
+    String address,
+  ) async {
+    if (!mounted) {
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surfaceLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sheetContext.l10n.tr('Detected address'),
+                  style: const TextStyle(
+                    fontFamily: 'Manrope',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  address,
+                  style: const TextStyle(
+                    color: AppTheme.onSurfaceVariant,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      await _runControllerAction(
+                        () => controller.openDetectedAddress(address),
+                      );
+                    },
+                    icon: const Icon(Icons.map_rounded),
+                    label: Text(sheetContext.l10n.tr('Open in Maps')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _runControllerAction(
+    Future<String?> Function() action,
+  ) async {
+    final message = await action();
+    if (!mounted || message == null) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -336,6 +520,8 @@ class _PhotoDetailChrome extends StatelessWidget {
     required this.onExtend,
     required this.onKeepForever,
     required this.onDelete,
+    required this.onPhoneTap,
+    required this.onAddressTap,
   });
 
   final PhotoRecord photo;
@@ -344,6 +530,8 @@ class _PhotoDetailChrome extends StatelessWidget {
   final Future<void> Function() onExtend;
   final Future<void> Function() onKeepForever;
   final Future<void> Function() onDelete;
+  final ValueChanged<String> onPhoneTap;
+  final ValueChanged<String> onAddressTap;
 
   @override
   Widget build(BuildContext context) {
@@ -489,6 +677,14 @@ class _PhotoDetailChrome extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      if (photo.hasDetectedDetails) ...[
+                        _DetectedDetailsPanel(
+                          photo: photo,
+                          onPhoneTap: onPhoneTap,
+                          onAddressTap: onAddressTap,
+                        ),
+                        const SizedBox(height: 14),
+                      ],
                       Row(
                         children: [
                           Expanded(
@@ -574,6 +770,142 @@ class _TopCircle extends StatelessWidget {
         ),
         child: Icon(icon, color: AppTheme.onSurface),
       ),
+    );
+  }
+}
+
+class _DetectedDetailsPanel extends StatelessWidget {
+  const _DetectedDetailsPanel({
+    required this.photo,
+    required this.onPhoneTap,
+    required this.onAddressTap,
+  });
+
+  final PhotoRecord photo;
+  final ValueChanged<String> onPhoneTap;
+  final ValueChanged<String> onAddressTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainer.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.tr('Detected details'),
+            style: const TextStyle(
+              fontSize: 12,
+              letterSpacing: 1.4,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            context.l10n.tr(
+              'Saved in TempCam until this photo expires or you keep it forever.',
+            ),
+            style: const TextStyle(
+              color: AppTheme.onSurfaceVariant,
+              height: 1.35,
+            ),
+          ),
+          if (photo.detectedPhoneNumbers.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _DetectedDetailGroup(
+              title: context.l10n.tr('Phone numbers'),
+              icon: Icons.call_rounded,
+              items: photo.detectedPhoneNumbers,
+              onTap: onPhoneTap,
+            ),
+          ],
+          if (photo.detectedAddresses.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _DetectedDetailGroup(
+              title: context.l10n.tr('Addresses'),
+              icon: Icons.location_on_rounded,
+              items: photo.detectedAddresses,
+              onTap: onAddressTap,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DetectedDetailGroup extends StatelessWidget {
+  const _DetectedDetailGroup({
+    required this.title,
+    required this.icon,
+    required this.items,
+    required this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final List<String> items;
+  final ValueChanged<String> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppTheme.onSurfaceVariant,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: items
+              .map(
+                (item) => InkWell(
+                  onTap: () => onTap(item),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 320),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceHigh,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(icon, size: 16, color: AppTheme.secondary),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            item,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ],
     );
   }
 }

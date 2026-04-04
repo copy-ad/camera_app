@@ -20,7 +20,9 @@ import '../repositories/vault_history_repository.dart';
 import '../services/biometric_service.dart';
 import '../services/billing_service.dart';
 import '../services/camera_service.dart';
+import '../services/document_scan_service.dart';
 import '../services/notification_service.dart';
+import '../services/system_action_service.dart';
 
 class _ImportedDeviceMedia {
   const _ImportedDeviceMedia({
@@ -90,6 +92,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     required VaultHistoryRepository vaultHistoryRepository,
     required NotificationService notificationService,
     required CameraService cameraService,
+    required DocumentScanService documentScanService,
+    required SystemActionService systemActionService,
     required BiometricService biometricService,
     required BillingService billingService,
   })  : _settingsRepository = settingsRepository,
@@ -97,6 +101,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _vaultHistoryRepository = vaultHistoryRepository,
         _notificationService = notificationService,
         _cameraService = cameraService,
+        _documentScanService = documentScanService,
+        _systemActionService = systemActionService,
         _biometricService = biometricService,
         _billingService = billingService {
     WidgetsBinding.instance.addObserver(this);
@@ -108,6 +114,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   final VaultHistoryRepository _vaultHistoryRepository;
   final NotificationService _notificationService;
   final CameraService _cameraService;
+  final DocumentScanService _documentScanService;
+  final SystemActionService _systemActionService;
   final BiometricService _biometricService;
   final BillingService _billingService;
   final ImagePicker _mediaPicker = ImagePicker();
@@ -1062,9 +1070,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         return;
       }
       final appliedTimer = selected ?? settings.defaultTimer;
-      await _photoRepository.createFromCapture(
-          sourcePath: file.path, timer: appliedTimer);
+      final record = await _photoRepository.createFromCapture(
+        sourcePath: file.path,
+        timer: appliedTimer,
+      );
       await refreshPhotos();
+      await _analyzePhotoRecord(record);
       _currentTabIndex = 0;
       notifyListeners();
     } finally {
@@ -1136,7 +1147,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         return null;
       }
       final timer = selected ?? settings.defaultTimer;
-      await _photoRepository.importFromDevice(
+      final importedRecords = await _photoRepository.importFromDevice(
         sourcePaths:
             importedItems.map((item) => item.tempPath).toList(growable: false),
         timer: timer,
@@ -1144,6 +1155,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final failedOriginalDeletions =
           await _consumeImportedMedia(importedItems, deleteOriginals: true);
       await refreshPhotos();
+      await _analyzePhotoRecords(importedRecords);
       _currentTabIndex = 0;
       notifyListeners();
       final count = importedItems.length;
@@ -1362,11 +1374,68 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await refreshPhotos();
   }
 
+  Future<void> ensurePhotoSmartScan(String photoId) async {
+    final photo = byId(photoId);
+    if (photo == null || photo.isVideo || photo.hasCompletedSmartScan) {
+      return;
+    }
+    await _analyzePhotoRecord(photo);
+  }
+
+  Future<String?> callDetectedPhoneNumber(String phoneNumber) async {
+    final sanitized = phoneNumber.trim();
+    if (sanitized.isEmpty) {
+      return l10n.tr('Unable to open the phone dialer right now.');
+    }
+    final launched = await _systemActionService.openExternalUrl(
+      'tel:${Uri.encodeComponent(sanitized)}',
+    );
+    if (launched) {
+      return null;
+    }
+    return l10n.tr('Unable to open the phone dialer right now.');
+  }
+
+  Future<String?> addDetectedPhoneNumberToContacts(String phoneNumber) async {
+    final sanitized = phoneNumber.trim();
+    if (sanitized.isEmpty) {
+      return l10n.tr('Unable to open the contacts app right now.');
+    }
+    final opened = await _systemActionService.openAddContact(
+      phoneNumber: sanitized,
+      displayName: l10n.tr('TempCam Contact'),
+    );
+    if (opened) {
+      return null;
+    }
+    return l10n.tr('Unable to open the contacts app right now.');
+  }
+
+  Future<String?> openDetectedAddress(String address) async {
+    final trimmed = address.trim();
+    if (trimmed.isEmpty) {
+      return l10n.tr('Unable to open the map right now.');
+    }
+    final geoLaunched = await _systemActionService.openExternalUrl(
+      'geo:0,0?q=${Uri.encodeComponent(trimmed)}',
+    );
+    if (geoLaunched) {
+      return null;
+    }
+    final webLaunched = await _systemActionService.openExternalUrl(
+      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(trimmed)}',
+    );
+    if (webLaunched) {
+      return null;
+    }
+    return l10n.tr('Unable to open the map right now.');
+  }
+
   PhotoRecord? byId(String id) {
     try {
       return _photos.firstWhere((photo) => photo.id == id);
     } catch (_) {
-      return null;
+      return _photoRepository.readById(id);
     }
   }
 
@@ -1459,6 +1528,38 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       title: title,
       details: details,
     );
+  }
+
+  Future<void> _analyzePhotoRecord(PhotoRecord record) async {
+    if (record.isVideo || record.hasCompletedSmartScan) {
+      return;
+    }
+
+    final result = await _documentScanService.scanPhoto(record.filePath);
+    final updated = await _photoRepository.saveSmartScanResults(
+      id: record.id,
+      detectedPhoneNumbers: result.phoneNumbers,
+      detectedAddresses: result.addresses,
+    );
+    if (updated == null) {
+      return;
+    }
+    _replacePhotoInMemory(updated);
+  }
+
+  Future<void> _analyzePhotoRecords(List<PhotoRecord> records) async {
+    for (final record in records) {
+      await _analyzePhotoRecord(record);
+    }
+  }
+
+  void _replacePhotoInMemory(PhotoRecord updated) {
+    final index = _photos.indexWhere((item) => item.id == updated.id);
+    if (index < 0) {
+      return;
+    }
+    _photos = List<PhotoRecord>.from(_photos)..[index] = updated;
+    notifyListeners();
   }
 
   MediaType _mediaTypeFromPath(String path) {

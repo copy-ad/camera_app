@@ -70,7 +70,8 @@ class _ObsidianSplashScreenState extends State<ObsidianSplashScreen>
               ),
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
                   child: Column(
                     children: [
                       const Spacer(),
@@ -83,7 +84,8 @@ class _ObsidianSplashScreenState extends State<ObsidianSplashScreen>
                             shape: BoxShape.circle,
                             color: AppTheme.surfaceLowest,
                             border: Border.all(
-                              color: AppTheme.outlineVariant.withValues(alpha: 0.28),
+                              color: AppTheme.outlineVariant
+                                  .withValues(alpha: 0.28),
                             ),
                             boxShadow: AppTheme.softGlow,
                           ),
@@ -95,7 +97,8 @@ class _ObsidianSplashScreenState extends State<ObsidianSplashScreen>
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: AppTheme.primary.withValues(alpha: 0.22),
+                                    color: AppTheme.primary
+                                        .withValues(alpha: 0.22),
                                   ),
                                 ),
                               ),
@@ -104,10 +107,12 @@ class _ObsidianSplashScreenState extends State<ObsidianSplashScreen>
                                 height: 78,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppTheme.primary.withValues(alpha: 0.08),
+                                  color:
+                                      AppTheme.primary.withValues(alpha: 0.08),
                                 ),
                               ),
-                              const Icon(Icons.lens_rounded, color: AppTheme.primary, size: 52),
+                              const Icon(Icons.lens_rounded,
+                                  color: AppTheme.primary, size: 52),
                             ],
                           ),
                         ),
@@ -165,11 +170,13 @@ class _ObsidianSplashScreenState extends State<ObsidianSplashScreen>
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 11),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceLow,
                           borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.05)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,

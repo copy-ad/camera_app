@@ -16,4 +16,3 @@ class SettingsRepository {
     await _box.put(_settingsKey, settings);
   }
 }
-

@@ -11,6 +11,9 @@ class PhotoRecord {
     this.expiresAt,
     this.isKeptForever = false,
     this.mediaType = MediaType.photo,
+    this.detectedPhoneNumbers = const [],
+    this.detectedAddresses = const [],
+    this.smartScanCompletedAt,
   });
 
   final String id;
@@ -20,6 +23,9 @@ class PhotoRecord {
   final bool isKeptForever;
   final String timerLabel;
   final MediaType mediaType;
+  final List<String> detectedPhoneNumbers;
+  final List<String> detectedAddresses;
+  final DateTime? smartScanCompletedAt;
 
   bool get isExpired {
     if (isKeptForever) {
@@ -30,6 +36,9 @@ class PhotoRecord {
 
   bool get isVideo => mediaType == MediaType.video;
   bool get isPhoto => mediaType == MediaType.photo;
+  bool get hasDetectedDetails =>
+      detectedPhoneNumbers.isNotEmpty || detectedAddresses.isNotEmpty;
+  bool get hasCompletedSmartScan => smartScanCompletedAt != null;
 
   PhotoRecord copyWith({
     String? filePath,
@@ -37,6 +46,9 @@ class PhotoRecord {
     bool? isKeptForever,
     String? timerLabel,
     MediaType? mediaType,
+    List<String>? detectedPhoneNumbers,
+    List<String>? detectedAddresses,
+    DateTime? smartScanCompletedAt,
   }) {
     return PhotoRecord(
       id: id,
@@ -46,6 +58,9 @@ class PhotoRecord {
       isKeptForever: isKeptForever ?? this.isKeptForever,
       timerLabel: timerLabel ?? this.timerLabel,
       mediaType: mediaType ?? this.mediaType,
+      detectedPhoneNumbers: detectedPhoneNumbers ?? this.detectedPhoneNumbers,
+      detectedAddresses: detectedAddresses ?? this.detectedAddresses,
+      smartScanCompletedAt: smartScanCompletedAt ?? this.smartScanCompletedAt,
     );
   }
 }
@@ -69,13 +84,20 @@ class PhotoRecordAdapter extends TypeAdapter<PhotoRecord> {
       isKeptForever: fields[4] as bool,
       timerLabel: fields[5] as String,
       mediaType: MediaType.values.byName((fields[6] as String?) ?? 'photo'),
+      detectedPhoneNumbers:
+          (fields[7] as List?)?.map((item) => item.toString()).toList() ??
+              const [],
+      detectedAddresses:
+          (fields[8] as List?)?.map((item) => item.toString()).toList() ??
+              const [],
+      smartScanCompletedAt: fields[9] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PhotoRecord obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -89,6 +111,12 @@ class PhotoRecordAdapter extends TypeAdapter<PhotoRecord> {
       ..writeByte(5)
       ..write(obj.timerLabel)
       ..writeByte(6)
-      ..write(obj.mediaType.name);
+      ..write(obj.mediaType.name)
+      ..writeByte(7)
+      ..write(obj.detectedPhoneNumbers)
+      ..writeByte(8)
+      ..write(obj.detectedAddresses)
+      ..writeByte(9)
+      ..write(obj.smartScanCompletedAt);
   }
 }

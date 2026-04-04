@@ -46,7 +46,11 @@ class TopBar extends StatelessWidget {
                       ),
                     ),
                     if (centerSubtitle != null)
-                      Text(centerSubtitle!, style: const TextStyle(fontSize: 10, letterSpacing: 2, color: AppTheme.onSurfaceVariant)),
+                      Text(centerSubtitle!,
+                          style: const TextStyle(
+                              fontSize: 10,
+                              letterSpacing: 2,
+                              color: AppTheme.onSurfaceVariant)),
                   ],
                 ),
               ),
@@ -58,4 +62,3 @@ class TopBar extends StatelessWidget {
     );
   }
 }
-

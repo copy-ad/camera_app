@@ -8,4 +8,3 @@ Future<void> main() async {
   await Hive.initFlutter();
   await bootstrap();
 }
-

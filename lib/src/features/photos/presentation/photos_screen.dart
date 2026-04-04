@@ -742,8 +742,20 @@ class _ExpiringCard extends StatelessWidget {
             Positioned(
               top: 14,
               left: 14,
-              child: _MediaPill(
-                label: context.l10n.tr(item.isVideo ? 'VIDEO' : 'PHOTO'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _MediaPill(
+                    label: context.l10n.tr(item.isVideo ? 'VIDEO' : 'PHOTO'),
+                  ),
+                  if (item.hasDetectedDetails) ...[
+                    const SizedBox(height: 8),
+                    _DetectedDetailPill(
+                      count: item.detectedPhoneNumbers.length +
+                          item.detectedAddresses.length,
+                    ),
+                  ],
+                ],
               ),
             ),
             Positioned(
@@ -853,10 +865,22 @@ class _VaultTile extends StatelessWidget {
                       Positioned(
                         top: 10,
                         left: 10,
-                        child: _MediaPill(
-                          label: context.l10n.tr(
-                            item.isVideo ? 'VIDEO' : 'PHOTO',
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _MediaPill(
+                              label: context.l10n.tr(
+                                item.isVideo ? 'VIDEO' : 'PHOTO',
+                              ),
+                            ),
+                            if (item.hasDetectedDetails) ...[
+                              const SizedBox(height: 8),
+                              _DetectedDetailPill(
+                                count: item.detectedPhoneNumbers.length +
+                                    item.detectedAddresses.length,
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       Positioned(
@@ -1050,6 +1074,42 @@ class _MediaPill extends StatelessWidget {
           letterSpacing: 1.6,
           fontWeight: FontWeight.w700,
         ),
+      ),
+    );
+  }
+}
+
+class _DetectedDetailPill extends StatelessWidget {
+  const _DetectedDetailPill({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.primary.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.document_scanner_rounded,
+            size: 12,
+            color: Color(0xFF003061),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '$count',
+            style: const TextStyle(
+              color: Color(0xFF003061),
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }

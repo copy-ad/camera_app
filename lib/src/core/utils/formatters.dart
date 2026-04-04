@@ -27,4 +27,3 @@ String formatRemaining(DateTime? expiresAt, {required bool isKeptForever}) {
 String formatTimestamp(DateTime value) {
   return DateFormat('MMM d, yyyy • h:mm a').format(value);
 }
-

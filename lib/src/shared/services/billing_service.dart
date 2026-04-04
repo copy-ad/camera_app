@@ -94,7 +94,8 @@ class BillingService {
     }
     final matches = response.productDetails
         .where(
-          (product) => product.id == PremiumConstants.yearlySubscriptionProductId,
+          (product) =>
+              product.id == PremiumConstants.yearlySubscriptionProductId,
         )
         .toList();
     _yearlyProduct = _selectPreferredProduct(matches);
@@ -199,14 +200,14 @@ class BillingService {
           BillingEvent(
             status: BillingEventStatus.error,
             purchase: purchase,
-            message:
-                purchase.error?.message ??
+            message: purchase.error?.message ??
                 'The purchase could not be completed.',
           ),
         );
       } else if (purchase.status == PurchaseStatus.purchased) {
         _eventsController.add(
-          BillingEvent(status: BillingEventStatus.purchased, purchase: purchase),
+          BillingEvent(
+              status: BillingEventStatus.purchased, purchase: purchase),
         );
       } else if (purchase.status == PurchaseStatus.restored) {
         _eventsController.add(

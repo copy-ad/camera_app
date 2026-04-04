@@ -13,8 +13,10 @@ import '../shared/repositories/vault_history_repository.dart';
 import '../shared/services/biometric_service.dart';
 import '../shared/services/billing_service.dart';
 import '../shared/services/camera_service.dart';
+import '../shared/services/document_scan_service.dart';
 import '../shared/services/notification_service.dart';
 import '../shared/services/photo_storage_service.dart';
+import '../shared/services/system_action_service.dart';
 import '../shared/state/app_controller.dart';
 import 'tempcam_app.dart';
 
@@ -37,6 +39,8 @@ Future<void> bootstrap() async {
     vaultHistoryRepository: VaultHistoryRepository(historyBox),
     notificationService: NotificationService(),
     cameraService: CameraService(),
+    documentScanService: DocumentScanService(),
+    systemActionService: SystemActionService(),
     biometricService: BiometricService(),
     billingService: BillingService(),
   );

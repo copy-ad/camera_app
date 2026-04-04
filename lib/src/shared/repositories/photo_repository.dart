@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:path/path.dart' as p;
@@ -30,6 +30,8 @@ class PhotoRepository {
     });
     return items;
   }
+
+  PhotoRecord? readById(String id) => _box.get(id);
 
   Future<PhotoRecord> createFromCapture({
     required String sourcePath,
@@ -110,15 +112,34 @@ class PhotoRepository {
   }
 
   Future<void> extend(PhotoRecord record, AppTimerOption timer) async {
-    final base = record.expiresAt != null && record.expiresAt!.isAfter(DateTime.now())
-        ? record.expiresAt!
-        : DateTime.now();
+    final base =
+        record.expiresAt != null && record.expiresAt!.isAfter(DateTime.now())
+            ? record.expiresAt!
+            : DateTime.now();
     final updated = record.copyWith(
       expiresAt: base.add(timer.duration),
       isKeptForever: false,
       timerLabel: timer.label,
     );
     await _box.put(record.id, updated);
+  }
+
+  Future<PhotoRecord?> saveSmartScanResults({
+    required String id,
+    required List<String> detectedPhoneNumbers,
+    required List<String> detectedAddresses,
+  }) async {
+    final record = _box.get(id);
+    if (record == null) {
+      return null;
+    }
+    final updated = record.copyWith(
+      detectedPhoneNumbers: detectedPhoneNumbers,
+      detectedAddresses: detectedAddresses,
+      smartScanCompletedAt: DateTime.now(),
+    );
+    await _box.put(id, updated);
+    return updated;
   }
 
   Future<List<PhotoRecord>> cleanupExpired() async {

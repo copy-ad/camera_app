@@ -1,11 +1,13 @@
 import Flutter
+import Contacts
+import ContactsUI
 import Photos
 import PhotosUI
 import UIKit
 import UniformTypeIdentifiers
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, PHPickerViewControllerDelegate {
+@objc class AppDelegate: FlutterAppDelegate, PHPickerViewControllerDelegate, CNContactViewControllerDelegate {
   private var pendingImportResult: FlutterResult?
 
   override func application(
@@ -22,9 +24,53 @@ import UniformTypeIdentifiers
       mediaGalleryChannel.setMethodCallHandler { [weak self] call, result in
         self?.handleMediaGalleryCall(call, result: result)
       }
+
+      let systemChannel = FlutterMethodChannel(
+        name: "tempcam/system",
+        binaryMessenger: controller.binaryMessenger
+      )
+      systemChannel.setMethodCallHandler { [weak self] call, result in
+        self?.handleSystemCall(call, result: result)
+      }
     }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  private func handleSystemCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "openExternalUrl":
+      guard
+        let arguments = call.arguments as? [String: Any],
+        let rawURL = arguments["url"] as? String,
+        let url = URL(string: rawURL)
+      else {
+        result(FlutterError(code: "bad_args", message: "url is required.", details: nil))
+        return
+      }
+
+      DispatchQueue.main.async {
+        UIApplication.shared.open(url, options: [:]) { success in
+          result(success)
+        }
+      }
+    case "openAddContact":
+      guard
+        let arguments = call.arguments as? [String: Any],
+        let phoneNumber = arguments["phoneNumber"] as? String,
+        !phoneNumber.isEmpty
+      else {
+        result(
+          FlutterError(code: "bad_args", message: "phoneNumber is required.", details: nil)
+        )
+        return
+      }
+
+      let displayName = (arguments["displayName"] as? String) ?? ""
+      openAddContact(phoneNumber: phoneNumber, displayName: displayName, result: result)
+    default:
+      result(FlutterMethodNotImplemented)
+    }
   }
 
   private func handleMediaGalleryCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -482,5 +528,48 @@ import UniformTypeIdentifiers
         continue
       }
     }
+  }
+
+  private func openAddContact(
+    phoneNumber: String,
+    displayName: String,
+    result: @escaping FlutterResult
+  ) {
+    guard let rootViewController = window?.rootViewController else {
+      result(
+        FlutterError(
+          code: "open_failed",
+          message: "Unable to present the contacts view right now.",
+          details: nil
+        )
+      )
+      return
+    }
+
+    let contact = CNMutableContact()
+    if !displayName.isEmpty {
+      contact.givenName = displayName
+    }
+    contact.phoneNumbers = [
+      CNLabeledValue(
+        label: CNLabelPhoneNumberMobile,
+        value: CNPhoneNumber(stringValue: phoneNumber)
+      )
+    ]
+
+    let controller = CNContactViewController(forNewContact: contact)
+    controller.contactStore = CNContactStore()
+    controller.delegate = self
+
+    let navigationController = UINavigationController(rootViewController: controller)
+    DispatchQueue.main.async {
+      rootViewController.present(navigationController, animated: true) {
+        result(true)
+      }
+    }
+  }
+
+  func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+    viewController.dismiss(animated: true)
   }
 }

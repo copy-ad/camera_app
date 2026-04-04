@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.provider.ContactsContract
 import android.webkit.MimeTypeMap
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -84,6 +85,19 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                     try {
                         result.success(openExternalUrl(url))
+                    } catch (exception: Exception) {
+                        result.error("open_failed", exception.message, null)
+                    }
+                }
+                "openAddContact" -> {
+                    val phoneNumber = call.argument<String>("phoneNumber")
+                    val displayName = call.argument<String>("displayName").orEmpty()
+                    if (phoneNumber.isNullOrBlank()) {
+                        result.error("bad_args", "phoneNumber is required.", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        result.success(openAddContact(phoneNumber, displayName))
                     } catch (exception: Exception) {
                         result.error("open_failed", exception.message, null)
                     }
@@ -301,6 +315,19 @@ class MainActivity : FlutterFragmentActivity() {
     private fun openExternalUrl(url: String): Boolean {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
             addCategory(Intent.CATEGORY_BROWSABLE)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        startActivity(intent)
+        return true
+    }
+
+    private fun openAddContact(phoneNumber: String, displayName: String): Boolean {
+        val intent = Intent(Intent.ACTION_INSERT).apply {
+            type = ContactsContract.RawContacts.CONTENT_TYPE
+            putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber)
+            if (displayName.isNotBlank()) {
+                putExtra(ContactsContract.Intents.Insert.NAME, displayName)
+            }
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         startActivity(intent)

@@ -34,53 +34,60 @@ class _AppTourScreenState extends State<AppTourScreen> {
     final l10n = context.l10n;
     final pages = <_TourPageData>[
       _TourPageData(
-        badge: l10n.tr('WELCOME'),
-        title: l10n.tr('TempCam keeps sensitive captures temporary.'),
-        description: l10n.tr(
-          'Take private photos and videos inside TempCam, keep them out of the main gallery, and let them disappear unless you keep them forever.',
-        ),
-        icon: Icons.shield_moon_rounded,
-      ),
-      _TourPageData(
         badge: l10n.tr('CAMERA'),
-        title: l10n.tr('Capture quickly with the private camera.'),
+        title: l10n.tr('Capture private photos and videos fast.'),
         description: l10n.tr(
-          'Use photo or video mode, tap to focus, pinch to zoom, control flash, and review the private preview before you apply the timer.',
+          'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.',
         ),
         icon: Icons.camera_alt_rounded,
       ),
       _TourPageData(
-        badge: l10n.tr('TIMERS'),
-        title: l10n.tr('Every item gets a self-destruct timer.'),
+        badge: l10n.tr('SCAN'),
+        title: l10n.tr('Document scan actions happen before saving.'),
         description: l10n.tr(
-          'Choose a timer after capture or import. If you skip it, TempCam uses your default timer from Settings.',
+          'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.',
         ),
-        icon: Icons.schedule_rounded,
+        icon: Icons.document_scanner_rounded,
       ),
       _TourPageData(
         badge: l10n.tr('VAULT'),
-        title: l10n.tr('The vault keeps temp media private first.'),
+        title: l10n.tr('The vault keeps temporary media organized.'),
         description: l10n.tr(
-          'Browse photos and videos in the private vault, filter by type, import existing media into TempCam, extend timers, or delete items when you need to.',
+          'Browse private photos and videos, see expiring items, open detected details again, import media into TempCam, extend timers, or delete items when you need to.',
         ),
         icon: Icons.lock_rounded,
       ),
       _TourPageData(
         badge: l10n.tr('SECURITY'),
-        title: l10n.tr('Biometrics, quick relock, and Panic Exit stay ready.'),
+        title: l10n.tr('Privacy protection stays ready under pressure.'),
         description: l10n.tr(
-          'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and Panic Exit for faster privacy under pressure.',
+          'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and Panic Exit for faster privacy when you need it.',
         ),
         icon: Icons.fingerprint_rounded,
       ),
       _TourPageData(
-        badge: l10n.tr('SETTINGS'),
-        title:
-            l10n.tr('Settings controls reminders, stealth mode, and access.'),
+        badge: l10n.tr('TIMERS'),
+        title: l10n.tr('Temp Save leads into the self-destruct timer.'),
         description: l10n.tr(
-          'Manage expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.',
+          'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.',
+        ),
+        icon: Icons.schedule_rounded,
+      ),
+      _TourPageData(
+        badge: l10n.tr('SETTINGS'),
+        title: l10n.tr('Settings controls language, reminders, and access.'),
+        description: l10n.tr(
+          'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.',
         ),
         icon: Icons.settings_rounded,
+      ),
+      _TourPageData(
+        badge: l10n.tr('WELCOME'),
+        title: l10n.tr('TempCam keeps sensitive captures temporary.'),
+        description: l10n.tr(
+          'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.',
+        ),
+        icon: Icons.shield_moon_rounded,
       ),
     ];
     final isLastPage = _pageIndex == pages.length - 1;

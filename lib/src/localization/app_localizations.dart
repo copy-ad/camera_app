@@ -333,10 +333,37 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Media no longer exists.': 'Media no longer exists.',
     'WELCOME': 'WELCOME',
     'CAMERA': 'CAMERA',
+    'SCAN': 'SCAN',
     'TIMERS': 'TIMERS',
     'VAULT': 'VAULT',
     'SECURITY': 'SECURITY',
     'SETTINGS': 'SETTINGS',
+    'Capture private photos and videos fast.':
+        'Capture private photos and videos fast.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.',
+    'Document scan actions happen before saving.':
+        'Document scan actions happen before saving.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.',
+    'The vault keeps temporary media organized.':
+        'The vault keeps temporary media organized.',
+    'Browse private photos and videos, see expiring items, open detected details again, import media into TempCam, extend timers, or delete items when you need to.':
+        'Browse private photos and videos, see expiring items, open detected details again, import media into TempCam, extend timers, or delete items when you need to.',
+    'Privacy protection stays ready under pressure.':
+        'Privacy protection stays ready under pressure.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and Panic Exit for faster privacy when you need it.':
+        'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and Panic Exit for faster privacy when you need it.',
+    'Temp Save leads into the self-destruct timer.':
+        'Temp Save leads into the self-destruct timer.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.',
+    'Settings controls language, reminders, and access.':
+        'Settings controls language, reminders, and access.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.',
     'TempCam keeps sensitive captures temporary.':
         'TempCam keeps sensitive captures temporary.',
     'Take private photos and videos inside TempCam, keep them out of the main gallery, and let them disappear unless you keep them forever.':
@@ -397,7 +424,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Help': 'Help',
     'Replay App Tour': 'Replay App Tour',
     'Walk through camera, timers, vault, security, and settings again any time.':
-        'Walk through camera, timers, vault, security, and settings again any time.',
+        'Walk through camera, smart scan, vault, security, timers, and settings again any time.',
     'Replay Tour': 'Replay Tour',
     'Why People Use TempCam': 'Why People Use TempCam',
     'Temporary by default': 'Temporary by default',

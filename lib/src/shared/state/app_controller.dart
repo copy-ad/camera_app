@@ -350,6 +350,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         ? _settings.copyWith(clearLocaleTag: true)
         : _settings.copyWith(localeTag: normalizedTag);
     await _settingsRepository.save(_settings);
+    await _resyncNotificationsSilently();
     notifyListeners();
   }
 
@@ -1056,6 +1057,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  Future<void> _resyncNotificationsSilently() async {
+    try {
+      await _syncNotificationsForCurrentPhotos();
+    } catch (_) {}
+  }
+
   void setTab(int index) {
     _currentTabIndex = index;
     notifyListeners();
@@ -1599,6 +1606,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void didChangeLocales(List<Locale>? locales) {
     if (_settings.localeTag == null) {
+      unawaited(_resyncNotificationsSilently());
       notifyListeners();
     }
   }

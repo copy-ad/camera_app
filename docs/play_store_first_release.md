@@ -2,6 +2,10 @@
 
 This guide is the exact order to follow for your first Android release of TempCam.
 
+Before building your final listing assets and store text, read:
+
+- `docs/app_store_positioning.md`
+
 ## 1. Final Product Facts
 
 - Package name: `com.tempcam`
@@ -75,10 +79,10 @@ In Play Console:
 3. Use product ID: `tempcam_premium_yearly`.
 4. Set a user-facing name like `TempCam Yearly Access`.
 5. Add benefits such as:
-   - Open the full TempCam app
-   - Temporary private photo vault
-   - Temporary private video vault
-   - Keep forever export
+   - Temporary sensitive photo capture
+   - Temporary sensitive video capture
+   - Document actions for phone numbers and addresses
+   - Self-destruct timers and keep forever export
 6. Save the subscription.
 
 Then create the base plan:
@@ -194,6 +198,7 @@ Check all of these:
 - biometric lock works on device
 - camera, photo capture, video capture, and playback work on device
 - Play store listing graphics are ready
+- store copy follows the temporary sensitive capture positioning
 - Data safety form is accurate
 - content rating is complete
 

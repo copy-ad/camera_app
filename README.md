@@ -1,21 +1,45 @@
 # TempCam
 
-TempCam is a Flutter mobile app for capturing or importing private photos and videos, storing them inside the app first, and deleting them later on a timer unless the user chooses to keep them.
+TempCam is a Flutter mobile app for temporary sensitive capture.
 
-The product direction is privacy-first and local-first:
+The core product promise is simple:
 
-- camera captures stay out of the main gallery by default
-- imported media can be moved into TempCam with a self-destruct timer
-- access can be protected with biometrics
-- expiry reminders and vault history stay on-device
+- capture photos or videos that should not live in the main gallery
+- act on useful document details like phone numbers or addresses immediately
+- store them inside TempCam for only as long as needed
+- let them expire automatically unless the user chooses `Keep Forever`
+
+TempCam is positioned as a local-first utility for receipts, labels, addresses, phone numbers, travel details, business cards, and private moments that users do not want sitting around in the device gallery.
+
+## Positioning
+
+### Product Direction
+
+TempCam is not trying to be a general camera app or a giant long-term cloud vault.
+It is strongest when presented as:
+
+- a temporary camera for sensitive photos and videos
+- a private capture space that keeps clutter and risk out of the main gallery
+- a short-lived document helper that can detect phone numbers and addresses
+
+### Core Tagline
+
+`Capture. Use. Let It Disappear.`
+
+### Store Positioning
+
+For exact App Store and Play Store copy, see:
+
+- [app_store_positioning.md](docs/app_store_positioning.md)
 
 ## Main Features
 
 - private photo and video capture that stays out of the main gallery by default
-- smart document scan flow for photos with detected phone numbers or addresses
+- live camera scan assist for phone numbers and addresses before capture
+- smart document scan flow after capture or import, before timer selection
 - pre-save actions for detected data: call, add to contacts, open maps, then `Temp Save`
 - temporary vault with self-destruct timers for photos, videos, and detected document details
-- media import from device library into TempCam with the same temp-save flow
+- media import from the device library into TempCam with the same temp-save flow
 - biometric lock, session privacy mode, protected recents preview, and panic exit
 - localization support with in-app language selection
 
@@ -24,7 +48,8 @@ The product direction is privacy-first and local-first:
 TempCam is an MVP with production-oriented platform wiring for:
 
 - timed photo and video capture
-- smart document scan with OCR-based phone/address detection for photos
+- OCR-based phone and address detection
+- live camera scan assist on the preview
 - private in-app vault browsing
 - import from device library into TempCam
 - biometric relock flow
@@ -45,6 +70,7 @@ Important implementation note:
 - tap to focus
 - pinch to zoom
 - flash controls
+- live scan actions on the camera screen for detected phone numbers or addresses
 - private preview before save
 - document scan detection before timer selection when a photo contains a phone number or address
 - `Temp Save` continues into timer selection
@@ -84,6 +110,7 @@ Important implementation note:
 
 - local reminders shortly before expiry
 - stealth wording option
+- branded notification icon and secure notification visibility handling
 
 ### Localization
 
@@ -95,6 +122,23 @@ Important implementation note:
 - one yearly subscription product
 - restore purchases
 - optional development bypass with `TEMPCAM_DISABLE_PAYMENTS`
+
+## Legal Docs
+
+TempCam includes editable legal pages and hosting guides:
+
+- [privacy_policy.md](docs/privacy_policy.md)
+- [subscription_terms.md](docs/subscription_terms.md)
+- [privacy-policy.html](docs/privacy-policy.html)
+- [subscription-terms.html](docs/subscription-terms.html)
+- [legal_hosting_guide.md](docs/legal_hosting_guide.md)
+
+The legal copy has been updated to match the current product:
+
+- temporary sensitive capture
+- OCR-based document actions
+- local-first storage
+- store-managed subscriptions
 
 ## Platform Notes
 
@@ -122,7 +166,7 @@ Key areas:
 - `lib/src/features/`: screens for camera, photos, lock, onboarding, settings, paywall
 - `android/app/src/main/kotlin/com/tempcam/MainActivity.kt`: Android media and external URL bridges
 - `ios/Runner/AppDelegate.swift`: iOS media import bridge
-- `docs/`: release notes, legal docs, and store-launch guides
+- `docs/`: release notes, legal docs, store positioning, and launch guides
 
 ## Libraries Used
 
@@ -213,6 +257,7 @@ flutter build appbundle --release \
 
 ## Repo Docs
 
+- [app_store_positioning.md](docs/app_store_positioning.md)
 - [play_store_first_release.md](docs/play_store_first_release.md)
 - [legal_hosting_guide.md](docs/legal_hosting_guide.md)
 - [privacy_policy.md](docs/privacy_policy.md)
@@ -224,4 +269,4 @@ flutter build appbundle --release \
 - add real at-rest encryption for vault metadata and media files
 - add automated tests for import, expiry cleanup, billing state, and lifecycle relock behavior
 - improve OCR quality for more document layouts like receipts and business cards
-- centralize platform capability notes so README, onboarding, and store copy stay aligned
+- centralize platform capability notes so README, onboarding, legal pages, and store copy stay aligned

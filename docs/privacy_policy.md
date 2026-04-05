@@ -1,6 +1,6 @@
 # TempCam Privacy Policy
 
-Last updated: March 27, 2026
+Last updated: April 5, 2026
 
 ## 1. Who We Are
 
@@ -12,13 +12,17 @@ Support contact:
 
 ## 2. What TempCam Does
 
-TempCam allows users to:
+TempCam is designed for temporary sensitive capture.
 
-- capture photos and videos
-- store temporary media inside the app
-- set self-destruct timers
+Users can use TempCam to:
+
+- capture photos and videos outside the main gallery by default
+- import selected photos or videos into TempCam for temporary storage
+- detect phone numbers and addresses from documents
+- open call, contact, or map actions from detected document data
+- set self-destruct timers for temporary media
 - receive local reminders before expiry
-- protect access with biometric lock
+- protect app access with biometric lock
 - shield app previews when TempCam moves into the background
 - keep a local history of important vault actions such as exports and deletions
 - export selected media to the main device gallery by choosing `Keep Forever`
@@ -33,6 +37,7 @@ Depending on the device and user choices, TempCam may access:
 - Biometric authentication
 - Media files created inside TempCam
 - User-selected photos or videos imported into TempCam from the device
+- OCR-processed text from documents scanned inside the app
 - On-device history entries for important vault actions
 - Google Play or Apple subscription purchase status
 
@@ -46,6 +51,7 @@ TempCam uses accessed data only to provide app features:
 - Biometrics: to lock app access and protect sensitive actions
 - Local media files: to show, store, auto-delete, or export captures
 - User-selected imported media: to copy chosen photos or videos into TempCam and apply the selected timer
+- OCR-processed text: to detect phone numbers and addresses and offer call, add-contact, or map actions
 - On-device history entries: to help users confirm when items were exported, deleted manually, or auto-deleted
 - Subscription status: to verify whether yearly access or a store-managed free trial is active
 
@@ -53,7 +59,8 @@ TempCam uses accessed data only to provide app features:
 
 - Temporary photos and videos are stored locally on the device inside TempCam.
 - If the user chooses to import existing device media, TempCam copies the selected items into its local private storage.
-- Temporary items remain there until they expire, are manually deleted, or are kept forever.
+- OCR-detected phone numbers and addresses are processed on-device and, when saved with a capture, stay associated with that capture until the item expires, is deleted, or is kept forever.
+- Temporary items remain in TempCam until they expire, are manually deleted, or are kept forever.
 - If a user selects `Keep Forever`, that selected item is exported to the main device gallery.
 - Expired temporary items are removed from TempCam storage by the app.
 - TempCam may store a small local history of exports, manual deletions, and auto-deletions to help the user verify important vault actions.
@@ -69,19 +76,21 @@ TempCam uses accessed data only to provide app features:
 
 - TempCam does not sell user data.
 - TempCam does not run its own advertising network for temporary media.
+- TempCam does not upload temporary photos, videos, or OCR-detected document details to its own cloud service as part of the in-app flow.
 - Google Play or Apple may process billing-related data as the platform store provider.
 
 ## 8. Security
 
-TempCam is designed to keep temporary media private by:
+TempCam is designed to reduce unnecessary exposure of sensitive capture by:
 
-- storing temp media inside app-local storage first
+- storing temporary media in app-local storage first
 - supporting biometric app lock
 - shielding recent-app previews when the app is backgrounded
-- allowing users to configure a quick biometric relock timeout
-- requiring sensitive actions to be protected when biometric lock is enabled
+- allowing a configurable quick relock timeout
+- supporting Session Privacy Mode
+- supporting fast app exit
 
-No system is perfectly secure, but TempCam is designed to minimize unnecessary data exposure.
+No system is perfectly secure, but TempCam is designed to minimize unnecessary exposure and keep temporary capture local first.
 
 ## 9. Third Parties
 
@@ -91,6 +100,7 @@ TempCam may rely on platform services and SDKs required for:
 - local notifications
 - biometric authentication
 - media playback
+- on-device OCR text recognition
 
 These services are used only to support app functionality.
 
@@ -99,7 +109,7 @@ These services are used only to support app functionality.
 Users can:
 
 - disable or enable notifications
-- enable or disable stealth notifications
+- disable or enable stealth notifications
 - disable or enable biometric lock
 - adjust the quick lock timeout
 - enable or disable Session Privacy Mode

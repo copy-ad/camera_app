@@ -650,6 +650,27 @@ const Map<String, Map<String, String>> _localizedValues = {
   },
   'tr': {
     'System Default': 'Sistem Varsayılanı',
+    'Capture private photos and videos fast.':
+        'Özel fotoğraf ve videoları hızlıca çekin.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Fotoğraf veya video modunu kullanın, odaklamak için dokunun, yakınlaştırmak için kıstırın, flaşı kontrol edin ve hassas çekimleri en baştan ana galerinin dışında tutun.',
+    'SCAN': 'TARA',
+    'Document scan actions happen before saving.':
+        'Belge tarama işlemleri kaydetmeden önce yapılır.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'TempCam bir fotoğrafta telefon numarası veya adres algılarsa, zamanlayıcıyı seçmeden önce arayabilir, kişiye ekleyebilir, haritaları açabilir veya Geçici Kaydetʼe dokunabilirsiniz.',
+    'The vault keeps temporary media organized.':
+        'Kasa geçici medyayı düzenli tutar.',
+    'Privacy protection stays ready under pressure.':
+        'Gizlilik koruması baskı altında hazır kalır.',
+    'Temp Save leads into the self-destruct timer.':
+        'Geçici Kaydet, kendini imha zamanlayıcısına götürür.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'Çekim veya içe aktarma sonrasında her öğenin TempCam’de ne kadar kalacağını seçin. Atlarsanız TempCam Ayarlar’daki varsayılan zamanlayıcınızı kullanır.',
+    'Settings controls language, reminders, and access.':
+        'Ayarlar dili, hatırlatıcıları ve erişimi kontrol eder.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Her şey, özel fotoğrafları, videoları ve algılanan belge ayrıntılarını, süreleri dolana veya saklamayı siz seçene kadar önce yerel tutacak şekilde tasarlanmıştır.',
     'Language': 'Dil',
     'Choose the app language. System Default follows your phone language.':
         'Uygulama dilini seçin. Sistem Varsayılanı telefonunuzun dilini kullanır.',
@@ -996,23 +1017,38 @@ const Map<String, Map<String, String>> _localizedValues = {
         'Yıllık aboneliğiniz geri yüklendi.',
     '{days}d {hours}h': '{days}d {hours}h',
     '{hours}h {minutes}m': '{hours}h {minutes}m',
-    'Secure reminder': 'G?venli hat?rlatma',
-    'Photo timer ending soon': 'Foto?raf zamanlay?c?s? yak?nda bitecek',
-    'Video timer ending soon': 'Video zamanlay?c?s? yak?nda bitecek',
+    'Secure reminder': 'Güvenli hatırlatma',
+    'Photo timer ending soon': 'Fotoğraf zamanlayıcısı yakında bitecek',
+    'Video timer ending soon': 'Video zamanlayıcısı yakında bitecek',
     'Open TempCam soon to review a secure reminder.':
-        'G?venli hat?rlatmay? g?rmek i?in TempCam i yak?nda a??n.',
+        'Güvenli hatırlatmayı görmek için TempCam i yakında açın.',
     'Open TempCam soon to keep it or let it expire safely.':
-        'Kayd? tutmak ya da g?venle s?resi dolsun diye TempCam i yak?nda a??n.',
+        'Kaydı tutmak ya da güvenle süresi dolsun diye TempCam i yakında açın.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'Uygulama dilini, sona erme bildirimlerini, gizli bildirim metnini, varsay?lan zamanlay?c?lar?, abonelik eri?imini y?netin ve bu turu istedi?iniz zaman Ayarlar b?l?m?nden yeniden a??n.',
+        'Uygulama dilini, sona erme bildirimlerini, gizli bildirim metnini, varsayılan zamanlayıcıları, abonelik erişimini yönetin ve bu turu istediğiniz zaman Ayarlar bölümünden yeniden açın.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        '?zel foto?raf ve videolara g?z at?n, s?resi dolan ??eleri g?r?n, alg?lanan ayr?nt?lar? yeniden a??n ve ge?ici ?zel depolamaya ihtiya? duydu?unuzda ana galeriden foto?raf veya videolar? TempCam i?ine ta??y?n.',
+        'Özel fotoğraf ve videolara göz atın, süresi dolan öğeleri görün, algılanan ayrıntıları yeniden açın ve geçici özel depolamaya ihtiyaç duyduğunuzda ana galeriden fotoğraf veya videoları TempCam içine taşıyın.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        'Biyometrik koruma, Oturum Gizlilik Modu, h?zl? kilit zaman a??m?, korumal? son uygulamalar ?nizlemesi kullan?n ve hemen gizlili?e ihtiya? duydu?unuzda h?zl? uygulama ??k??? i?in g?z simgesine dokunun.',
+        'Biyometrik koruma, Oturum Gizlilik Modu, hızlı kilit zaman aşımı, korumalı son uygulamalar önizlemesi kullanın ve hemen gizliliğe ihtiyaç duyduğunuzda hızlı uygulama çıkışı için göz simgesine dokunun.',
     '{minutes}m': '{minutes}m',
   },
   'zh': {
     'System Default': '跟随系统',
+    'Capture private photos and videos fast.': '快速拍摄私人照片和视频。',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        '使用照片或视频模式，点按对焦、双指缩放、控制闪光灯，并从一开始就让敏感内容不进入主图库。',
+    'SCAN': '扫描',
+    'Document scan actions happen before saving.': '文档扫描操作会在保存前进行。',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        '如果 TempCam 在照片中检测到电话号码或地址，您可以先拨打电话、添加联系人、打开地图，或先点按“临时保存”再选择计时器。',
+    'The vault keeps temporary media organized.': '保管库让临时媒体井然有序。',
+    'Privacy protection stays ready under pressure.': '隐私保护在紧急情况下也随时可用。',
+    'Temp Save leads into the self-destruct timer.': '临时保存会进入自毁计时器设置。',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        '拍摄或导入后，选择每个项目在 TempCam 中保留多久。如果跳过，TempCam 会使用您在“设置”中的默认计时器。',
+    'Settings controls language, reminders, and access.': '设置控制语言、提醒和访问权限。',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        '一切设计都旨在让私人照片、视频和检测到的文档详情优先保留在本地，直到它们到期或您选择永久保留。',
     'Language': '语言',
     'Choose the app language. System Default follows your phone language.':
         '选择应用语言。“跟随系统”会使用手机语言。',
@@ -1319,22 +1355,43 @@ const Map<String, Map<String, String>> _localizedValues = {
     '{media} exported to the main gallery and removed from TempCam expiry.':
         '{media} 导出到主图库并从 TempCam 到期中删除。',
     '{media} removed manually before its timer ended.': '{media} 在计时器结束之前手动删除。',
-    'Secure reminder': '????',
-    'Photo timer ending soon': '?????????',
-    'Video timer ending soon': '?????????',
-    'Open TempCam soon to review a secure reminder.': '???? TempCam ???????',
+    'Secure reminder': '安全提醒',
+    'Photo timer ending soon': '照片计时器即将结束',
+    'Video timer ending soon': '视频计时器即将结束',
+    'Open TempCam soon to review a secure reminder.': '尽快打开 TempCam 查看安全提醒。',
     'Open TempCam soon to keep it or let it expire safely.':
-        '???? TempCam??????????????',
+        '尽快打开 TempCam，选择保留它或让它安全到期。',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        '????????????????????????????????????????????????',
+        '管理应用语言、到期通知、隐形通知措辞、默认计时器、订阅访问权限，并随时从“设置”重新打开此导览。',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        '???????????????????????????????????????????????????????? TempCam?',
+        '浏览私人照片和视频，查看即将到期的项目，再次打开已检测的详细信息，并在需要临时私人存储时将照片或视频从主图库移入 TempCam。',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        '?????????????????????????????????????????????????????????',
+        '使用生物识别保护、会话隐私模式、快速锁定超时、受保护的最近预览，并在您需要立即获得隐私时点击眼睛图标快速退出应用。',
     '{minutes}m': '{minutes}米',
   },
   'es': {
     'System Default': 'Predeterminado del sistema',
+    'Capture private photos and videos fast.':
+        'Captura rápido fotos y videos privados.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Usa el modo foto o video, toca para enfocar, pellizca para hacer zoom, controla el flash y mantén las capturas sensibles fuera de la galería principal desde el inicio.',
+    'SCAN': 'ESCANEAR',
+    'Document scan actions happen before saving.':
+        'Las acciones de escaneo de documentos ocurren antes de guardar.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'Si TempCam detecta un número de teléfono o una dirección en una foto, puedes llamar, añadir un contacto, abrir mapas o tocar Guardado temporal antes de elegir el temporizador.',
+    'The vault keeps temporary media organized.':
+        'La bóveda mantiene organizados los medios temporales.',
+    'Privacy protection stays ready under pressure.':
+        'La protección de privacidad está lista bajo presión.',
+    'Temp Save leads into the self-destruct timer.':
+        'Guardado temporal te lleva al temporizador de autodestrucción.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'Después de capturar o importar, elige cuánto tiempo debe permanecer cada elemento en TempCam. Si lo omites, TempCam usa tu temporizador predeterminado de Ajustes.',
+    'Settings controls language, reminders, and access.':
+        'Ajustes controla el idioma, los recordatorios y el acceso.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Todo está diseñado para mantener primero en local las fotos privadas, los videos y los detalles detectados de documentos hasta que caduquen o decidas conservarlos.',
     'Language': 'Idioma',
     'Choose the app language. System Default follows your phone language.':
         'Elige el idioma de la app. Predeterminado del sistema sigue el idioma del telefono.',
@@ -1683,15 +1740,36 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Open TempCam soon to keep it or let it expire safely.':
         'Abra TempCam pronto para conservarlo o dejar que expire de forma segura.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'Administre el idioma de la app, las notificaciones de vencimiento, la redacci?n de las notificaciones ocultas, los temporizadores predeterminados, el acceso a la suscripci?n y vuelva a abrir este recorrido en cualquier momento desde Configuraci?n.',
+        'Administre el idioma de la app, las notificaciones de vencimiento, la redacción de las notificaciones ocultas, los temporizadores predeterminados, el acceso a la suscripción y vuelva a abrir este recorrido en cualquier momento desde Configuración.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        'Explore fotos y videos privados, vea los elementos que est?n por vencer, vuelva a abrir los detalles detectados y mueva fotos o videos desde la galer?a principal a TempCam cuando necesite almacenamiento privado temporal.',
+        'Explore fotos y videos privados, vea los elementos que están por vencer, vuelva a abrir los detalles detectados y mueva fotos o videos desde la galería principal a TempCam cuando necesite almacenamiento privado temporal.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        'Use protecci?n biom?trica, Modo de privacidad de sesi?n, tiempo de bloqueo r?pido, vista previa protegida de recientes y toque el ?cono del ojo para salir r?pido de la app cuando necesite privacidad de inmediato.',
+        'Use protección biométrica, Modo de privacidad de sesión, tiempo de bloqueo rápido, vista previa protegida de recientes y toque el ícono del ojo para salir rápido de la app cuando necesite privacidad de inmediato.',
     '{minutes}m': '{minutes}m',
   },
   'de': {
     'System Default': 'Systemstandard',
+    'Capture private photos and videos fast.':
+        'Private Fotos und Videos schnell aufnehmen.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Verwenden Sie den Foto- oder Videomodus, tippen Sie zum Fokussieren, ziehen Sie zum Zoomen auseinander, steuern Sie den Blitz und halten Sie sensible Aufnahmen von Anfang an aus der Hauptgalerie heraus.',
+    'SCAN': 'SCANNEN',
+    'Document scan actions happen before saving.':
+        'Dokumentenscan-Aktionen erfolgen vor dem Speichern.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'Wenn TempCam in einem Foto eine Telefonnummer oder Adresse erkennt, können Sie anrufen, einen Kontakt hinzufügen, Karten öffnen oder vor der Timer-Auswahl auf Temp Save tippen.',
+    'The vault keeps temporary media organized.':
+        'Der Tresor hält temporäre Medien organisiert.',
+    'Privacy protection stays ready under pressure.':
+        'Der Datenschutz bleibt auch unter Druck einsatzbereit.',
+    'Temp Save leads into the self-destruct timer.':
+        'Temp Save führt zum Selbstzerstörungs-Timer.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'Wählen Sie nach der Aufnahme oder dem Import, wie lange jedes Element in TempCam bleiben soll. Wenn Sie es überspringen, verwendet TempCam Ihren Standard-Timer aus den Einstellungen.',
+    'Settings controls language, reminders, and access.':
+        'Einstellungen steuern Sprache, Erinnerungen und Zugriff.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Alles ist darauf ausgelegt, private Fotos, Videos und erkannte Dokumentdetails zunächst lokal zu halten, bis sie ablaufen oder Sie sich entscheiden, sie zu behalten.',
     'Language': 'Sprache',
     'Choose the app language. System Default follows your phone language.':
         'Wahle die App-Sprache. Systemstandard folgt der Sprache deines Telefons.',
@@ -2033,19 +2111,40 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Photo timer ending soon': 'Foto-Timer endet bald',
     'Video timer ending soon': 'Video-Timer endet bald',
     'Open TempCam soon to review a secure reminder.':
-        '?ffnen Sie TempCam bald, um eine sichere Erinnerung zu pr?fen.',
+        'Öffnen Sie TempCam bald, um eine sichere Erinnerung zu prüfen.',
     'Open TempCam soon to keep it or let it expire safely.':
-        '?ffnen Sie TempCam bald, um es zu behalten oder sicher ablaufen zu lassen.',
+        'Öffnen Sie TempCam bald, um es zu behalten oder sicher ablaufen zu lassen.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'Verwalten Sie die App-Sprache, Ablaufbenachrichtigungen, den Wortlaut von Stealth-Benachrichtigungen, Standard-Timer und den Abonnementzugriff und ?ffnen Sie diese Tour jederzeit ?ber die Einstellungen erneut.',
+        'Verwalten Sie die App-Sprache, Ablaufbenachrichtigungen, den Wortlaut von Stealth-Benachrichtigungen, Standard-Timer und den Abonnementzugriff und öffnen Sie diese Tour jederzeit über die Einstellungen erneut.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        'Durchsuchen Sie private Fotos und Videos, sehen Sie ablaufende Elemente, ?ffnen Sie erkannte Details erneut und verschieben Sie Fotos oder Videos aus der Hauptgalerie in TempCam, wenn Sie einen vor?bergehend privaten Speicher ben?tigen.',
+        'Durchsuchen Sie private Fotos und Videos, sehen Sie ablaufende Elemente, öffnen Sie erkannte Details erneut und verschieben Sie Fotos oder Videos aus der Hauptgalerie in TempCam, wenn Sie einen vorübergehend privaten Speicher benötigen.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        'Nutzen Sie biometrischen Schutz, den Sitzungs-Privatsph?renmodus, das Schnell-Sperr-Timeout, die gesch?tzte Zuletzt-verwendet-Vorschau und tippen Sie auf das Augensymbol f?r einen schnellen App-Ausstieg, wenn Sie sofort Privatsph?re brauchen.',
+        'Nutzen Sie biometrischen Schutz, den Sitzungs-Privatsphärenmodus, das Schnell-Sperr-Timeout, die geschützte Zuletzt-verwendet-Vorschau und tippen Sie auf das Augensymbol für einen schnellen App-Ausstieg, wenn Sie sofort Privatsphäre brauchen.',
     '{minutes}m': '{minutes}m',
   },
   'fr': {
     'System Default': 'Par defaut du systeme',
+    'Capture private photos and videos fast.':
+        'Capturez rapidement des photos et vidéos privées.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Utilisez le mode photo ou vidéo, appuyez pour faire la mise au point, pincez pour zoomer, contrôlez le flash et gardez les captures sensibles hors de la galerie principale dès le départ.',
+    'SCAN': 'SCAN',
+    'Document scan actions happen before saving.':
+        'Les actions de numérisation de documents ont lieu avant l’enregistrement.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'Si TempCam détecte un numéro de téléphone ou une adresse dans une photo, vous pouvez appeler, ajouter un contact, ouvrir Plans ou appuyer sur Enregistrement temporaire avant de choisir la minuterie.',
+    'The vault keeps temporary media organized.':
+        'Le coffre-fort garde les médias temporaires organisés.',
+    'Privacy protection stays ready under pressure.':
+        'La protection de la vie privée reste prête sous pression.',
+    'Temp Save leads into the self-destruct timer.':
+        'Enregistrement temporaire mène à la minuterie d’autodestruction.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'Après la capture ou l’importation, choisissez combien de temps chaque élément doit rester dans TempCam. Si vous ignorez cette étape, TempCam utilise votre minuterie par défaut dans les paramètres.',
+    'Settings controls language, reminders, and access.':
+        'Les paramètres contrôlent la langue, les rappels et l’accès.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Tout est conçu pour garder d’abord en local les photos privées, les vidéos et les détails de document détectés jusqu’à leur expiration ou jusqu’à ce que vous choisissiez de les conserver.',
     'Language': 'Langue',
     'Choose the app language. System Default follows your phone language.':
         'Choisissez la langue de l'
@@ -2386,23 +2485,44 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} exporté vers la galerie principale et supprimé à l\'expiration de TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} a été supprimé manuellement avant la fin de son minuteur.',
-    'Secure reminder': 'Rappel s?curis?',
-    'Photo timer ending soon': 'Le minuteur de la photo se termine bient?t',
-    'Video timer ending soon': 'Le minuteur de la vid?o se termine bient?t',
+    'Secure reminder': 'Rappel sécurisé',
+    'Photo timer ending soon': 'Le minuteur de la photo se termine bientôt',
+    'Video timer ending soon': 'Le minuteur de la vidéo se termine bientôt',
     'Open TempCam soon to review a secure reminder.':
-        'Ouvrez bient?t TempCam pour consulter un rappel s?curis?.',
+        'Ouvrez bientôt TempCam pour consulter un rappel sécurisé.',
     'Open TempCam soon to keep it or let it expire safely.':
-        'Ouvrez bient?t TempCam pour le conserver ou le laisser expirer en toute s?curit?.',
+        'Ouvrez bientôt TempCam pour le conserver ou le laisser expirer en toute sécurité.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'G?rez la langue de l\'application, les notifications d\'expiration, le libell? des notifications furtives, les minuteries par d?faut, l\'acc?s aux abonnements et rouvrez cette visite ? tout moment ? partir des param?tres.',
+        'Gérez la langue de l\'application, les notifications d\'expiration, le libellé des notifications furtives, les minuteries par défaut, l\'accès aux abonnements et rouvrez cette visite à tout moment à partir des paramètres.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        'Parcourez les photos et vid?os priv?es, voyez les ?l?ments qui expirent, rouvrez les d?tails d?tect?s et d?placez des photos ou vid?os de la galerie principale vers TempCam lorsque vous avez besoin d\'un stockage priv? temporaire.',
+        'Parcourez les photos et vidéos privées, voyez les éléments qui expirent, rouvrez les détails détectés et déplacez des photos ou vidéos de la galerie principale vers TempCam lorsque vous avez besoin d\'un stockage privé temporaire.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        'Utilisez la protection biom?trique, le mode confidentialit? de session, le d?lai de verrouillage rapide, l\'aper?u prot?g? des ?l?ments r?cents et touchez l\'ic?ne en forme d\'?il pour quitter rapidement l\'application lorsque vous avez besoin de confidentialit? imm?diatement.',
+        'Utilisez la protection biométrique, le mode confidentialité de session, le délai de verrouillage rapide, l\'aperçu protégé des éléments récents et touchez l\'icône en forme d\'œil pour quitter rapidement l\'application lorsque vous avez besoin de confidentialité immédiatement.',
     '{minutes}m': '{minutes}m',
   },
   'pt_BR': {
     'System Default': 'Padrao do sistema',
+    'Capture private photos and videos fast.':
+        'Capture fotos e vídeos privados rapidamente.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Use o modo foto ou vídeo, toque para focar, faça o gesto de pinça para ampliar, controle o flash e mantenha capturas sensíveis fora da galeria principal desde o começo.',
+    'SCAN': 'ESCANEAR',
+    'Document scan actions happen before saving.':
+        'As ações de escaneamento de documentos acontecem antes de salvar.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'Se o TempCam detectar um número de telefone ou endereço em uma foto, você poderá ligar, adicionar um contato, abrir mapas ou tocar em Salvamento temporário antes de escolher o temporizador.',
+    'The vault keeps temporary media organized.':
+        'O cofre mantém a mídia temporária organizada.',
+    'Privacy protection stays ready under pressure.':
+        'A proteção de privacidade continua pronta sob pressão.',
+    'Temp Save leads into the self-destruct timer.':
+        'Salvamento temporário leva ao temporizador de autodestruição.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'Após capturar ou importar, escolha por quanto tempo cada item deve permanecer no TempCam. Se você pular, o TempCam usará seu temporizador padrão em Configurações.',
+    'Settings controls language, reminders, and access.':
+        'Configurações controlam idioma, lembretes e acesso.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Tudo foi projetado para manter primeiro no dispositivo as fotos privadas, vídeos e detalhes de documentos detectados até que expirem ou até você escolher mantê-los.',
     'Language': 'Idioma',
     'Choose the app language. System Default follows your phone language.':
         'Escolha o idioma do app. Padrao do sistema segue o idioma do telefone.',
@@ -2740,21 +2860,42 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} removido manualmente antes do término do cronômetro.',
     'Secure reminder': 'Lembrete seguro',
     'Photo timer ending soon': 'O temporizador da foto termina em breve',
-    'Video timer ending soon': 'O temporizador do v?deo termina em breve',
+    'Video timer ending soon': 'O temporizador do vídeo termina em breve',
     'Open TempCam soon to review a secure reminder.':
         'Abra o TempCam em breve para revisar um lembrete seguro.',
     'Open TempCam soon to keep it or let it expire safely.':
-        'Abra o TempCam em breve para mant?-lo ou deix?-lo expirar com seguran?a.',
+        'Abra o TempCam em breve para mantê-lo ou deixá-lo expirar com segurança.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'Gerencie o idioma do app, as notifica??es de expira??o, o texto de notifica??o furtiva, os temporizadores padr?o, o acesso ? assinatura e reabra este tour a qualquer momento em Configura??es.',
+        'Gerencie o idioma do app, as notificações de expiração, o texto de notificação furtiva, os temporizadores padrão, o acesso à assinatura e reabra este tour a qualquer momento em Configurações.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        'Navegue por fotos e v?deos privados, veja os itens que est?o para expirar, abra novamente os detalhes detectados e mova fotos ou v?deos da galeria principal para o TempCam quando precisar de armazenamento privado tempor?rio.',
+        'Navegue por fotos e vídeos privados, veja os itens que estão para expirar, abra novamente os detalhes detectados e mova fotos ou vídeos da galeria principal para o TempCam quando precisar de armazenamento privado temporário.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        'Use prote??o biom?trica, Modo de Privacidade da Sess?o, tempo limite de bloqueio r?pido, visualiza??o protegida dos recentes e toque no ?cone de olho para sair rapidamente do app quando precisar de privacidade imediatamente.',
+        'Use proteção biométrica, Modo de Privacidade da Sessão, tempo limite de bloqueio rápido, visualização protegida dos recentes e toque no ícone de olho para sair rapidamente do app quando precisar de privacidade imediatamente.',
     '{minutes}m': '{minutes}m',
   },
   'ru': {
     'System Default': 'Системный язык',
+    'Capture private photos and videos fast.':
+        'Быстро снимайте личные фото и видео.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'Используйте режим фото или видео, нажмите для фокусировки, сведите или разведите пальцы для масштаба, управляйте вспышкой и с самого начала держите конфиденциальные материалы вне основной галереи.',
+    'SCAN': 'СКАН',
+    'Document scan actions happen before saving.':
+        'Действия сканирования документа выполняются до сохранения.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'Если TempCam обнаружит в фото номер телефона или адрес, вы сможете позвонить, добавить контакт, открыть карты или нажать «Временное сохранение» перед выбором таймера.',
+    'The vault keeps temporary media organized.':
+        'Хранилище помогает держать временные файлы в порядке.',
+    'Privacy protection stays ready under pressure.':
+        'Защита конфиденциальности готова даже в напряженный момент.',
+    'Temp Save leads into the self-destruct timer.':
+        'Временное сохранение ведет к таймеру самоуничтожения.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'После съемки или импорта выберите, как долго каждый элемент должен оставаться в TempCam. Если пропустить этот шаг, TempCam использует таймер по умолчанию из настроек.',
+    'Settings controls language, reminders, and access.':
+        'Настройки управляют языком, напоминаниями и доступом.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'Все устроено так, чтобы личные фото, видео и обнаруженные данные документов сначала оставались только на устройстве, пока не истечет срок или пока вы не решите сохранить их.',
     'Language': 'Язык',
     'Choose the app language. System Default follows your phone language.':
         'Выберите язык приложения. Системный режим использует язык телефона.',
@@ -3091,23 +3232,44 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} экспортирован в главную галерею и удален по истечении срока действия TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} удален вручную до истечения таймера.',
-    'Secure reminder': '?????????? ???????????',
-    'Photo timer ending soon': '?????? ???? ????? ??????????',
-    'Video timer ending soon': '?????? ????? ????? ??????????',
+    'Secure reminder': 'Безопасное напоминание',
+    'Photo timer ending soon': 'Таймер фото скоро закончится',
+    'Video timer ending soon': 'Таймер видео скоро закончится',
     'Open TempCam soon to review a secure reminder.':
-        '????? ???????? TempCam, ????? ??????????? ?????????? ???????????.',
+        'Скоро откройте TempCam, чтобы просмотреть безопасное напоминание.',
     'Open TempCam soon to keep it or let it expire safely.':
-        '????? ???????? TempCam, ????? ????????? ??? ??? ???? ??? ????????? ??????.',
+        'Скоро откройте TempCam, чтобы сохранить его или дать ему безопасно истечь.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        '?????????? ?????? ??????????, ????????????? ?? ????????? ????? ????????, ????????????? ??????? ???????????, ????????? ?? ?????????, ???????? ? ???????? ? ???????? ?????????? ???? ??? ? ????? ????? ?? ????????.',
+        'Управляйте языком приложения, уведомлениями об истечении срока действия, формулировкой скрытых уведомлений, таймерами по умолчанию, доступом к подписке и повторно открывайте этот тур в любое время из настроек.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        '?????????????? ?????? ???? ? ?????, ???????? ???????? ? ?????????? ??????, ????? ?????????? ???????????? ?????? ? ??????????? ???? ??? ????? ?? ???????? ??????? ? TempCam, ????? ??? ????? ????????? ????????? ?????????.',
+        'Просматривайте личные фото и видео, смотрите элементы с истекающим сроком, снова открывайте обнаруженные данные и перемещайте фото или видео из основной галереи в TempCam, когда вам нужно временное приватное хранилище.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        '??????????? ?????????????? ??????, ????? ?????????????????? ??????, ????-??? ??????? ??????????, ?????????? ???????????? ???????? ?????????? ? ????????? ?????? ????? ??? ???????? ?????? ?? ??????????, ????? ?????????????????? ????? ??????????.',
+        'Используйте биометрическую защиту, режим конфиденциальности сеанса, тайм-аут быстрой блокировки, защищенный предпросмотр недавних приложений и нажимайте значок глаза для быстрого выхода из приложения, когда конфиденциальность нужна немедленно.',
     '{minutes}m': '{minutes}м',
   },
   'ar': {
     'System Default': 'افتراضي النظام',
+    'Capture private photos and videos fast.':
+        'التقط الصور ومقاطع الفيديو الخاصة بسرعة.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        'استخدم وضع الصورة أو الفيديو، واضغط للتركيز، وقم بالقرص للتكبير، وتحكم في الفلاش، وأبقِ اللقطات الحساسة خارج المعرض الرئيسي من البداية.',
+    'SCAN': 'المسح',
+    'Document scan actions happen before saving.':
+        'تحدث إجراءات مسح المستندات قبل الحفظ.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'إذا اكتشف TempCam رقم هاتف أو عنوانًا في صورة، يمكنك الاتصال أو إضافة جهة اتصال أو فتح الخرائط أو الضغط على الحفظ المؤقت قبل اختيار المؤقت.',
+    'The vault keeps temporary media organized.':
+        'يحافظ الخزنة على تنظيم الوسائط المؤقتة.',
+    'Privacy protection stays ready under pressure.':
+        'تبقى حماية الخصوصية جاهزة تحت الضغط.',
+    'Temp Save leads into the self-destruct timer.':
+        'يؤدي الحفظ المؤقت إلى مؤقت التدمير الذاتي.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        'بعد الالتقاط أو الاستيراد، اختر مدة بقاء كل عنصر في TempCam. إذا تخطيت ذلك، يستخدم TempCam المؤقت الافتراضي من الإعدادات.',
+    'Settings controls language, reminders, and access.':
+        'تتحكم الإعدادات في اللغة والتذكيرات والوصول.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        'تم تصميم كل شيء لإبقاء الصور الخاصة ومقاطع الفيديو وتفاصيل المستندات المكتشفة محلية أولًا إلى أن تنتهي صلاحيتها أو تختار الاحتفاظ بها.',
     'Language': 'اللغة',
     'Choose the app language. System Default follows your phone language.':
         'اختر لغة التطبيق. الوضع الافتراضي يتبع لغة الهاتف.',
@@ -3438,23 +3600,40 @@ const Map<String, Map<String, String>> _localizedValues = {
         'تم تصدير {media} إلى المعرض الرئيسي وإزالته من تاريخ انتهاء الصلاحية TempCam.',
     '{media} removed manually before its timer ended.':
         'تمت إزالة {media} يدويًا قبل انتهاء مؤقته.',
-    'Secure reminder': '????? ???',
-    'Photo timer ending soon': '???? ?????? ?????? ??????',
-    'Video timer ending soon': '???? ??????? ?????? ??????',
+    'Secure reminder': 'تذكير آمن',
+    'Photo timer ending soon': 'مؤقت الصورة سينتهي قريبًا',
+    'Video timer ending soon': 'مؤقت الفيديو سينتهي قريبًا',
     'Open TempCam soon to review a secure reminder.':
-        '???? TempCam ?????? ??????? ????? ???.',
+        'افتح TempCam قريبًا لمراجعة تذكير آمن.',
     'Open TempCam soon to keep it or let it expire safely.':
-        '???? TempCam ?????? ???????? ?? ?? ???? ????? ?????.',
+        'افتح TempCam قريبًا للاحتفاظ به أو تركه ينتهي بأمان.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        '????? ??? ???????? ???????? ?????? ????????? ?????? ????????? ??????? ????????? ??????????? ??????? ??? ????????? ?????? ??? ??? ?????? ?? ?? ??? ?? ?????????.',
+        'إدارة لغة التطبيق، وإشعارات انتهاء الصلاحية، وصياغة الإشعارات الخفية، والمؤقتات الافتراضية، والوصول إلى الاشتراك، وإعادة فتح هذه الجولة في أي وقت من الإعدادات.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        '???? ????? ?????? ??????? ??????? ????? ??? ??????? ???? ???? ??? ????????? ????? ???????? ???????? ??? ????? ????? ????? ?? ????? ??????? ?? ?????? ??????? ??? TempCam ????? ????? ??? ????? ??? ????.',
+        'تصفح الصور ومقاطع الفيديو الخاصة، واطلع على العناصر التي توشك على الانتهاء، وافتح التفاصيل المكتشفة مرة أخرى، وانقل الصور أو مقاطع الفيديو من المعرض الرئيسي إلى TempCam عندما تحتاج إلى تخزين خاص مؤقت.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        '?????? ??????? ?????????? ???? ?????? ?????? ????? ????? ?????? ????????? ??????? ??????? ???????? ????? ??? ?????? ????? ?????? ?????? ?? ??????? ????? ????? ??? ???????? ?????.',
+        'استخدم الحماية البيومترية ووضع خصوصية الجلسة ومهلة القفل السريع والمعاينة المحمية للعناصر الحديثة، واضغط على أيقونة العين للخروج السريع من التطبيق عندما تحتاج إلى الخصوصية فورًا.',
     '{minutes}m': '{minutes}م',
   },
   'ko': {
     'System Default': '시스템 기본값',
+    'Capture private photos and videos fast.': '비공개 사진과 동영상을 빠르게 촬영하세요.',
+    'Use photo or video mode, tap to focus, pinch to zoom, control flash, and keep sensitive captures out of the main gallery from the start.':
+        '사진 또는 동영상 모드를 사용하고, 탭하여 초점을 맞추고, 핀치로 확대하거나 축소하고, 플래시를 제어하며, 민감한 촬영물이 처음부터 기본 갤러리에 들어가지 않도록 하세요.',
+    'SCAN': '스캔',
+    'Document scan actions happen before saving.': '문서 스캔 작업은 저장 전에 이루어집니다.',
+    'If TempCam detects a phone number or address in a photo, you can call, add a contact, open maps, or tap Temp Save before choosing the timer.':
+        'TempCam이 사진에서 전화번호나 주소를 감지하면 타이머를 선택하기 전에 전화 걸기, 연락처 추가, 지도 열기 또는 임시 저장을 탭할 수 있습니다.',
+    'The vault keeps temporary media organized.': '보관함은 임시 미디어를 정리된 상태로 유지합니다.',
+    'Privacy protection stays ready under pressure.':
+        '개인정보 보호 기능은 긴급한 상황에서도 바로 사용할 수 있습니다.',
+    'Temp Save leads into the self-destruct timer.': '임시 저장은 자동 삭제 타이머로 이어집니다.',
+    'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.':
+        '촬영하거나 가져온 후 각 항목을 TempCam에 얼마나 오래 둘지 선택하세요. 건너뛰면 TempCam이 설정의 기본 타이머를 사용합니다.',
+    'Settings controls language, reminders, and access.':
+        '설정은 언어, 알림, 액세스를 제어합니다.',
+    'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
+        '모든 것은 비공개 사진, 동영상, 감지된 문서 세부 정보를 만료되거나 직접 보관하기로 선택할 때까지 우선 로컬에 머물게 하도록 설계되었습니다.',
     'Language': '언어',
     'Choose the app language. System Default follows your phone language.':
         '앱 언어를 선택하세요. 시스템 기본값은 휴대폰 언어를 따릅니다.',
@@ -3775,19 +3954,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media}을(를) 기본 갤러리로 내보내고 TempCam 만료 시 제거했습니다.',
     '{media} removed manually before its timer ended.':
         '{media}은 타이머가 끝나기 전에 수동으로 제거되었습니다.',
-    'Secure reminder': '?? ??',
-    'Photo timer ending soon': '?? ???? ? ?????',
-    'Video timer ending soon': '??? ???? ? ?????',
+    'Secure reminder': '보안 알림',
+    'Photo timer ending soon': '사진 타이머가 곧 종료됩니다',
+    'Video timer ending soon': '동영상 타이머가 곧 종료됩니다',
     'Open TempCam soon to review a secure reminder.':
-        '?? ??? ????? ? TempCam? ???.',
+        '보안 알림을 확인하려면 곧 TempCam을 여세요.',
     'Open TempCam soon to keep it or let it expire safely.':
-        '? TempCam? ?? ????? ???? ????? ???.',
+        '곧 TempCam을 열어 보관하거나 안전하게 만료되도록 두세요.',
     'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        '? ??, ?? ??, ??? ?? ??, ?? ???, ?? ???? ???? ???? ???? ? ??? ?? ? ? ????.',
+        '앱 언어, 만료 알림, 스텔스 알림 문구, 기본 타이머, 구독 액세스를 관리하고 언제든지 설정에서 이 투어를 다시 열 수 있습니다.',
     'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
-        '??? ??? ???? ????, ?? ?? ??? ????, ??? ?? ??? ?? ??, ?? ??? ???? ??? ? ?? ????? TempCam?? ???? ???? ????.',
+        '비공개 사진과 동영상을 둘러보고, 만료 예정 항목을 확인하고, 감지된 세부 정보를 다시 열고, 임시 비공개 저장소가 필요할 때 기본 갤러리에서 TempCam으로 사진이나 동영상을 옮기세요.',
     'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
-        '?? ?? ??, ?? ???? ?? ??, ?? ?? ?? ??, ??? ?? ?? ????? ???? ?? ???? ??? ??? ? ??? ?? ????? ? ???? ????.',
+        '생체 인식 보호, 세션 개인정보 보호 모드, 빠른 잠금 시간 초과, 보호된 최근 항목 미리보기를 사용하고 즉시 개인정보 보호가 필요할 때 빠르게 앱을 종료하려면 눈 아이콘을 탭하세요.',
     '{minutes}m': '{minutes}m',
   },
 };

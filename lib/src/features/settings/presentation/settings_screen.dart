@@ -369,10 +369,6 @@ class SettingsScreen extends StatelessWidget {
                               foregroundColor: AppTheme.onSurface,
                             ),
                             onPressed: () async {
-                              await controller.reopenTour();
-                              if (!context.mounted) {
-                                return;
-                              }
                               await AppTourScreen.show(context);
                             },
                             child: Text(

@@ -270,13 +270,6 @@ const Map<String, Map<String, String>> _localizedValues = {
     'PRIVATE • TEMPORARY • LOCAL': 'PRIVATE • TEMPORARY • LOCAL',
     'Preparing secure vault experience': 'Preparing secure vault experience',
     'Secure session initializing': 'Secure session initializing',
-    'Secure reminder': 'Secure reminder',
-    'Photo timer ending soon': 'Photo timer ending soon',
-    'Video timer ending soon': 'Video timer ending soon',
-    'Open TempCam soon to review a secure reminder.':
-        'Open TempCam soon to review a secure reminder.',
-    'Open TempCam soon to keep it or let it expire safely.':
-        'Open TempCam soon to keep it or let it expire safely.',
     'LOCAL PRIVATE STORAGE': 'LOCAL PRIVATE STORAGE',
     'Vault Locked': 'Vault Locked',
     'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.':
@@ -369,8 +362,6 @@ const Map<String, Map<String, String>> _localizedValues = {
         'After capture or import, choose how long each item should stay in TempCam. If you skip it, TempCam uses your default timer from Settings.',
     'Settings controls language, reminders, and access.':
         'Settings controls language, reminders, and access.',
-    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
-        'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.',
     'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.':
         'Everything is designed to keep private photos, videos, and detected document details local first until they expire or you choose to keep them.',
     'TempCam keeps sensitive captures temporary.':
@@ -489,6 +480,19 @@ const Map<String, Map<String, String>> _localizedValues = {
     'Expired': 'Expired',
     '{days}d {hours}h': '{days}d {hours}h',
     '{hours}h {minutes}m': '{hours}h {minutes}m',
+    'Secure reminder': 'Secure reminder',
+    'Photo timer ending soon': 'Photo timer ending soon',
+    'Video timer ending soon': 'Video timer ending soon',
+    'Open TempCam soon to review a secure reminder.':
+        'Open TempCam soon to review a secure reminder.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Open TempCam soon to keep it or let it expire safely.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.',
     '{minutes}m': '{minutes}m',
     'Start': 'Start',
     'Every temporary moment, in one calm vault.':
@@ -665,13 +669,6 @@ const Map<String, Map<String, String>> _localizedValues = {
     'PRIVATE • TEMPORARY • LOCAL': 'ÖZEL • GEÇİCİ • YEREL',
     'Preparing secure vault experience': 'Güvenli kasa deneyimi hazırlanıyor',
     'Secure session initializing': 'Güvenli oturum başlatılıyor',
-    'Secure reminder': 'Güvenli hatırlatma',
-    'Photo timer ending soon': 'Fotoğraf zamanlayıcısı yakında bitecek',
-    'Video timer ending soon': 'Video zamanlayıcısı yakında bitecek',
-    'Open TempCam soon to review a secure reminder.':
-        'Güvenli hatırlatmayı görmek için TempCam i yakında açın.',
-    'Open TempCam soon to keep it or let it expire safely.':
-        'Kaydı tutmak ya da güvenle süresi dolsun diye TempCam i yakında açın.',
     'LOCAL PRIVATE STORAGE': 'YEREL ÖZEL DEPOLAMA',
     'Vault Locked': 'Kasa Kilitli',
     'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.':
@@ -999,6 +996,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         'Yıllık aboneliğiniz geri yüklendi.',
     '{days}d {hours}h': '{days}d {hours}h',
     '{hours}h {minutes}m': '{hours}h {minutes}m',
+    'Secure reminder': 'G?venli hat?rlatma',
+    'Photo timer ending soon': 'Foto?raf zamanlay?c?s? yak?nda bitecek',
+    'Video timer ending soon': 'Video zamanlay?c?s? yak?nda bitecek',
+    'Open TempCam soon to review a secure reminder.':
+        'G?venli hat?rlatmay? g?rmek i?in TempCam i yak?nda a??n.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Kayd? tutmak ya da g?venle s?resi dolsun diye TempCam i yak?nda a??n.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Uygulama dilini, sona erme bildirimlerini, gizli bildirim metnini, varsay?lan zamanlay?c?lar?, abonelik eri?imini y?netin ve bu turu istedi?iniz zaman Ayarlar b?l?m?nden yeniden a??n.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        '?zel foto?raf ve videolara g?z at?n, s?resi dolan ??eleri g?r?n, alg?lanan ayr?nt?lar? yeniden a??n ve ge?ici ?zel depolamaya ihtiya? duydu?unuzda ana galeriden foto?raf veya videolar? TempCam i?ine ta??y?n.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Biyometrik koruma, Oturum Gizlilik Modu, h?zl? kilit zaman a??m?, korumal? son uygulamalar ?nizlemesi kullan?n ve hemen gizlili?e ihtiya? duydu?unuzda h?zl? uygulama ??k??? i?in g?z simgesine dokunun.',
     '{minutes}m': '{minutes}m',
   },
   'zh': {
@@ -1309,6 +1319,18 @@ const Map<String, Map<String, String>> _localizedValues = {
     '{media} exported to the main gallery and removed from TempCam expiry.':
         '{media} 导出到主图库并从 TempCam 到期中删除。',
     '{media} removed manually before its timer ended.': '{media} 在计时器结束之前手动删除。',
+    'Secure reminder': '????',
+    'Photo timer ending soon': '?????????',
+    'Video timer ending soon': '?????????',
+    'Open TempCam soon to review a secure reminder.': '???? TempCam ???????',
+    'Open TempCam soon to keep it or let it expire safely.':
+        '???? TempCam??????????????',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        '????????????????????????????????????????????????',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        '???????????????????????????????????????????????????????? TempCam?',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        '?????????????????????????????????????????????????????????',
     '{minutes}m': '{minutes}米',
   },
   'es': {
@@ -1653,6 +1675,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} exportado a la galería principal y eliminado del vencimiento de TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} se eliminó manualmente antes de que terminara el cronómetro.',
+    'Secure reminder': 'Recordatorio seguro',
+    'Photo timer ending soon': 'El temporizador de la foto termina pronto',
+    'Video timer ending soon': 'El temporizador del video termina pronto',
+    'Open TempCam soon to review a secure reminder.':
+        'Abra TempCam pronto para revisar un recordatorio seguro.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Abra TempCam pronto para conservarlo o dejar que expire de forma segura.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Administre el idioma de la app, las notificaciones de vencimiento, la redacci?n de las notificaciones ocultas, los temporizadores predeterminados, el acceso a la suscripci?n y vuelva a abrir este recorrido en cualquier momento desde Configuraci?n.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        'Explore fotos y videos privados, vea los elementos que est?n por vencer, vuelva a abrir los detalles detectados y mueva fotos o videos desde la galer?a principal a TempCam cuando necesite almacenamiento privado temporal.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Use protecci?n biom?trica, Modo de privacidad de sesi?n, tiempo de bloqueo r?pido, vista previa protegida de recientes y toque el ?cono del ojo para salir r?pido de la app cuando necesite privacidad de inmediato.',
     '{minutes}m': '{minutes}m',
   },
   'de': {
@@ -1994,6 +2029,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} wurde in die Hauptgalerie exportiert und aus dem Ablauf von TempCam entfernt.',
     '{media} removed manually before its timer ended.':
         '{media} wurde manuell entfernt, bevor der Timer abgelaufen ist.',
+    'Secure reminder': 'Sichere Erinnerung',
+    'Photo timer ending soon': 'Foto-Timer endet bald',
+    'Video timer ending soon': 'Video-Timer endet bald',
+    'Open TempCam soon to review a secure reminder.':
+        '?ffnen Sie TempCam bald, um eine sichere Erinnerung zu pr?fen.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        '?ffnen Sie TempCam bald, um es zu behalten oder sicher ablaufen zu lassen.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Verwalten Sie die App-Sprache, Ablaufbenachrichtigungen, den Wortlaut von Stealth-Benachrichtigungen, Standard-Timer und den Abonnementzugriff und ?ffnen Sie diese Tour jederzeit ?ber die Einstellungen erneut.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        'Durchsuchen Sie private Fotos und Videos, sehen Sie ablaufende Elemente, ?ffnen Sie erkannte Details erneut und verschieben Sie Fotos oder Videos aus der Hauptgalerie in TempCam, wenn Sie einen vor?bergehend privaten Speicher ben?tigen.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Nutzen Sie biometrischen Schutz, den Sitzungs-Privatsph?renmodus, das Schnell-Sperr-Timeout, die gesch?tzte Zuletzt-verwendet-Vorschau und tippen Sie auf das Augensymbol f?r einen schnellen App-Ausstieg, wenn Sie sofort Privatsph?re brauchen.',
     '{minutes}m': '{minutes}m',
   },
   'fr': {
@@ -2338,6 +2386,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} exporté vers la galerie principale et supprimé à l\'expiration de TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} a été supprimé manuellement avant la fin de son minuteur.',
+    'Secure reminder': 'Rappel s?curis?',
+    'Photo timer ending soon': 'Le minuteur de la photo se termine bient?t',
+    'Video timer ending soon': 'Le minuteur de la vid?o se termine bient?t',
+    'Open TempCam soon to review a secure reminder.':
+        'Ouvrez bient?t TempCam pour consulter un rappel s?curis?.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Ouvrez bient?t TempCam pour le conserver ou le laisser expirer en toute s?curit?.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'G?rez la langue de l\'application, les notifications d\'expiration, le libell? des notifications furtives, les minuteries par d?faut, l\'acc?s aux abonnements et rouvrez cette visite ? tout moment ? partir des param?tres.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        'Parcourez les photos et vid?os priv?es, voyez les ?l?ments qui expirent, rouvrez les d?tails d?tect?s et d?placez des photos ou vid?os de la galerie principale vers TempCam lorsque vous avez besoin d\'un stockage priv? temporaire.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Utilisez la protection biom?trique, le mode confidentialit? de session, le d?lai de verrouillage rapide, l\'aper?u prot?g? des ?l?ments r?cents et touchez l\'ic?ne en forme d\'?il pour quitter rapidement l\'application lorsque vous avez besoin de confidentialit? imm?diatement.',
     '{minutes}m': '{minutes}m',
   },
   'pt_BR': {
@@ -2677,6 +2738,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} exportado para a galeria principal e removido da expiração de TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} removido manualmente antes do término do cronômetro.',
+    'Secure reminder': 'Lembrete seguro',
+    'Photo timer ending soon': 'O temporizador da foto termina em breve',
+    'Video timer ending soon': 'O temporizador do v?deo termina em breve',
+    'Open TempCam soon to review a secure reminder.':
+        'Abra o TempCam em breve para revisar um lembrete seguro.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Abra o TempCam em breve para mant?-lo ou deix?-lo expirar com seguran?a.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        'Gerencie o idioma do app, as notifica??es de expira??o, o texto de notifica??o furtiva, os temporizadores padr?o, o acesso ? assinatura e reabra este tour a qualquer momento em Configura??es.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        'Navegue por fotos e v?deos privados, veja os itens que est?o para expirar, abra novamente os detalhes detectados e mova fotos ou v?deos da galeria principal para o TempCam quando precisar de armazenamento privado tempor?rio.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        'Use prote??o biom?trica, Modo de Privacidade da Sess?o, tempo limite de bloqueio r?pido, visualiza??o protegida dos recentes e toque no ?cone de olho para sair rapidamente do app quando precisar de privacidade imediatamente.',
     '{minutes}m': '{minutes}m',
   },
   'ru': {
@@ -3017,6 +3091,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media} экспортирован в главную галерею и удален по истечении срока действия TempCam.',
     '{media} removed manually before its timer ended.':
         '{media} удален вручную до истечения таймера.',
+    'Secure reminder': '?????????? ???????????',
+    'Photo timer ending soon': '?????? ???? ????? ??????????',
+    'Video timer ending soon': '?????? ????? ????? ??????????',
+    'Open TempCam soon to review a secure reminder.':
+        '????? ???????? TempCam, ????? ??????????? ?????????? ???????????.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        '????? ???????? TempCam, ????? ????????? ??? ??? ???? ??? ????????? ??????.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        '?????????? ?????? ??????????, ????????????? ?? ????????? ????? ????????, ????????????? ??????? ???????????, ????????? ?? ?????????, ???????? ? ???????? ? ???????? ?????????? ???? ??? ? ????? ????? ?? ????????.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        '?????????????? ?????? ???? ? ?????, ???????? ???????? ? ?????????? ??????, ????? ?????????? ???????????? ?????? ? ??????????? ???? ??? ????? ?? ???????? ??????? ? TempCam, ????? ??? ????? ????????? ????????? ?????????.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        '??????????? ?????????????? ??????, ????? ?????????????????? ??????, ????-??? ??????? ??????????, ?????????? ???????????? ???????? ?????????? ? ????????? ?????? ????? ??? ???????? ?????? ?? ??????????, ????? ?????????????????? ????? ??????????.',
     '{minutes}m': '{minutes}м',
   },
   'ar': {
@@ -3351,6 +3438,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         'تم تصدير {media} إلى المعرض الرئيسي وإزالته من تاريخ انتهاء الصلاحية TempCam.',
     '{media} removed manually before its timer ended.':
         'تمت إزالة {media} يدويًا قبل انتهاء مؤقته.',
+    'Secure reminder': '????? ???',
+    'Photo timer ending soon': '???? ?????? ?????? ??????',
+    'Video timer ending soon': '???? ??????? ?????? ??????',
+    'Open TempCam soon to review a secure reminder.':
+        '???? TempCam ?????? ??????? ????? ???.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        '???? TempCam ?????? ???????? ?? ?? ???? ????? ?????.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        '????? ??? ???????? ???????? ?????? ????????? ?????? ????????? ??????? ????????? ??????????? ??????? ??? ????????? ?????? ??? ??? ?????? ?? ?? ??? ?? ?????????.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        '???? ????? ?????? ??????? ??????? ????? ??? ??????? ???? ???? ??? ????????? ????? ???????? ???????? ??? ????? ????? ????? ?? ????? ??????? ?? ?????? ??????? ??? TempCam ????? ????? ??? ????? ??? ????.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        '?????? ??????? ?????????? ???? ?????? ?????? ????? ????? ?????? ????????? ??????? ??????? ???????? ????? ??? ?????? ????? ?????? ?????? ?? ??????? ????? ????? ??? ???????? ?????.',
     '{minutes}m': '{minutes}م',
   },
   'ko': {
@@ -3675,6 +3775,19 @@ const Map<String, Map<String, String>> _localizedValues = {
         '{media}을(를) 기본 갤러리로 내보내고 TempCam 만료 시 제거했습니다.',
     '{media} removed manually before its timer ended.':
         '{media}은 타이머가 끝나기 전에 수동으로 제거되었습니다.',
+    'Secure reminder': '?? ??',
+    'Photo timer ending soon': '?? ???? ? ?????',
+    'Video timer ending soon': '??? ???? ? ?????',
+    'Open TempCam soon to review a secure reminder.':
+        '?? ??? ????? ? TempCam? ???.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        '? TempCam? ?? ????? ???? ????? ???.',
+    'Manage app language, expiry notifications, stealth notification wording, default timers, subscription access, and reopen this tour anytime from Settings.':
+        '? ??, ?? ??, ??? ?? ??, ?? ???, ?? ???? ???? ???? ???? ? ??? ?? ? ? ????.',
+    'Browse private photos and videos, see expiring items, open detected details again, and move photos or videos from the main gallery into TempCam when you need temporary private storage.':
+        '??? ??? ???? ????, ?? ?? ??? ????, ??? ?? ??? ?? ??, ?? ??? ???? ??? ? ?? ????? TempCam?? ???? ???? ????.',
+    'Use biometric protection, Session Privacy Mode, quick lock timeout, protected recents preview, and tap the eye icon for a fast app exit when you need privacy right away.':
+        '?? ?? ??, ?? ???? ?? ??, ?? ?? ?? ??, ??? ?? ?? ????? ???? ?? ???? ??? ??? ? ??? ?? ????? ? ???? ????.',
     '{minutes}m': '{minutes}m',
   },
 };

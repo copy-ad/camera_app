@@ -7,6 +7,7 @@ import '../../../core/constants/legal_links.dart';
 import '../../../core/constants/premium_constants.dart';
 import '../../../shared/state/app_controller.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/tempcam_brand_mark.dart';
 
 class PremiumPaywallScreen extends StatelessWidget {
   const PremiumPaywallScreen({
@@ -134,9 +135,37 @@ class PremiumPaywallScreen extends StatelessWidget {
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [AppTheme.surface, AppTheme.surfaceLowest],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF090B10),
+                      AppTheme.surface,
+                      AppTheme.surfaceLowest,
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: -120,
+                right: -40,
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.primary.withValues(alpha: 0.08),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: -50,
+                top: 180,
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.secondary.withValues(alpha: 0.06),
                   ),
                 ),
               ),
@@ -180,33 +209,13 @@ class PremiumPaywallScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
-                          const CircleAvatar(
-                            radius: 28,
-                            backgroundColor: AppTheme.surfaceHighest,
-                            child: Icon(Icons.verified_user_rounded,
-                                color: AppTheme.secondary),
-                          ),
                           const SizedBox(height: 18),
-                          Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: 'Manrope',
-                              fontSize: 34,
-                              fontWeight: FontWeight.w800,
-                              height: 1.1,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            description,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: AppTheme.onSurfaceVariant,
-                              height: 1.45,
-                            ),
+                          _PremiumHeroPanel(
+                            title: title,
+                            description: description,
+                            badgeText: badgeText,
+                            priceLine: priceLine,
+                            pricingCaption: pricingCaption,
                           ),
                           const SizedBox(height: 22),
                           LayoutBuilder(
@@ -505,11 +514,25 @@ class _FeatureCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceContainer.withValues(alpha: 0.76),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accent.withValues(alpha: 0.12),
+                AppTheme.surfaceContainer.withValues(alpha: 0.94),
+              ],
+            ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: AppTheme.outlineVariant.withValues(alpha: 0.18),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: accent.withValues(alpha: 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: horizontal
               ? Row(
@@ -594,7 +617,17 @@ class _PricingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: selected ? AppTheme.surfaceHighest : AppTheme.surfaceLow,
+        gradient: selected
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1B2636),
+                  Color(0xFF121922),
+                ],
+              )
+            : null,
+        color: selected ? null : AppTheme.surfaceLow,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: selected
@@ -653,6 +686,161 @@ class _PricingCard extends StatelessWidget {
                     ),
                   )
                 : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PremiumHeroPanel extends StatelessWidget {
+  const _PremiumHeroPanel({
+    required this.title,
+    required this.description,
+    required this.badgeText,
+    required this.priceLine,
+    required this.pricingCaption,
+  });
+
+  final String title;
+  final String description;
+  final String badgeText;
+  final String priceLine;
+  final String pricingCaption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF151F2D),
+            Color(0xFF0E131B),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.08),
+            blurRadius: 26,
+            offset: const Offset(0, 18),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const TempCamBrandMark(size: 112, showGlow: false),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.secondary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              badgeText,
+              style: const TextStyle(
+                fontSize: 10,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.secondary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Manrope',
+              fontSize: 34,
+              fontWeight: FontWeight.w800,
+              height: 1.08,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 17,
+              color: AppTheme.onSurfaceVariant,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _HeroMetric(
+                  icon: Icons.workspace_premium_rounded,
+                  title: priceLine,
+                  subtitle: pricingCaption,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _HeroMetric(
+                  icon: Icons.lock_clock_rounded,
+                  title: AppLocalizations.of(context).tr('Timed Saving'),
+                  subtitle: AppLocalizations.of(context).tr(
+                    'Apply self-destruct timers and keep temporary captures inside TempCam after you enroll.',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroMetric extends StatelessWidget {
+  const _HeroMetric({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainer.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppTheme.primary, size: 20),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              color: AppTheme.onSurfaceVariant,
+              fontSize: 12,
+              height: 1.4,
+            ),
           ),
         ],
       ),

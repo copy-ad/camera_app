@@ -270,6 +270,13 @@ const Map<String, Map<String, String>> _localizedValues = {
     'PRIVATE • TEMPORARY • LOCAL': 'PRIVATE • TEMPORARY • LOCAL',
     'Preparing secure vault experience': 'Preparing secure vault experience',
     'Secure session initializing': 'Secure session initializing',
+    'Secure reminder': 'Secure reminder',
+    'Photo timer ending soon': 'Photo timer ending soon',
+    'Video timer ending soon': 'Video timer ending soon',
+    'Open TempCam soon to review a secure reminder.':
+        'Open TempCam soon to review a secure reminder.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Open TempCam soon to keep it or let it expire safely.',
     'LOCAL PRIVATE STORAGE': 'LOCAL PRIVATE STORAGE',
     'Vault Locked': 'Vault Locked',
     'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.':
@@ -658,6 +665,13 @@ const Map<String, Map<String, String>> _localizedValues = {
     'PRIVATE • TEMPORARY • LOCAL': 'ÖZEL • GEÇİCİ • YEREL',
     'Preparing secure vault experience': 'Güvenli kasa deneyimi hazırlanıyor',
     'Secure session initializing': 'Güvenli oturum başlatılıyor',
+    'Secure reminder': 'Güvenli hatırlatma',
+    'Photo timer ending soon': 'Fotoğraf zamanlayıcısı yakında bitecek',
+    'Video timer ending soon': 'Video zamanlayıcısı yakında bitecek',
+    'Open TempCam soon to review a secure reminder.':
+        'Güvenli hatırlatmayı görmek için TempCam i yakında açın.',
+    'Open TempCam soon to keep it or let it expire safely.':
+        'Kaydı tutmak ya da güvenle süresi dolsun diye TempCam i yakında açın.',
     'LOCAL PRIVATE STORAGE': 'YEREL ÖZEL DEPOLAMA',
     'Vault Locked': 'Kasa Kilitli',
     'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.':

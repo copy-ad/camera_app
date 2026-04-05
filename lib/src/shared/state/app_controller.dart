@@ -821,16 +821,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (controller.value.exposurePointSupported) {
         await controller.setExposurePoint(point);
       }
-      await Future<void>.delayed(const Duration(milliseconds: 280));
-      if (_cameraController != controller || !controller.value.isInitialized) {
-        return;
-      }
-      try {
-        await controller.setFocusMode(FocusMode.locked);
-      } catch (_) {}
-      try {
-        await controller.setExposureMode(ExposureMode.locked);
-      } catch (_) {}
       _focusResetTimer = Timer(const Duration(seconds: 3), () {
         unawaited(_resetFocusToAuto(controller));
       });
@@ -1062,6 +1052,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _photos,
       enabled: _settings.notificationsEnabled,
       stealthMode: _settings.stealthNotificationsEnabled,
+      locale: activeLocale,
     );
   }
 

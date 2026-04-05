@@ -13,36 +13,43 @@
                 android:viewportWidth="108"
                 android:viewportHeight="108">
                 <path
-                    android:fillColor="#0C1119"
-                    android:pathData="M54,6A48,48 0 1,1 6,54A48,48 0 0,1 54,6Z" />
+                    android:fillColor="#0A1018"
+                    android:pathData="M24,10h60c7.73,0 14,6.27 14,14v60c0,7.73 -6.27,14 -14,14H24c-7.73,0 -14,-6.27 -14,-14V24c0,-7.73 6.27,-14 14,-14z" />
                 <path
-                    android:fillColor="#1A2331"
-                    android:pathData="M30,28h15l6,-8h14l6,8h7c8.8,0 16,7.2 16,16v22c0,8.8 -7.2,16 -16,16H30c-8.8,0 -16,-7.2 -16,-16V44c0,-8.8 7.2,-16 16,-16z" />
+                    android:fillColor="#FFFFFF"
+                    android:fillAlpha="0.06"
+                    android:pathData="M24,10h60c7.73,0 14,6.27 14,14v60c0,7.73 -6.27,14 -14,14H24c-7.73,0 -14,-6.27 -14,-14V24c0,-7.73 6.27,-14 14,-14z" />
                 <path
-                    android:fillColor="#A7C8FF"
-                    android:pathData="M54,25m-21,0a21,21 0 1,0 42,0a21,21 0 1,0 -42,0" />
+                    android:fillColor="#F4F7FB"
+                    android:pathData="M25,23h24c3.31,0 6,2.69 6,6v25c0,3.31 -2.69,6 -6,6H25c-3.31,0 -6,-2.69 -6,-6V29c0,-3.31 2.69,-6 6,-6z" />
                 <path
-                    android:fillColor="#223247"
-                    android:pathData="M54,54m-19,0a19,19 0 1,0 38,0a19,19 0 1,0 -38,0" />
-                <path
-                    android:fillColor="#DCEBFF"
-                    android:pathData="M54,54m-12.5,0a12.5,12.5 0 1,0 25,0a12.5,12.5 0 1,0 -25,0" />
-                <path
-                    android:fillColor="#162334"
-                    android:pathData="M54,54m-9,0a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" />
-                <path
-                    android:fillColor="#E9C349"
-                    android:pathData="M54,42 L48.5,50 H59.5 Z" />
-                <path
-                    android:fillColor="#E9C349"
-                    android:pathData="M48.5,58 H59.5 L54,66 Z" />
-                <path
-                    android:fillColor="#FFDA6C"
-                    android:pathData="M74,31m-5.5,0a5.5,5.5 0 1,0 11,0a5.5,5.5 0 1,0 -11,0" />
+                    android:fillColor="#D9E3F3"
+                    android:pathData="M45,23h10v10z" />
                 <path
                     android:fillColor="#A7C8FF"
-                    android:fillAlpha="0.28"
-                    android:pathData="M54,12A42,42 0 1,1 12,54A42,42 0 0,1 54,12Zm0,4A38,38 0 1,0 92,54A38,38 0 0,0 54,16Z" />
+                    android:pathData="M60,54m-23,0a23,23 0 1,0 46,0a23,23 0 1,0 -46,0" />
+                <path
+                    android:fillColor="#162233"
+                    android:pathData="M60,54m-18.5,0a18.5,18.5 0 1,0 37,0a18.5,18.5 0 1,0 -37,0" />
+                <path
+                    android:fillColor="#E8F2FF"
+                    android:pathData="M60,54m-12.5,0a12.5,12.5 0 1,0 25,0a12.5,12.5 0 1,0 -25,0" />
+                <path
+                    android:fillColor="#0A121C"
+                    android:pathData="M60,54m-7.5,0a7.5,7.5 0 1,0 15,0a7.5,7.5 0 1,0 -15,0" />
+                <path
+                    android:fillColor="#E9C349"
+                    android:pathData="M60,31m-4.8,0a4.8,4.8 0 1,0 9.6,0a4.8,4.8 0 1,0 -9.6,0" />
+                <path
+                    android:fillColor="#E9C349"
+                    android:pathData="M80,71h6c4.42,0 8,3.58 8,8v6c0,7.18 -5.54,13.01 -12.5,13.8 -6.96,-0.79 -12.5,-6.62 -12.5,-13.8v-6c0,-4.42 3.58,-8 8,-8h3v-4h6z" />
+                <path
+                    android:fillColor="#0F1722"
+                    android:pathData="M81.5,76l5.5,2.3v4.6c0,4.22 -2.8,8.02 -5.5,9.7 -2.7,-1.68 -5.5,-5.48 -5.5,-9.7v-4.6z" />
+                <path
+                    android:fillColor="#FFFFFF"
+                    android:fillAlpha="0.12"
+                    android:pathData="M24,14h60c5.52,0 10,4.48 10,10v60c0,5.52 -4.48,10 -10,10H24c-5.52,0 -10,-4.48 -10,-10V24c0,-5.52 4.48,-10 10,-10z" />
             </vector>
         </inset>
     </item>

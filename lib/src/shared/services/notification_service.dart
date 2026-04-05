@@ -1,8 +1,10 @@
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/widgets.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../localization/app_localizations.dart';
 import '../models/photo_record.dart';
 
 class NotificationService {
@@ -68,11 +70,14 @@ class NotificationService {
     List<PhotoRecord> records, {
     required bool enabled,
     required bool stealthMode,
+    required Locale? locale,
   }) async {
+    final l10n = AppLocalizations.fromLocale(locale);
     final signature = _buildSignature(
       records,
       enabled: enabled,
       stealthMode: stealthMode,
+      localeTag: AppLocalizations.localeTag(l10n.locale),
     );
     if (_lastSyncSignature == signature) {
       return;
@@ -97,8 +102,8 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         _notificationIdFor(record.id),
-        _titleFor(record, stealthMode: stealthMode),
-        _bodyFor(record, stealthMode: stealthMode),
+        _titleFor(record, stealthMode: stealthMode, l10n: l10n),
+        _bodyFor(stealthMode: stealthMode, l10n: l10n),
         scheduledAt,
         NotificationDetails(
           android: AndroidNotificationDetails(
@@ -106,10 +111,18 @@ class NotificationService {
             _expiryChannel.name,
             channelDescription: _expiryChannel.description,
             icon: 'ic_stat_tempcam',
+            largeIcon: const DrawableResourceAndroidBitmap('notification_logo'),
             importance: Importance.high,
             priority: Priority.high,
             category: AndroidNotificationCategory.reminder,
-            visibility: NotificationVisibility.private,
+            visibility: stealthMode
+                ? NotificationVisibility.secret
+                : NotificationVisibility.private,
+            onlyAlertOnce: true,
+            channelShowBadge: false,
+            styleInformation: BigTextStyleInformation(
+              _bodyFor(stealthMode: stealthMode, l10n: l10n),
+            ),
           ),
           iOS: const DarwinNotificationDetails(),
         ),
@@ -129,9 +142,12 @@ class NotificationService {
     List<PhotoRecord> records, {
     required bool enabled,
     required bool stealthMode,
+    required String localeTag,
   }) {
     final buffer = StringBuffer(enabled ? 'on|' : 'off|');
     buffer.write(stealthMode ? 'stealth|' : 'standard|');
+    buffer.write(localeTag);
+    buffer.write('|');
     for (final record in records) {
       buffer
         ..write(record.id)
@@ -157,19 +173,27 @@ class NotificationService {
     return tz.TZDateTime.from(effective, tz.local);
   }
 
-  String _titleFor(PhotoRecord record, {required bool stealthMode}) {
+  String _titleFor(
+    PhotoRecord record, {
+    required bool stealthMode,
+    required AppLocalizations l10n,
+  }) {
     if (stealthMode) {
-      return 'Reminder';
+      return l10n.tr('Secure reminder');
     }
-    return record.isVideo ? 'Video expiring soon' : 'Photo expiring soon';
+    return l10n.tr(
+      record.isVideo ? 'Video timer ending soon' : 'Photo timer ending soon',
+    );
   }
 
-  String _bodyFor(PhotoRecord record, {required bool stealthMode}) {
+  String _bodyFor({
+    required bool stealthMode,
+    required AppLocalizations l10n,
+  }) {
     if (stealthMode) {
-      return 'One item needs your attention in about 10 minutes.';
+      return l10n.tr('Open TempCam soon to review a secure reminder.');
     }
-    final media = record.isVideo ? 'video' : 'photo';
-    return 'Your TempCam $media will auto-delete in about 10 minutes.';
+    return l10n.tr('Open TempCam soon to keep it or let it expire safely.');
   }
 
   int _notificationIdFor(String id) {

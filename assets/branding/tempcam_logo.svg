@@ -1,26 +1,32 @@
 <svg width="512" height="512" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="18" y1="12" x2="90" y2="96" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#20304A"/>
-      <stop offset="0.5" stop-color="#111824"/>
-      <stop offset="1" stop-color="#070A10"/>
+    <linearGradient id="bg" x1="16" y1="12" x2="94" y2="98" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D2C42"/>
+      <stop offset="0.52" stop-color="#101724"/>
+      <stop offset="1" stop-color="#070A11"/>
     </linearGradient>
+    <radialGradient id="lens" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(54 54) rotate(90) scale(18)">
+      <stop stop-color="#E8F2FF"/>
+      <stop offset="0.48" stop-color="#A7C8FF"/>
+      <stop offset="1" stop-color="#203145"/>
+    </radialGradient>
   </defs>
 
-  <rect width="108" height="108" rx="24" fill="url(#bg)"/>
+  <rect x="10" y="10" width="88" height="88" rx="24" fill="url(#bg)"/>
+  <rect x="10" y="10" width="88" height="88" rx="24" fill="white" fill-opacity="0.05"/>
 
-  <circle cx="54" cy="54" r="48" fill="#0C1119"/>
-  <path d="M30 28H45L51 20H65L71 28H78C86.837 28 94 35.163 94 44V66C94 74.837 86.837 82 78 82H30C21.163 82 14 74.837 14 66V44C14 35.163 21.163 28 30 28Z" fill="#1A2331"/>
+  <rect x="20" y="23" width="28" height="36" rx="6" fill="#F4F7FB"/>
+  <path d="M38 23H48V33Z" fill="#D9E3F3"/>
 
-  <circle cx="54" cy="54" r="21" fill="#A7C8FF"/>
-  <circle cx="54" cy="54" r="19" fill="#223247"/>
-  <circle cx="54" cy="54" r="12.5" fill="#DCEBFF"/>
-  <circle cx="54" cy="54" r="9" fill="#162334"/>
+  <circle cx="54" cy="54" r="23" fill="#A7C8FF"/>
+  <circle cx="54" cy="54" r="18.5" fill="#162233"/>
+  <circle cx="54" cy="54" r="12.5" fill="url(#lens)"/>
+  <circle cx="54" cy="54" r="7.5" fill="#0A121C"/>
 
-  <path d="M54 42L48.5 50H59.5L54 42Z" fill="#E9C349"/>
-  <path d="M48.5 58H59.5L54 66L48.5 58Z" fill="#E9C349"/>
+  <circle cx="60" cy="31" r="4.8" fill="#E9C349"/>
 
-  <circle cx="74" cy="31" r="5.5" fill="#FFDA6C"/>
+  <path d="M80 71H86C90.418 71 94 74.582 94 79V85C94 92.18 88.46 98.01 81.5 98.8C74.54 98.01 69 92.18 69 85V79C69 74.582 72.582 71 77 71H80V67H86V71Z" fill="#E9C349"/>
+  <path d="M81.5 76L87 78.3V82.9C87 87.12 84.2 90.92 81.5 92.6C78.8 90.92 76 87.12 76 82.9V78.3L81.5 76Z" fill="#0F1722"/>
 
-  <path d="M54 12C77.196 12 96 30.804 96 54C96 77.196 77.196 96 54 96C30.804 96 12 77.196 12 54C12 30.804 30.804 12 54 12ZM54 16C33.013 16 16 33.013 16 54C16 74.987 33.013 92 54 92C74.987 92 92 74.987 92 54C92 33.013 74.987 16 54 16Z" fill="#A7C8FF" fill-opacity="0.28"/>
+  <rect x="14" y="14" width="80" height="80" rx="20" stroke="white" stroke-opacity="0.1" stroke-width="1.5"/>
 </svg>

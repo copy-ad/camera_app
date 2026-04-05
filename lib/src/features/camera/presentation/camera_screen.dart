@@ -447,38 +447,15 @@ class _InteractiveCameraViewportState
     Offset localPosition,
     Size viewportSize,
   ) {
-    final previewSize = camera.value.previewSize;
-    if (previewSize == null ||
+    if (!camera.value.isInitialized ||
         viewportSize.width <= 0 ||
         viewportSize.height <= 0) {
       return const Offset(0.5, 0.5);
     }
-
-    final previewWidth = previewSize.height;
-    final previewHeight = previewSize.width;
-    final previewAspectRatio = previewWidth / previewHeight;
-    final viewportAspectRatio = viewportSize.width / viewportSize.height;
-
-    double scaledWidth;
-    double scaledHeight;
-    double offsetX = 0;
-    double offsetY = 0;
-
-    if (previewAspectRatio > viewportAspectRatio) {
-      scaledHeight = viewportSize.height;
-      scaledWidth = scaledHeight * previewAspectRatio;
-      offsetX = (scaledWidth - viewportSize.width) / 2;
-    } else {
-      scaledWidth = viewportSize.width;
-      scaledHeight = scaledWidth / previewAspectRatio;
-      offsetY = (scaledHeight - viewportSize.height) / 2;
-    }
-
-    final normalizedDx =
-        ((localPosition.dx + offsetX) / scaledWidth).clamp(0.0, 1.0);
-    final normalizedDy =
-        ((localPosition.dy + offsetY) / scaledHeight).clamp(0.0, 1.0);
-    return Offset(normalizedDx, normalizedDy);
+    return Offset(
+      (localPosition.dx / viewportSize.width).clamp(0.0, 1.0),
+      (localPosition.dy / viewportSize.height).clamp(0.0, 1.0),
+    );
   }
 }
 

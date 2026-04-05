@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tempcam/src/localization/app_localizations.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
+import 'package:tempcam/src/shared/widgets/glass_panel.dart';
 
 class CameraScreen extends StatelessWidget {
   const CameraScreen({super.key});
@@ -79,9 +80,11 @@ class CameraScreen extends StatelessWidget {
                             ? null
                             : () => controller.promptForPremiumAccess(context),
                         child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceHigh.withValues(alpha: 0.82),
-                            borderRadius: BorderRadius.circular(999),
+                          decoration: AppTheme.glassDecoration(
+                            radius: 999,
+                            fill:
+                                AppTheme.surfaceContainer.withValues(alpha: 0.48),
+                            shadows: const [],
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -215,13 +218,10 @@ class _LiveScanAssistCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final result = controller.liveScanResult;
-    return Container(
+    return GlassPanel(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceLowest.withValues(alpha: 0.86),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
+      radius: 22,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.56),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -714,12 +714,10 @@ class _ModeSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPanel(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceLowest.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(999),
-      ),
+      radius: 999,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -760,8 +758,14 @@ class _ModeChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary : Colors.transparent,
+          gradient: selected
+              ? const LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.primaryContainer],
+                )
+              : null,
+          color: selected ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(999),
+          boxShadow: selected ? AppTheme.softGlow : const [],
         ),
         child: Text(
           label,
@@ -833,7 +837,8 @@ class _CircleActionButton extends StatelessWidget {
         height: 46,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppTheme.surfaceLowest.withValues(alpha: 0.58),
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Icon(icon, color: AppTheme.onSurface),
       ),
@@ -862,7 +867,7 @@ class _GalleryThumb extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.22),
             width: 2,
           ),
-          color: AppTheme.surfaceHighest,
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.58),
         ),
         child: file != null
             ? Image.file(file!, fit: BoxFit.cover)
@@ -899,13 +904,14 @@ class _ShutterButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: Container(
         padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: AppTheme.onSurface.withValues(alpha: 0.3),
-            width: 2,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppTheme.onSurface.withValues(alpha: 0.3),
+              width: 2,
+            ),
+            boxShadow: AppTheme.deepShadow,
           ),
-        ),
         child: Container(
           width: 68,
           height: 68,
@@ -961,7 +967,8 @@ class _CircleIconButton extends StatelessWidget {
         height: 56,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppTheme.surfaceContainer.withValues(alpha: 0.68),
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Icon(icon, color: AppTheme.onSurface),
       ),

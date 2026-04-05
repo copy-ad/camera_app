@@ -4,6 +4,8 @@ import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../../shared/state/app_controller.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_backdrop.dart';
+import '../../../shared/widgets/glass_panel.dart';
 
 class AppTourScreen extends StatefulWidget {
   const AppTourScreen({super.key});
@@ -102,22 +104,18 @@ class _AppTourScreenState extends State<AppTourScreen> {
         await _closeTour();
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF090B0F),
-        body: SafeArea(
+        body: AppBackdrop(
+          safeTop: true,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
             child: Column(
               children: [
                 Row(
                   children: [
-                    Container(
+                    GlassPanel(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         l10n.tr('APP TOUR'),
@@ -152,21 +150,38 @@ class _AppTourScreenState extends State<AppTourScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Row(
-                  children: List.generate(
-                    pages.length,
-                    (index) => Expanded(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        height: 4,
-                        margin: EdgeInsets.only(
-                          right: index == pages.length - 1 ? 0 : 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: index == _pageIndex
-                              ? AppTheme.primary
-                              : Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(999),
+                GlassPanel(
+                  radius: 26,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  color: AppTheme.surfaceContainer.withValues(alpha: 0.48),
+                  child: Row(
+                    children: List.generate(
+                      pages.length,
+                      (index) => Expanded(
+                        child: AnimatedContainer(
+                          duration: AppTheme.motionFast,
+                          curve: AppTheme.emphasizedCurve,
+                          height: 5,
+                          margin: EdgeInsets.only(
+                            right: index == pages.length - 1 ? 0 : 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: index == _pageIndex
+                                ? const LinearGradient(
+                                    colors: [
+                                      AppTheme.primary,
+                                      AppTheme.primaryContainer,
+                                    ],
+                                  )
+                                : null,
+                            color: index == _pageIndex
+                                ? null
+                                : Colors.white.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                         ),
                       ),
                     ),
@@ -178,12 +193,6 @@ class _AppTourScreenState extends State<AppTourScreen> {
                     if (_pageIndex > 0)
                       Expanded(
                         child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
                           onPressed: _goBack,
                           child: Text(l10n.tr('Back')),
                         ),
@@ -194,11 +203,6 @@ class _AppTourScreenState extends State<AppTourScreen> {
                     Expanded(
                       flex: 2,
                       child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: const Color(0xFF003061),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
                         onPressed: isLastPage ? _closeTour : _goNext,
                         child: Text(
                           isLastPage ? l10n.tr('Get Started') : l10n.tr('Next'),
@@ -249,91 +253,91 @@ class _TourCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(34),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF202631), Color(0xFF0E1117)],
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
-      ),
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 66,
-            height: 66,
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.14),
-              shape: BoxShape.circle,
+      child: GlassPanel(
+        radius: 34,
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+        color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedContainer(
+              duration: AppTheme.motionMedium,
+              curve: AppTheme.emphasizedCurve,
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.primary,
+                    AppTheme.primaryContainer,
+                  ],
+                ),
+                boxShadow: AppTheme.softGlow,
+              ),
+              child: Icon(page.icon, color: const Color(0xFF05263D), size: 34),
             ),
-            child: Icon(page.icon, color: AppTheme.primary, size: 34),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: AppTheme.secondary.withValues(alpha: 0.92),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              page.badge,
-              style: const TextStyle(
-                color: Color(0xFF3C2F00),
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
+            const SizedBox(height: 24),
+            GlassPanel(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              radius: 999,
+              color: AppTheme.secondary.withValues(alpha: 0.24),
+              child: Text(
+                page.badge,
+                style: const TextStyle(
+                  color: AppTheme.secondary,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            page.title,
-            style: const TextStyle(
-              fontFamily: 'Manrope',
-              fontSize: 32,
-              fontWeight: FontWeight.w800,
-              height: 1.06,
+            const SizedBox(height: 20),
+            Text(
+              page.title,
+              style: const TextStyle(
+                fontFamily: 'Manrope',
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                height: 1.06,
+              ),
             ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            page.description,
-            style: const TextStyle(
-              color: AppTheme.onSurfaceVariant,
-              fontSize: 16,
-              height: 1.55,
+            const SizedBox(height: 14),
+            Text(
+              page.description,
+              style: const TextStyle(
+                color: AppTheme.onSurfaceVariant,
+                fontSize: 16,
+                height: 1.55,
+              ),
             ),
-          ),
-          const Spacer(),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-            ),
-            child: Row(
-              children: [
-                Icon(page.icon, color: AppTheme.secondary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.l10n.tr(
-                      'You can skip this now and reopen it any time from Settings.',
-                    ),
-                    style: const TextStyle(
-                      color: AppTheme.onSurface,
-                      height: 1.4,
+            const Spacer(),
+            GlassPanel(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              radius: 24,
+              color: Colors.white.withValues(alpha: 0.035),
+              child: Row(
+                children: [
+                  Icon(page.icon, color: AppTheme.secondary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      context.l10n.tr(
+                        'You can skip this now and reopen it any time from Settings.',
+                      ),
+                      style: const TextStyle(
+                        color: AppTheme.onSurface,
+                        height: 1.4,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

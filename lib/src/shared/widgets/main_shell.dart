@@ -8,6 +8,7 @@ import '../../features/photos/presentation/photos_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import 'glass_panel.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -45,21 +46,14 @@ class _MainShellState extends State<MainShell> {
                 ? null
                 : SafeArea(
                     top: false,
-                    child: Container(
+                    child: GlassPanel(
                       margin: const EdgeInsets.fromLTRB(18, 0, 18, 18),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppTheme.background.withValues(alpha: 0.82),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusL),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x66000000),
-                            blurRadius: 24,
-                            offset: Offset(0, -4),
-                          ),
-                        ],
+                        horizontal: 16,
+                        vertical: 12,
                       ),
+                      radius: AppTheme.radiusL,
+                      color: AppTheme.surfaceContainer.withValues(alpha: 0.56),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -125,11 +119,19 @@ class _NavIcon extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
-      child: Padding(
+      child: AnimatedContainer(
+        duration: AppTheme.motionFast,
+        curve: AppTheme.emphasizedCurve,
         padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: selected
+              ? AppTheme.primary.withValues(alpha: 0.16)
+              : Colors.transparent,
+        ),
         child: Icon(
           icon,
-          color: selected ? AppTheme.primary : AppTheme.surfaceHighest,
+          color: selected ? AppTheme.primary : AppTheme.onSurfaceVariant,
         ),
       ),
     );
@@ -148,12 +150,37 @@ class _CenterLens extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.all(16),
+        duration: AppTheme.motionMedium,
+        curve: AppTheme.emphasizedCurve,
+        padding: const EdgeInsets.all(17),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: selected ? AppTheme.primary : AppTheme.surfaceLow,
-          boxShadow: selected ? AppTheme.softGlow : const [],
+          gradient: selected
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.primary,
+                    AppTheme.primaryContainer,
+                  ],
+                )
+              : null,
+          color: selected ? null : AppTheme.surfaceLow,
+          border: Border.all(
+            color: selected
+                ? Colors.white.withValues(alpha: 0.22)
+                : Colors.white.withValues(alpha: 0.06),
+          ),
+          boxShadow: selected
+              ? [
+                  ...AppTheme.softGlow,
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.18),
+                    blurRadius: 22,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : AppTheme.deepShadow,
         ),
         child: Icon(
           Icons.lens_rounded,

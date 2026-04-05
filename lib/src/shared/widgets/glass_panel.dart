@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
@@ -8,25 +10,49 @@ class GlassPanel extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.radius = AppTheme.radiusS,
-    this.color = const Color(0xCC201F1F),
+    this.color = AppTheme.glassFill,
+    this.blur = 20,
+    this.margin,
+    this.width,
+    this.height,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double radius;
   final Color color;
+  final double blur;
+  final EdgeInsetsGeometry? margin;
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(radius),
-        border:
-            Border.all(color: AppTheme.outlineVariant.withValues(alpha: 0.18)),
+    final panel = ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        child: Container(
+          width: width,
+          height: height,
+          padding: padding,
+          decoration: AppTheme.glassDecoration(
+            radius: radius,
+            fill: color,
+            stroke: Colors.white.withValues(alpha: 0.08),
+          ),
+          child: child,
+        ),
       ),
-      child: child,
+    );
+
+    if (margin == null) {
+      return panel;
+    }
+
+    return Padding(
+      padding: margin!,
+      child: panel,
     );
   }
 }

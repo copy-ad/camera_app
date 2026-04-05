@@ -9,6 +9,7 @@ import 'package:tempcam/src/shared/models/app_settings.dart';
 import 'package:tempcam/src/shared/models/photo_record.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
+import 'package:tempcam/src/shared/widgets/glass_panel.dart';
 import 'package:video_player/video_player.dart';
 
 class PhotoDetailScreen extends StatefulWidget {
@@ -207,15 +208,18 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     }
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surfaceLow,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
         return SafeArea(
           top: false,
-          child: Padding(
+          child: GlassPanel(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+            radius: 28,
+            color: AppTheme.surfaceContainer.withValues(alpha: 0.78),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,8 +294,11 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       builder: (sheetContext) {
         return SafeArea(
           top: false,
-          child: Padding(
+          child: GlassPanel(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+            radius: 28,
+            color: AppTheme.surfaceContainer.withValues(alpha: 0.78),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,11 +485,11 @@ class _PrivateVideoPlayerState extends State<_PrivateVideoPlayer> {
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.56),
+                        color:
+                            AppTheme.surfaceContainer.withValues(alpha: 0.58),
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.08),
-                        ),
+                            color: Colors.white.withValues(alpha: 0.08)),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -620,15 +627,11 @@ class _PhotoDetailChrome extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Container(
+                GlassPanel(
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer.withValues(alpha: 0.74),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                        color: AppTheme.outlineVariant.withValues(alpha: 0.2)),
-                  ),
+                  radius: 22,
+                  color: AppTheme.surfaceContainer.withValues(alpha: 0.52),
                   child: Row(
                     children: [
                       Expanded(
@@ -691,14 +694,11 @@ class _PhotoDetailChrome extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Container(
+                GlassPanel(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
-                  decoration: const BoxDecoration(
-                    color: Color(0xEE0E0E0E),
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(28)),
-                  ),
+                  radius: 28,
+                  color: AppTheme.surfaceContainer.withValues(alpha: 0.5),
                   child: Column(
                     children: [
                       if (photo.hasDetectedDetails) ...[
@@ -790,7 +790,8 @@ class _TopCircle extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppTheme.surfaceContainer.withValues(alpha: 0.56),
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.46),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Icon(icon, color: AppTheme.onSurface),
       ),
@@ -811,14 +812,11 @@ class _DetectedDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPanel(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
+      radius: 20,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

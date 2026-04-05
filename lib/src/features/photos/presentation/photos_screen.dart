@@ -9,6 +9,8 @@ import 'package:tempcam/src/features/photos/presentation/photo_detail_screen.dar
 import 'package:tempcam/src/shared/models/photo_record.dart';
 import 'package:tempcam/src/shared/state/app_controller.dart';
 import 'package:tempcam/src/shared/theme/app_theme.dart';
+import 'package:tempcam/src/shared/widgets/app_backdrop.dart';
+import 'package:tempcam/src/shared/widgets/glass_panel.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 enum _GalleryFilter {
@@ -61,185 +63,189 @@ class _PhotosScreenState extends State<PhotosScreen> {
             controller.photos.where((item) => item.isVideo).length;
 
         return Scaffold(
-          body: RefreshIndicator(
-            color: AppTheme.primary,
-            onRefresh: controller.refreshPhotos,
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: SafeArea(
-                    bottom: false,
+          body: AppBackdrop(
+            child: RefreshIndicator(
+              color: AppTheme.primary,
+              onRefresh: controller.refreshPhotos,
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _GalleryHero(
+                              totalCount: controller.photos.length,
+                              photoCount: photoCount,
+                              videoCount: videoCount,
+                              onOpenCamera: () => controller.setTab(1),
+                              onImport: () => _importMedia(controller),
+                              onPanicExit: controller.panicExit,
+                            ),
+                            const SizedBox(height: 18),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: _GalleryFilter.values.map((filter) {
+                                  final isSelected = filter == _filter;
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      right:
+                                          filter == _GalleryFilter.values.last
+                                              ? 0
+                                              : 10,
+                                    ),
+                                    child: _FilterChipButton(
+                                      label: l10n.tr(filter.label),
+                                      selected: isSelected,
+                                      onTap: () {
+                                        if (_filter == filter) {
+                                          return;
+                                        }
+                                        setState(() {
+                                          _filter = filter;
+                                          _clearSelection();
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (expiringSoon.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                        child: _ExpiringSoonStrip(
+                          items: expiringSoon,
+                          onOpen: _openMedia,
+                        ),
+                      ),
+                    ),
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _GalleryHero(
-                            totalCount: controller.photos.length,
-                            photoCount: photoCount,
-                            videoCount: videoCount,
-                            onOpenCamera: () => controller.setTab(1),
-                            onImport: () => _importMedia(controller),
-                            onPanicExit: controller.panicExit,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.tr('Private Vault'),
+                                      style: const TextStyle(
+                                        fontFamily: 'Manrope',
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      l10n.tr(
+                                        '{count} temp items ready',
+                                        {'count': '${visibleMedia.length}'},
+                                      ),
+                                      style: const TextStyle(
+                                        color: AppTheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              _SelectionToggleButton(
+                                selectionMode: _selectionMode,
+                                selectedCount: _selectedIds.length,
+                                onTap: () {
+                                  setState(() {
+                                    if (_selectionMode) {
+                                      _clearSelection();
+                                    } else {
+                                      _selectionMode = true;
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 18),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: _GalleryFilter.values.map((filter) {
-                                final isSelected = filter == _filter;
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    right: filter == _GalleryFilter.values.last
-                                        ? 0
-                                        : 10,
-                                  ),
-                                  child: _FilterChipButton(
-                                    label: l10n.tr(filter.label),
-                                    selected: isSelected,
-                                    onTap: () {
-                                      if (_filter == filter) {
-                                        return;
-                                      }
-                                      setState(() {
-                                        _filter = filter;
-                                        _clearSelection();
-                                      });
-                                    },
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 220),
+                            child: _selectionMode
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: _SelectionBar(
+                                      selectedCount: _selectedIds.length,
+                                      onCancel: () {
+                                        setState(_clearSelection);
+                                      },
+                                      onDelete: _selectedIds.isEmpty
+                                          ? null
+                                          : () => _deleteSelected(
+                                                controller,
+                                                selectedMedia,
+                                              ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
-                if (expiringSoon.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                      child: _ExpiringSoonStrip(
-                        items: expiringSoon,
-                        onOpen: _openMedia,
-                      ),
-                    ),
-                  ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.tr('Private Vault'),
-                                    style: const TextStyle(
-                                      fontFamily: 'Manrope',
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    l10n.tr(
-                                      '{count} temp items ready',
-                                      {'count': '${visibleMedia.length}'},
-                                    ),
-                                    style: const TextStyle(
-                                      color: AppTheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            _SelectionToggleButton(
+                  if (visibleMedia.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _EmptyVaultState(filter: _filter),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 140),
+                      sliver: SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final item = visibleMedia[index];
+                            return _VaultTile(
+                              item: item,
+                              selected: _selectedIds.contains(item.id),
                               selectionMode: _selectionMode,
-                              selectedCount: _selectedIds.length,
-                              onTap: () {
-                                setState(() {
-                                  if (_selectionMode) {
-                                    _clearSelection();
-                                  } else {
-                                    _selectionMode = true;
-                                  }
-                                });
-                              },
-                            ),
-                          ],
+                              onTap: () => _handleTileTap(item),
+                              onLongPress: () => _handleTileLongPress(item),
+                            );
+                          },
+                          childCount: visibleMedia.length,
                         ),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 220),
-                          child: _selectionMode
-                              ? Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: _SelectionBar(
-                                    selectedCount: _selectedIds.length,
-                                    onCancel: () {
-                                      setState(_clearSelection);
-                                    },
-                                    onDelete: _selectedIds.isEmpty
-                                        ? null
-                                        : () => _deleteSelected(
-                                              controller,
-                                              selectedMedia,
-                                            ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: 0.74,
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (visibleMedia.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _EmptyVaultState(filter: _filter),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 140),
-                    sliver: SliverGrid(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final item = visibleMedia[index];
-                          return _VaultTile(
-                            item: item,
-                            selected: _selectedIds.contains(item.id),
-                            selectionMode: _selectionMode,
-                            onTap: () => _handleTileTap(item),
-                            onLongPress: () => _handleTileLongPress(item),
-                          );
-                        },
-                        childCount: visibleMedia.length,
-                      ),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                        childAspectRatio: 0.74,
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
           floatingActionButton: FloatingActionButton.extended(
-            backgroundColor: AppTheme.primaryContainer,
-            foregroundColor: const Color(0xFF002A55),
+            backgroundColor: AppTheme.primary,
+            foregroundColor: const Color(0xFF04253A),
+            elevation: 0,
             onPressed: () => controller.setTab(1),
             icon: const Icon(Icons.camera_alt_rounded),
             label: Text(
@@ -388,16 +394,9 @@ class _GalleryHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF23272F), Color(0xFF121316)],
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
+    return GlassPanel(
+      radius: 32,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.46),
       padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,28 +423,16 @@ class _GalleryHero extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.06),
-                      foregroundColor: AppTheme.onSurface,
-                    ),
                     onPressed: onOpenCamera,
                     icon: const Icon(Icons.camera_alt_rounded),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.06),
-                      foregroundColor: AppTheme.onSurface,
-                    ),
                     onPressed: () => onImport(),
                     icon: const Icon(Icons.file_upload_rounded),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.06),
-                      foregroundColor: AppTheme.onSurface,
-                    ),
                     onPressed: () => onPanicExit(),
                     icon: const Icon(Icons.visibility_off_rounded),
                   ),
@@ -514,10 +501,10 @@ class _HeroMetric extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minWidth: 96),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      decoration: AppTheme.glassDecoration(
+        radius: 20,
+        fill: Colors.white.withValues(alpha: 0.04),
+        shadows: const [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,22 +543,33 @@ class _FilterChipButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: AppTheme.motionFast,
+          curve: AppTheme.emphasizedCurve,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.primary : AppTheme.surfaceContainer,
+            gradient: selected
+                ? const LinearGradient(
+                    colors: [
+                      AppTheme.primary,
+                      AppTheme.primaryContainer,
+                    ],
+                  )
+                : null,
+            color: selected
+                ? null
+                : AppTheme.surfaceContainer.withValues(alpha: 0.44),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: selected
-                  ? AppTheme.primary
-                  : Colors.white.withValues(alpha: 0.05),
+                  ? Colors.white.withValues(alpha: 0.16)
+                  : Colors.white.withValues(alpha: 0.06),
             ),
             boxShadow: selected ? AppTheme.softGlow : const [],
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? const Color(0xFF003061) : AppTheme.onSurface,
+              color: selected ? const Color(0xFF04253A) : AppTheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -629,12 +627,9 @@ class _SelectionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceLow,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
+    return GlassPanel(
+      radius: 24,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.46),
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
@@ -741,10 +736,9 @@ class _ExpiringCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: Ink(
         width: 228,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: AppTheme.surfaceContainer,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        decoration: AppTheme.glassDecoration(
+          radius: 24,
+          fill: AppTheme.surfaceContainer.withValues(alpha: 0.5),
         ),
         child: Stack(
           fit: StackFit.expand,
@@ -851,17 +845,15 @@ class _VaultTile extends StatelessWidget {
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(26),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(
-              color: selected
-                  ? AppTheme.primary
-                  : Colors.white.withValues(alpha: 0.06),
-              width: selected ? 1.6 : 1,
-            ),
-            boxShadow: selected ? AppTheme.softGlow : const [],
+          duration: AppTheme.motionFast,
+          curve: AppTheme.emphasizedCurve,
+          decoration: AppTheme.glassDecoration(
+            radius: 26,
+            fill: AppTheme.surfaceContainer.withValues(alpha: 0.44),
+            stroke: selected
+                ? AppTheme.primary.withValues(alpha: 0.92)
+                : Colors.white.withValues(alpha: 0.06),
+            shadows: selected ? AppTheme.softGlow : AppTheme.deepShadow,
           ),
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -1177,40 +1169,46 @@ class _EmptyVaultState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 92,
-              height: 92,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        child: GlassPanel(
+          radius: 28,
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.42),
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 92,
+                height: 92,
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceContainer,
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                ),
+                child: const Icon(Icons.photo_library_outlined,
+                    color: AppTheme.outline, size: 40),
               ),
-              child: const Icon(Icons.photo_library_outlined,
-                  color: AppTheme.outline, size: 40),
-            ),
-            const SizedBox(height: 22),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'Manrope',
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
+              const SizedBox(height: 22),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Manrope',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppTheme.onSurfaceVariant,
-                height: 1.45,
+              const SizedBox(height: 10),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppTheme.onSurfaceVariant,
+                  height: 1.45,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

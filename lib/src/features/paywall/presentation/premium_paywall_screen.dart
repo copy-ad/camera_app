@@ -7,6 +7,8 @@ import '../../../core/constants/legal_links.dart';
 import '../../../core/constants/premium_constants.dart';
 import '../../../shared/state/app_controller.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_backdrop.dart';
+import '../../../shared/widgets/glass_panel.dart';
 import '../../../shared/widgets/tempcam_brand_mark.dart';
 
 class PremiumPaywallScreen extends StatelessWidget {
@@ -132,43 +134,7 @@ class PremiumPaywallScreen extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF090B10),
-                      AppTheme.surface,
-                      AppTheme.surfaceLowest,
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: -120,
-                right: -40,
-                child: Container(
-                  width: 260,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.primary.withValues(alpha: 0.08),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: -50,
-                top: 180,
-                child: Container(
-                  width: 220,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.secondary.withValues(alpha: 0.06),
-                  ),
-                ),
-              ),
+              const AppBackdrop(child: SizedBox.expand()),
               SafeArea(
                 child: LayoutBuilder(
                   builder: (context, constraints) => SingleChildScrollView(
@@ -513,20 +479,10 @@ class _FeatureCard extends StatelessWidget {
         final horizontal = constraints.maxWidth > 220;
         return Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                accent.withValues(alpha: 0.12),
-                AppTheme.surfaceContainer.withValues(alpha: 0.94),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: AppTheme.outlineVariant.withValues(alpha: 0.18),
-            ),
-            boxShadow: [
+          decoration: AppTheme.glassDecoration(
+            radius: 24,
+            fill: AppTheme.surfaceContainer.withValues(alpha: 0.52),
+            shadows: [
               BoxShadow(
                 color: accent.withValues(alpha: 0.08),
                 blurRadius: 18,
@@ -616,25 +572,14 @@ class _PricingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: selected
-            ? const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1B2636),
-                  Color(0xFF121922),
-                ],
-              )
-            : null,
-        color: selected ? null : AppTheme.surfaceLow,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: selected
-              ? AppTheme.primary.withValues(alpha: 0.4)
-              : AppTheme.outlineVariant.withValues(alpha: 0.16),
-          width: selected ? 2 : 1,
-        ),
+      decoration: AppTheme.glassDecoration(
+        radius: 22,
+        fill: selected
+            ? AppTheme.surfaceContainer.withValues(alpha: 0.56)
+            : AppTheme.surfaceLow.withValues(alpha: 0.46),
+        stroke: selected
+            ? AppTheme.primary.withValues(alpha: 0.4)
+            : AppTheme.outlineVariant.withValues(alpha: 0.16),
       ),
       child: Row(
         children: [
@@ -710,28 +655,11 @@ class _PremiumHeroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPanel(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF151F2D),
-            Color(0xFF0E131B),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.08),
-            blurRadius: 26,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
+      radius: 32,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.52),
       child: Column(
         children: [
           const TempCamBrandMark(size: 112, showGlow: false),
@@ -814,13 +742,10 @@ class _HeroMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassPanel(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
+      radius: 22,
+      color: AppTheme.surfaceContainer.withValues(alpha: 0.42),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

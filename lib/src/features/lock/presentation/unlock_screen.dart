@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tempcam/src/localization/app_localizations.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_backdrop.dart';
 import '../../../shared/widgets/glass_panel.dart';
 
 class UnlockScreen extends StatefulWidget {
@@ -42,93 +43,110 @@ class _UnlockScreenState extends State<UnlockScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppTheme.background,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF1A1A1A), AppTheme.background],
-              ),
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: GlassPanel(
-                padding: const EdgeInsets.all(28),
-                radius: AppTheme.radiusM,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.surfaceHighest,
-                        boxShadow: AppTheme.softGlow,
+      body: AppBackdrop(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: GlassPanel(
+              padding: const EdgeInsets.all(28),
+              radius: AppTheme.radiusL,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 84,
+                    height: 84,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.primary,
+                          AppTheme.primaryContainer,
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.verified_user_rounded,
-                        color: AppTheme.primary,
-                        size: 34,
-                      ),
+                      boxShadow: AppTheme.softGlow,
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      l10n.tr('Vault Locked'),
-                      style: const TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    child: const Icon(
+                      Icons.verified_user_rounded,
+                      color: Color(0xFF05263D),
+                      size: 38,
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      widget.canUseBiometric
-                          ? l10n.tr(
-                              'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.',
-                            )
-                          : l10n.tr(
-                              'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
-                            ),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppTheme.onSurfaceVariant,
-                        height: 1.5,
-                      ),
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    l10n.tr('Vault Locked'),
+                    style: const TextStyle(
+                      fontFamily: 'Manrope',
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
                     ),
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: AppTheme.background,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(22),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.canUseBiometric
+                        ? l10n.tr(
+                            'Authenticating now. If the prompt does not appear, tap below to unlock TempCam.',
+                          )
+                        : l10n.tr(
+                            'Biometrics are unavailable on this device. Continue without biometric lock from settings.',
+                          ),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppTheme.onSurfaceVariant,
+                      height: 1.55,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: AppTheme.glassDecoration(
+                      radius: 24,
+                      fill: Colors.white.withValues(alpha: 0.04),
+                      shadows: const [],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: AppTheme.secondary,
+                            shape: BoxShape.circle,
                           ),
                         ),
-                        onPressed:
-                            widget.isBusy ? null : () => widget.onUnlock(),
-                        child: Text(
-                          widget.isBusy
-                              ? l10n.tr('Unlocking...')
-                              : l10n.tr('Unlock TempCam'),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            l10n.tr('Protected Preview'),
+                            style: const TextStyle(
+                              color: AppTheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: widget.isBusy ? null : () => widget.onUnlock(),
+                      child: Text(
+                        widget.isBusy
+                            ? l10n.tr('Unlocking...')
+                            : l10n.tr('Unlock TempCam'),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

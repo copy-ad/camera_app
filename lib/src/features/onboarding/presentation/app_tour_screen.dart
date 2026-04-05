@@ -253,90 +253,106 @@ class _TourCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      child: GlassPanel(
-        radius: 34,
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-        color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AnimatedContainer(
-              duration: AppTheme.motionMedium,
-              curve: AppTheme.emphasizedCurve,
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.primary,
-                    AppTheme.primaryContainer,
-                  ],
-                ),
-                boxShadow: AppTheme.softGlow,
-              ),
-              child: Icon(page.icon, color: const Color(0xFF05263D), size: 34),
-            ),
-            const SizedBox(height: 24),
-            GlassPanel(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              radius: 999,
-              color: AppTheme.secondary.withValues(alpha: 0.24),
-              child: Text(
-                page.badge,
-                style: const TextStyle(
-                  color: AppTheme.secondary,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              page.title,
-              style: const TextStyle(
-                fontFamily: 'Manrope',
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                height: 1.06,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              page.description,
-              style: const TextStyle(
-                color: AppTheme.onSurfaceVariant,
-                fontSize: 16,
-                height: 1.55,
-              ),
-            ),
-            const Spacer(),
-            GlassPanel(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              radius: 24,
-              color: Colors.white.withValues(alpha: 0.035),
-              child: Row(
-                children: [
-                  Icon(page.icon, color: AppTheme.secondary),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      context.l10n.tr(
-                        'You can skip this now and reopen it any time from Settings.',
+      child: LayoutBuilder(
+        builder: (context, constraints) => GlassPanel(
+          radius: 34,
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+          color: AppTheme.surfaceContainer.withValues(alpha: 0.44),
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedContainer(
+                      duration: AppTheme.motionMedium,
+                      curve: AppTheme.emphasizedCurve,
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppTheme.primary,
+                            AppTheme.primaryContainer,
+                          ],
+                        ),
+                        boxShadow: AppTheme.softGlow,
                       ),
-                      style: const TextStyle(
-                        color: AppTheme.onSurface,
-                        height: 1.4,
+                      child: Icon(
+                        page.icon,
+                        color: const Color(0xFF05263D),
+                        size: 34,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    GlassPanel(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
+                      ),
+                      radius: 999,
+                      color: AppTheme.secondary.withValues(alpha: 0.24),
+                      child: Text(
+                        page.badge,
+                        style: const TextStyle(
+                          color: AppTheme.secondary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      page.title,
+                      style: const TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        height: 1.06,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      page.description,
+                      style: const TextStyle(
+                        color: AppTheme.onSurfaceVariant,
+                        fontSize: 16,
+                        height: 1.55,
+                      ),
+                    ),
+                    const Spacer(),
+                    GlassPanel(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      radius: 24,
+                      color: Colors.white.withValues(alpha: 0.035),
+                      child: Row(
+                        children: [
+                          Icon(page.icon, color: AppTheme.secondary),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              context.l10n.tr(
+                                'You can skip this now and reopen it any time from Settings.',
+                              ),
+                              style: const TextStyle(
+                                color: AppTheme.onSurface,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

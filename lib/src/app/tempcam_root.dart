@@ -53,12 +53,7 @@ class _TempCamRootState extends State<TempCamRoot> {
             if (!mounted) {
               return;
             }
-            final appController = context.read<AppController>();
             await AppTourScreen.show(context);
-            if (!mounted) {
-              return;
-            }
-            await appController.markTourCompleted();
             _isShowingTour = false;
           });
         }

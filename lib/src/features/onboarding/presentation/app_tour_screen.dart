@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tempcam/src/localization/app_localizations.dart';
 
+import '../../../shared/state/app_controller.dart';
 import '../../../shared/theme/app_theme.dart';
 
 class AppTourScreen extends StatefulWidget {
@@ -91,112 +93,123 @@ class _AppTourScreenState extends State<AppTourScreen> {
       ),
     ];
     final isLastPage = _pageIndex == pages.length - 1;
-    return Scaffold(
-      backgroundColor: const Color(0xFF090B0F),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      l10n.tr('APP TOUR'),
-                      style: const TextStyle(
-                        color: AppTheme.primary,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l10n.tr('Skip')),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: pages.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _pageIndex = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    final page = pages[index];
-                    return _TourCard(page: page);
-                  },
-                ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: List.generate(
-                  pages.length,
-                  (index) => Expanded(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      height: 4,
-                      margin: EdgeInsets.only(
-                        right: index == pages.length - 1 ? 0 : 8,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
+        await _closeTour();
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF090B0F),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        color: index == _pageIndex
-                            ? AppTheme.primary
-                            : Colors.white.withValues(alpha: 0.12),
+                        color: AppTheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        l10n.tr('APP TOUR'),
+                        style: const TextStyle(
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: _closeTour,
+                      child: Text(l10n.tr('Skip')),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: pages.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _pageIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final page = pages[index];
+                      return _TourCard(page: page);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: List.generate(
+                    pages.length,
+                    (index) => Expanded(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        height: 4,
+                        margin: EdgeInsets.only(
+                          right: index == pages.length - 1 ? 0 : 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: index == _pageIndex
+                              ? AppTheme.primary
+                              : Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  if (_pageIndex > 0)
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.12),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    if (_pageIndex > 0)
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
+                          onPressed: _goBack,
+                          child: Text(l10n.tr('Back')),
+                        ),
+                      )
+                    else
+                      const Spacer(),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: const Color(0xFF003061),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        onPressed: _goBack,
-                        child: Text(l10n.tr('Back')),
-                      ),
-                    )
-                  else
-                    const Spacer(),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: const Color(0xFF003061),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: isLastPage ? _finish : _goNext,
-                      child: Text(
-                        isLastPage ? l10n.tr('Get Started') : l10n.tr('Next'),
-                        style: const TextStyle(fontWeight: FontWeight.w800),
+                        onPressed: isLastPage ? _closeTour : _goNext,
+                        child: Text(
+                          isLastPage ? l10n.tr('Get Started') : l10n.tr('Next'),
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -217,7 +230,12 @@ class _AppTourScreenState extends State<AppTourScreen> {
     );
   }
 
-  void _finish() {
+  Future<void> _closeTour() async {
+    final controller = context.read<AppController>();
+    await controller.markTourCompleted();
+    if (!mounted) {
+      return;
+    }
     Navigator.of(context).pop();
   }
 }

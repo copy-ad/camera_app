@@ -365,10 +365,6 @@ class SettingsScreen extends StatelessWidget {
                               return;
                             }
                             await AppTourScreen.show(context);
-                            if (!context.mounted) {
-                              return;
-                            }
-                            await controller.markTourCompleted();
                           },
                           child: Text(
                             l10n.tr('Start'),

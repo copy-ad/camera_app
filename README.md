@@ -124,6 +124,45 @@ Key areas:
 - `ios/Runner/AppDelegate.swift`: iOS media import bridge
 - `docs/`: release notes, legal docs, and store-launch guides
 
+## Libraries Used
+
+### Flutter SDK
+
+- `flutter`
+- `flutter_localizations`
+- `flutter_test`
+
+### App Dependencies
+
+- `cupertino_icons: ^1.0.8`
+- `provider: ^6.1.2`
+- `camera: ^0.11.0+2`
+- `path: ^1.9.0`
+- `path_provider: ^2.1.4`
+- `hive: ^2.2.3`
+- `hive_flutter: ^1.1.0`
+- `uuid: ^4.5.1`
+- `intl: ^0.20.2`
+- `local_auth: ^2.3.0`
+- `flutter_local_notifications: ^18.0.1`
+- `flutter_timezone: ^4.1.1`
+- `in_app_purchase: ^3.2.3`
+- `in_app_purchase_android: ^0.4.0+8`
+- `image_picker: 1.1.2`
+- `quick_actions: 1.0.8`
+- `video_player: ^2.9.2`
+- `video_thumbnail: ^0.5.6`
+- `timezone: ^0.10.1`
+- `google_mlkit_text_recognition: ^0.15.1`
+
+### Dev Dependencies
+
+- `flutter_lints: ^4.0.0`
+
+### Dependency Override
+
+- `image_picker_android: 0.8.12+12`
+
 ## Getting Started
 
 ### Prerequisites

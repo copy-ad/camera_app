@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -84,9 +85,30 @@ class _ImportedDeviceMedia {
   }
 }
 
+class LiveScanResult {
+  const LiveScanResult({
+    this.phoneNumber,
+    this.address,
+  });
+
+  final String? phoneNumber;
+  final String? address;
+
+  bool get hasData =>
+      (phoneNumber != null && phoneNumber!.isNotEmpty) ||
+      (address != null && address!.isNotEmpty);
+
+  bool isSameAs(LiveScanResult other) {
+    return phoneNumber == other.phoneNumber && address == other.address;
+  }
+}
+
 class AppController extends ChangeNotifier with WidgetsBindingObserver {
   static const MethodChannel _mediaGalleryChannel =
       MethodChannel('tempcam/media_gallery');
+  static const Duration _liveScanMinInterval = Duration(milliseconds: 900);
+  static const Duration _liveScanCooldownDuration = Duration(seconds: 8);
+  static const Duration _liveScanResultHoldDuration = Duration(seconds: 3);
   AppController({
     required SettingsRepository settingsRepository,
     required PhotoRepository photoRepository,
@@ -159,6 +181,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   DateTime? _pausedAt;
   int _cameraSetupToken = 0;
   String? _pendingSmartScanPhotoId;
+  bool _isLiveScanStreaming = false;
+  bool _isLiveScanProcessing = false;
+  DateTime? _lastLiveScanProcessedAt;
+  DateTime? _liveScanCooldownUntil;
+  Timer? _liveScanResultHoldTimer;
+  LiveScanResult _liveScanResult = const LiveScanResult();
 
   AppSettings get settings => _settings;
   List<PhotoRecord> get photos => _photos;
@@ -192,6 +220,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   String? get billingStatusMessage => _billingStatusMessage;
   ProductDetails? get yearlySubscriptionProduct => _yearlySubscriptionProduct;
   String? get pendingSmartScanPhotoId => _pendingSmartScanPhotoId;
+  LiveScanResult get liveScanResult => _liveScanResult;
+  bool get hasLiveScanResult => _liveScanResult.hasData;
   bool get hasStoreManagedTrialOffer =>
       _billingService.hasStoreManagedTrialOffer;
   Locale? get localeOverride =>
@@ -583,6 +613,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     return ResolutionPreset.high;
   }
 
+  ImageFormatGroup get _cameraImageFormatGroup {
+    if (Platform.isAndroid) {
+      return ImageFormatGroup.nv21;
+    }
+    if (Platform.isIOS) {
+      return ImageFormatGroup.bgra8888;
+    }
+    return ImageFormatGroup.unknown;
+  }
+
   CameraDescription _selectInitialCamera(List<CameraDescription> cameras) {
     return cameras.firstWhere(
       (camera) => camera.lensDirection == CameraLensDirection.back,
@@ -643,6 +683,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _maxZoomLevel = maxZoomLevel;
       _currentZoomLevel = 1.0;
       notifyListeners();
+      await _syncLiveScanState();
     } catch (_) {
       if (token != _cameraSetupToken || _cameraController != controller) {
         return;
@@ -651,6 +692,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _maxZoomLevel = 8.0;
       _currentZoomLevel = 1.0;
       notifyListeners();
+      await _syncLiveScanState();
     }
   }
 
@@ -670,6 +712,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
           initialCamera,
           _cameraResolutionPreset,
           enableAudio: true,
+          imageFormatGroup: _cameraImageFormatGroup,
         );
         await _configureCameraController(_cameraController!, token: token);
       }
@@ -694,6 +737,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       next,
       _cameraResolutionPreset,
       enableAudio: true,
+      imageFormatGroup: _cameraImageFormatGroup,
     );
     final token = ++_cameraSetupToken;
     try {
@@ -847,6 +891,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     _isVideoMode = !_isVideoMode;
     notifyListeners();
+    unawaited(_syncLiveScanState());
     unawaited(_syncFlashModeForCurrentCaptureMode());
   }
 
@@ -1023,16 +1068,19 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   void setTab(int index) {
     _currentTabIndex = index;
     notifyListeners();
+    unawaited(_syncLiveScanState());
   }
 
   void openCameraQuickAction() {
     _currentTabIndex = 1;
     notifyListeners();
+    unawaited(_syncLiveScanState());
   }
 
   void openVaultQuickAction() {
     _currentTabIndex = 0;
     notifyListeners();
+    unawaited(_syncLiveScanState());
   }
 
   Future<void> captureWithTimerFlow(BuildContext context) async {
@@ -1043,6 +1091,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     XFile? file;
     try {
       _isCapturing = true;
+      await _syncLiveScanState();
       notifyListeners();
       await _waitForFocusToSettleIfNeeded();
       file = await controller.takePicture();
@@ -1111,6 +1160,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _isCapturing = false;
         notifyListeners();
       }
+      await _syncLiveScanState();
     }
   }
 
@@ -1462,6 +1512,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     return l10n.tr('Unable to open the phone dialer right now.');
   }
 
+  Future<String?> callLiveScanPhoneNumber(String phoneNumber) async {
+    snoozeLiveScan();
+    return callDetectedPhoneNumber(phoneNumber);
+  }
+
   Future<String?> addDetectedPhoneNumberToContacts(String phoneNumber) async {
     final sanitized = phoneNumber.trim();
     if (sanitized.isEmpty) {
@@ -1475,6 +1530,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return null;
     }
     return l10n.tr('Unable to open the contacts app right now.');
+  }
+
+  Future<String?> addLiveScanPhoneNumberToContacts(String phoneNumber) async {
+    snoozeLiveScan();
+    return addDetectedPhoneNumberToContacts(phoneNumber);
   }
 
   Future<String?> openDetectedAddress(String address) async {
@@ -1497,6 +1557,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     return l10n.tr('Unable to open the map right now.');
   }
 
+  Future<String?> openLiveScanAddress(String address) async {
+    snoozeLiveScan();
+    return openDetectedAddress(address);
+  }
+
+  void snoozeLiveScan() {
+    _liveScanCooldownUntil = DateTime.now().add(_liveScanCooldownDuration);
+    _setLiveScanResult(const LiveScanResult());
+  }
+
   PhotoRecord? byId(String id) {
     try {
       return _photos.firstWhere((photo) => photo.id == id);
@@ -1515,6 +1585,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         state == AppLifecycleState.paused) {
       _pausedAt = DateTime.now();
       _isPreviewShieldActive = true;
+      unawaited(_stopLiveScanStream());
       if (_settings.sessionPrivacyModeEnabled &&
           hasPremiumAccess &&
           _settings.biometricLockEnabled &&
@@ -1548,15 +1619,18 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (!hasPremiumAccess) {
       _isLocked = false;
       notifyListeners();
+      await _syncLiveScanState();
       return;
     }
     if (!_settings.biometricLockEnabled || !_biometricAvailable) {
       notifyListeners();
+      await _syncLiveScanState();
       return;
     }
     if (_settings.sessionPrivacyModeEnabled) {
       _isLocked = true;
       notifyListeners();
+      await _syncLiveScanState();
       return;
     }
     final pausedAt = _pausedAt;
@@ -1567,6 +1641,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       _isLocked = true;
     }
     notifyListeners();
+    await _syncLiveScanState();
   }
 
   @override
@@ -1579,6 +1654,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     if (controller != null) {
       unawaited(_disposeControllerSafely(controller));
     }
+    _liveScanResultHoldTimer?.cancel();
     _billingSubscription.cancel();
     unawaited(_billingService.dispose());
     super.dispose();
@@ -1646,6 +1722,180 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _replacePhotoInMemory(updated);
+  }
+
+  bool get _shouldEnableLiveScan {
+    final controller = _cameraController;
+    return controller != null &&
+        controller.value.isInitialized &&
+        !_isVideoMode &&
+        !_isCapturing &&
+        !_isRecordingVideo &&
+        !_isSwitchingCamera &&
+        _currentTabIndex == 1 &&
+        controller.description.lensDirection == CameraLensDirection.back &&
+        (Platform.isAndroid || Platform.isIOS);
+  }
+
+  Future<void> _syncLiveScanState() async {
+    if (_shouldEnableLiveScan) {
+      await _startLiveScanStream();
+      return;
+    }
+    await _stopLiveScanStream();
+  }
+
+  Future<void> _startLiveScanStream() async {
+    final controller = _cameraController;
+    if (controller == null ||
+        !controller.value.isInitialized ||
+        _isLiveScanStreaming ||
+        controller.value.isStreamingImages) {
+      return;
+    }
+    try {
+      await controller.startImageStream(_handleLiveCameraImage);
+      _isLiveScanStreaming = true;
+    } catch (_) {
+      _isLiveScanStreaming = false;
+    }
+  }
+
+  Future<void> _stopLiveScanStream() async {
+    final controller = _cameraController;
+    _liveScanResultHoldTimer?.cancel();
+    _isLiveScanProcessing = false;
+    if (controller == null || !_isLiveScanStreaming) {
+      _setLiveScanResult(const LiveScanResult());
+      return;
+    }
+    try {
+      await controller.stopImageStream();
+    } catch (_) {}
+    _isLiveScanStreaming = false;
+    _setLiveScanResult(const LiveScanResult());
+  }
+
+  Future<void> _handleLiveCameraImage(CameraImage image) async {
+    if (!_shouldEnableLiveScan || _isLiveScanProcessing) {
+      return;
+    }
+    final cooldownUntil = _liveScanCooldownUntil;
+    if (cooldownUntil != null && DateTime.now().isBefore(cooldownUntil)) {
+      return;
+    }
+    final lastProcessedAt = _lastLiveScanProcessedAt;
+    if (lastProcessedAt != null &&
+        DateTime.now().difference(lastProcessedAt) < _liveScanMinInterval) {
+      return;
+    }
+
+    final controller = _cameraController;
+    if (controller == null) {
+      return;
+    }
+    final inputImage = _inputImageFromCameraImage(
+      image,
+      controller: controller,
+    );
+    if (inputImage == null) {
+      return;
+    }
+
+    _isLiveScanProcessing = true;
+    _lastLiveScanProcessedAt = DateTime.now();
+    try {
+      final result = await _documentScanService.scanInputImage(inputImage);
+      if (!_shouldEnableLiveScan) {
+        return;
+      }
+      if (result.hasData) {
+        _setLiveScanResult(
+          LiveScanResult(
+            phoneNumber:
+                result.phoneNumbers.isEmpty ? null : result.phoneNumbers.first,
+            address: result.addresses.isEmpty ? null : result.addresses.first,
+          ),
+        );
+      }
+    } catch (_) {
+    } finally {
+      _isLiveScanProcessing = false;
+    }
+  }
+
+  InputImage? _inputImageFromCameraImage(
+    CameraImage image, {
+    required CameraController controller,
+  }) {
+    final camera = controller.description;
+    final sensorOrientation = camera.sensorOrientation;
+
+    InputImageRotation? rotation;
+    if (Platform.isIOS) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    } else if (Platform.isAndroid) {
+      const orientations = <DeviceOrientation, int>{
+        DeviceOrientation.portraitUp: 0,
+        DeviceOrientation.landscapeLeft: 90,
+        DeviceOrientation.portraitDown: 180,
+        DeviceOrientation.landscapeRight: 270,
+      };
+      var rotationCompensation =
+          orientations[controller.value.deviceOrientation];
+      if (rotationCompensation == null) {
+        return null;
+      }
+      if (camera.lensDirection == CameraLensDirection.front) {
+        rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
+      } else {
+        rotationCompensation =
+            (sensorOrientation - rotationCompensation + 360) % 360;
+      }
+      rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+    }
+    if (rotation == null) {
+      return null;
+    }
+
+    final format = InputImageFormatValue.fromRawValue(image.format.raw);
+    if (format == null ||
+        (Platform.isAndroid && format != InputImageFormat.nv21) ||
+        (Platform.isIOS && format != InputImageFormat.bgra8888) ||
+        image.planes.length != 1) {
+      return null;
+    }
+
+    final plane = image.planes.first;
+    return InputImage.fromBytes(
+      bytes: plane.bytes,
+      metadata: InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        rotation: rotation,
+        format: format,
+        bytesPerRow: plane.bytesPerRow,
+      ),
+    );
+  }
+
+  void _setLiveScanResult(LiveScanResult next) {
+    if (_liveScanResult.isSameAs(next)) {
+      if (next.hasData) {
+        _liveScanResultHoldTimer?.cancel();
+        _liveScanResultHoldTimer = Timer(_liveScanResultHoldDuration, () {
+          _setLiveScanResult(const LiveScanResult());
+        });
+      }
+      return;
+    }
+    _liveScanResult = next;
+    _liveScanResultHoldTimer?.cancel();
+    if (next.hasData) {
+      _liveScanResultHoldTimer = Timer(_liveScanResultHoldDuration, () {
+        _setLiveScanResult(const LiveScanResult());
+      });
+    }
+    notifyListeners();
   }
 
   Future<void> _analyzePhotoRecord(

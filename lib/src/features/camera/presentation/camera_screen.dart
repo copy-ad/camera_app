@@ -133,6 +133,13 @@ class CameraScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              if (controller.hasLiveScanResult)
+                Positioned(
+                  left: 18,
+                  right: 18,
+                  bottom: 236,
+                  child: _LiveScanAssistCard(controller: controller),
+                ),
               Positioned(
                 left: 0,
                 right: 0,
@@ -198,6 +205,179 @@ class CameraScreen extends StatelessWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
   }
+}
+
+class _LiveScanAssistCard extends StatelessWidget {
+  const _LiveScanAssistCard({required this.controller});
+
+  final AppController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final result = controller.liveScanResult;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceLowest.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  context.l10n.tr('Live Scan'),
+                  style: const TextStyle(
+                    color: AppTheme.primary,
+                    fontSize: 10,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                context.l10n.tr('Detected on camera'),
+                style: const TextStyle(
+                  color: AppTheme.onSurfaceVariant,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          if (result.phoneNumber != null) ...[
+            const SizedBox(height: 12),
+            _LiveScanRow(
+              icon: Icons.call_rounded,
+              value: result.phoneNumber!,
+              actions: [
+                _LiveScanAction(
+                  label: context.l10n.tr('Call'),
+                  onTap: () => _runLiveAction(
+                    context,
+                    () => controller.callLiveScanPhoneNumber(
+                      result.phoneNumber!,
+                    ),
+                  ),
+                ),
+                _LiveScanAction(
+                  label: context.l10n.tr('Add to Contacts'),
+                  onTap: () => _runLiveAction(
+                    context,
+                    () => controller.addLiveScanPhoneNumberToContacts(
+                      result.phoneNumber!,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (result.address != null) ...[
+            const SizedBox(height: 12),
+            _LiveScanRow(
+              icon: Icons.location_on_rounded,
+              value: result.address!,
+              actions: [
+                _LiveScanAction(
+                  label: context.l10n.tr('Open in Maps'),
+                  onTap: () => _runLiveAction(
+                    context,
+                    () => controller.openLiveScanAddress(result.address!),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _runLiveAction(
+    BuildContext context,
+    Future<String?> Function() action,
+  ) async {
+    final message = await action();
+    if (!context.mounted || message == null) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _LiveScanRow extends StatelessWidget {
+  const _LiveScanRow({
+    required this.icon,
+    required this.value,
+    required this.actions,
+  });
+
+  final IconData icon;
+  final String value;
+  final List<_LiveScanAction> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 16, color: AppTheme.secondary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                value,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  height: 1.3,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: actions
+              .map(
+                (action) => FilledButton.tonal(
+                  onPressed: action.onTap,
+                  child: Text(action.label),
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ],
+    );
+  }
+}
+
+class _LiveScanAction {
+  const _LiveScanAction({
+    required this.label,
+    required this.onTap,
+  });
+
+  final String label;
+  final Future<void> Function() onTap;
 }
 
 class _InteractiveCameraViewport extends StatefulWidget {

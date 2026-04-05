@@ -75,22 +75,40 @@ class DocumentScanService {
     final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
     try {
       final image = InputImage.fromFilePath(filePath);
-      final recognized = await recognizer.processImage(image);
-      final lines = recognized.blocks
-          .expand((block) => block.lines)
-          .map((line) => line.text.trim())
-          .where((line) => line.isNotEmpty)
-          .toList(growable: false);
-
-      return DocumentScanResult(
-        phoneNumbers: _extractPhoneNumbers(lines),
-        addresses: _extractAddresses(lines),
-      );
+      return await _processInputImage(image, recognizer);
     } catch (_) {
       return const DocumentScanResult(phoneNumbers: [], addresses: []);
     } finally {
       await recognizer.close();
     }
+  }
+
+  Future<DocumentScanResult> scanInputImage(InputImage inputImage) async {
+    final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    try {
+      return await _processInputImage(inputImage, recognizer);
+    } catch (_) {
+      return const DocumentScanResult(phoneNumbers: [], addresses: []);
+    } finally {
+      await recognizer.close();
+    }
+  }
+
+  Future<DocumentScanResult> _processInputImage(
+    InputImage inputImage,
+    TextRecognizer recognizer,
+  ) async {
+    final recognized = await recognizer.processImage(inputImage);
+    final lines = recognized.blocks
+        .expand((block) => block.lines)
+        .map((line) => line.text.trim())
+        .where((line) => line.isNotEmpty)
+        .toList(growable: false);
+
+    return DocumentScanResult(
+      phoneNumbers: _extractPhoneNumbers(lines),
+      addresses: _extractAddresses(lines),
+    );
   }
 
   List<String> _extractPhoneNumbers(List<String> lines) {

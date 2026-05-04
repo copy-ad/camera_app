@@ -1512,6 +1512,37 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  Future<String?> contactSupport() async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: 'support@bizclicq.com',
+      queryParameters: {
+        'subject': 'TempCam Support',
+      },
+    );
+    final launched = await _systemActionService.openExternalUrl(uri.toString());
+    if (launched) {
+      return null;
+    }
+    return l10n.tr('Unable to open your mail app right now.');
+  }
+
+  Future<String?> shareApp({Rect? origin}) async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          title: 'TempCam',
+          text:
+              'Try TempCam for private temporary photos and videos: https://play.google.com/store/apps/details?id=com.tempcam',
+          sharePositionOrigin: origin,
+        ),
+      );
+      return null;
+    } catch (_) {
+      return l10n.tr('Unable to share TempCam right now.');
+    }
+  }
+
   Future<void> ensurePhotoSmartScan(String photoId) async {
     final photo = byId(photoId);
     if (photo == null || photo.isVideo || photo.hasCompletedSmartScan) {

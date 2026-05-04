@@ -38,6 +38,28 @@ class SettingsScreen extends StatelessWidget {
     await action();
   }
 
+  Future<void> _runSettingsAction(
+    BuildContext context,
+    Future<String?> Function() action,
+  ) async {
+    final message = await action();
+    if (!context.mounted || message == null) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Rect _shareOrigin(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) {
+      final size = MediaQuery.sizeOf(context);
+      return Offset.zero & size;
+    }
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppController>(
@@ -373,6 +395,56 @@ class SettingsScreen extends StatelessWidget {
                             },
                             child: Text(
                               l10n.tr('Start'),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        const Divider(color: Color(0x33414755), height: 1),
+                        const SizedBox(height: 14),
+                        _ActionRow(
+                          icon: Icons.mail_rounded,
+                          title: l10n.tr('Support Mail'),
+                          subtitle: 'support@bizclicq.com',
+                          trailing: FilledButton.tonal(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.surfaceContainer,
+                              foregroundColor: AppTheme.onSurface,
+                            ),
+                            onPressed: () => _runSettingsAction(
+                              context,
+                              controller.contactSupport,
+                            ),
+                            child: Text(
+                              l10n.tr('Email'),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        const Divider(color: Color(0x33414755), height: 1),
+                        const SizedBox(height: 14),
+                        _ActionRow(
+                          icon: Icons.ios_share_rounded,
+                          title: l10n.tr('Share This App'),
+                          subtitle: l10n.tr(
+                            'Send TempCam to someone who needs private temporary capture.',
+                          ),
+                          trailing: FilledButton.tonal(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.surfaceContainer,
+                              foregroundColor: AppTheme.onSurface,
+                            ),
+                            onPressed: () => _runSettingsAction(
+                              context,
+                              () => controller.shareApp(
+                                origin: _shareOrigin(context),
+                              ),
+                            ),
+                            child: Text(
+                              l10n.tr('Share'),
                               style:
                                   const TextStyle(fontWeight: FontWeight.w800),
                             ),

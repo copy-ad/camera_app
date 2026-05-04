@@ -1251,6 +1251,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final importedRecords = await _photoRepository.importFromDevice(
         sourcePaths:
             importedItems.map((item) => item.tempPath).toList(growable: false),
+        mediaTypes:
+            importedItems.map((item) => item.mediaType).toList(growable: false),
         timer: timer,
       );
       final failedOriginalDeletions =

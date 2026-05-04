@@ -272,6 +272,14 @@ class MainActivity : FlutterFragmentActivity() {
         if (mimeType?.startsWith("video/") == true) {
             return "video"
         }
+        if (mimeType?.startsWith("image/") == true) {
+            return "photo"
+        }
+        val extension = extensionForUri(uri)?.lowercase()
+            ?: queryDisplayName(uri)?.substringAfterLast('.', "")?.lowercase()
+        if (extension in setOf("mp4", "mov", "m4v", "avi", "mkv", "webm", "3gp")) {
+            return "video"
+        }
         return "photo"
     }
 

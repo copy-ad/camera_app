@@ -72,14 +72,23 @@ class PhotoRepository {
   Future<List<PhotoRecord>> importFromDevice({
     required List<String> sourcePaths,
     required AppTimerOption timer,
+    List<MediaType>? mediaTypes,
   }) async {
+    if (mediaTypes != null && mediaTypes.length != sourcePaths.length) {
+      throw ArgumentError.value(
+        mediaTypes,
+        'mediaTypes',
+        'Must match sourcePaths length.',
+      );
+    }
     final imported = <PhotoRecord>[];
-    for (final sourcePath in sourcePaths) {
+    for (var index = 0; index < sourcePaths.length; index++) {
+      final sourcePath = sourcePaths[index];
       imported.add(
         await createFromCapture(
           sourcePath: sourcePath,
           timer: timer,
-          mediaType: _inferMediaType(sourcePath),
+          mediaType: mediaTypes?[index] ?? _inferMediaType(sourcePath),
         ),
       );
     }

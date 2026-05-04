@@ -186,6 +186,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   DateTime? _lastLiveScanProcessedAt;
   DateTime? _liveScanCooldownUntil;
   Timer? _liveScanResultHoldTimer;
+  final List<LiveScanResult> _recentLiveScanResults = [];
   LiveScanResult _liveScanResult = const LiveScanResult();
 
   AppSettings get settings => _settings;
@@ -1564,6 +1565,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   void snoozeLiveScan() {
     _liveScanCooldownUntil = DateTime.now().add(_liveScanCooldownDuration);
+    _recentLiveScanResults.clear();
     _setLiveScanResult(const LiveScanResult());
   }
 
@@ -1766,6 +1768,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final controller = _cameraController;
     _liveScanResultHoldTimer?.cancel();
     _isLiveScanProcessing = false;
+    _recentLiveScanResults.clear();
     if (controller == null || !_isLiveScanStreaming) {
       _setLiveScanResult(const LiveScanResult());
       return;
@@ -1810,15 +1813,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       if (!_shouldEnableLiveScan) {
         return;
       }
-      if (result.hasData) {
-        _setLiveScanResult(
-          LiveScanResult(
-            phoneNumber:
-                result.phoneNumbers.isEmpty ? null : result.phoneNumbers.first,
-            address: result.addresses.isEmpty ? null : result.addresses.first,
-          ),
-        );
-      }
+      _recordLiveScanResult(
+        LiveScanResult(
+          phoneNumber:
+              result.phoneNumbers.isEmpty ? null : result.phoneNumbers.first,
+          address: result.addresses.isEmpty ? null : result.addresses.first,
+        ),
+      );
     } catch (_) {
     } finally {
       _isLiveScanProcessing = false;
@@ -1877,6 +1878,63 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         bytesPerRow: plane.bytesPerRow,
       ),
     );
+  }
+
+  void _recordLiveScanResult(LiveScanResult next) {
+    _recentLiveScanResults.add(next);
+    if (_recentLiveScanResults.length > 4) {
+      _recentLiveScanResults.removeAt(0);
+    }
+    final stable = _stableLiveScanResult();
+    _setLiveScanResult(stable);
+  }
+
+  LiveScanResult _stableLiveScanResult() {
+    final phoneCounts = <String, int>{};
+    final addressCounts = <String, int>{};
+    final phonesByKey = <String, String>{};
+    final addressesByKey = <String, String>{};
+
+    for (final result in _recentLiveScanResults) {
+      final phone = result.phoneNumber;
+      if (phone != null && phone.isNotEmpty) {
+        final key = _normalizeLiveCandidate(phone);
+        phoneCounts[key] = (phoneCounts[key] ?? 0) + 1;
+        phonesByKey[key] = phone;
+      }
+      final address = result.address;
+      if (address != null && address.isNotEmpty) {
+        final key = _normalizeLiveCandidate(address);
+        addressCounts[key] = (addressCounts[key] ?? 0) + 1;
+        addressesByKey[key] = address;
+      }
+    }
+
+    final phoneKey = _bestStableKey(phoneCounts, 2);
+    final addressKey = _bestStableKey(addressCounts, 3);
+    return LiveScanResult(
+      phoneNumber: phoneKey == null ? null : phonesByKey[phoneKey],
+      address: addressKey == null ? null : addressesByKey[addressKey],
+    );
+  }
+
+  String? _bestStableKey(Map<String, int> counts, int requiredCount) {
+    String? bestKey;
+    var bestCount = 0;
+    for (final entry in counts.entries) {
+      if (entry.value > bestCount) {
+        bestKey = entry.key;
+        bestCount = entry.value;
+      }
+    }
+    if (bestCount < requiredCount) {
+      return null;
+    }
+    return bestKey;
+  }
+
+  String _normalizeLiveCandidate(String value) {
+    return value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9+]+'), ' ').trim();
   }
 
   void _setLiveScanResult(LiveScanResult next) {

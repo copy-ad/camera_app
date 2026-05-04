@@ -10,12 +10,14 @@ class DocumentActionSheet extends StatelessWidget {
     required this.onCallPhone,
     required this.onAddToContacts,
     required this.onOpenAddress,
+    this.scrollController,
   });
 
   final DocumentScanResult result;
   final ValueChanged<String> onCallPhone;
   final ValueChanged<String> onAddToContacts;
   final ValueChanged<String> onOpenAddress;
+  final ScrollController? scrollController;
 
   static Future<bool> show(
     BuildContext context, {
@@ -28,11 +30,18 @@ class DocumentActionSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => DocumentActionSheet(
-        result: result,
-        onCallPhone: onCallPhone,
-        onAddToContacts: onAddToContacts,
-        onOpenAddress: onOpenAddress,
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.78,
+        minChildSize: 0.35,
+        maxChildSize: 0.92,
+        builder: (_, scrollController) => DocumentActionSheet(
+          result: result,
+          onCallPhone: onCallPhone,
+          onAddToContacts: onAddToContacts,
+          onOpenAddress: onOpenAddress,
+          scrollController: scrollController,
+        ),
       ),
     );
     return value ?? false;
@@ -43,116 +52,110 @@ class DocumentActionSheet extends StatelessWidget {
     final l10n = context.l10n;
     return SafeArea(
       top: false,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: constraints.maxHeight),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
-              decoration: const BoxDecoration(
-                color: Color(0xE6131313),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(42)),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      child: Container(
-                        width: 52,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceHighest,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Text(
-                      l10n.tr('Detected details before saving'),
-                      style: const TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.tr(
-                        'Use the detected phone number or address first, then tap Temp Save to choose the timer.',
-                      ),
-                      style: const TextStyle(
-                        color: AppTheme.onSurfaceVariant,
-                        height: 1.4,
-                      ),
-                    ),
-                    if (result.phoneNumbers.isNotEmpty) ...[
-                      const SizedBox(height: 20),
-                      _SectionTitle(title: l10n.tr('Phone numbers')),
-                      const SizedBox(height: 10),
-                      ...result.phoneNumbers.map(
-                        (phoneNumber) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _PhoneActionCard(
-                            phoneNumber: phoneNumber,
-                            onCall: () => onCallPhone(phoneNumber),
-                            onAddToContacts: () => onAddToContacts(phoneNumber),
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (result.addresses.isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      _SectionTitle(title: l10n.tr('Addresses')),
-                      const SizedBox(height: 10),
-                      ...result.addresses.map(
-                        (address) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _AddressActionCard(
-                            address: address,
-                            onOpen: () => onOpenAddress(address),
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 18),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: const Color(0xFF003061),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        onPressed: () => Navigator.of(context).pop(true),
-                        icon: const Icon(Icons.inventory_2_rounded),
-                        label: Text(
-                          l10n.tr('Temp Save'),
-                          style: const TextStyle(
-                            fontFamily: 'Manrope',
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text(l10n.tr('Discard')),
-                      ),
-                    ),
-                  ],
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
+        decoration: const BoxDecoration(
+          color: Color(0xE6131313),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(42)),
+        ),
+        child: SingleChildScrollView(
+          controller: scrollController,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                child: Container(
+                  width: 52,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceHighest,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+              const SizedBox(height: 22),
+              Text(
+                l10n.tr('Detected details before saving'),
+                style: const TextStyle(
+                  fontFamily: 'Manrope',
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.tr(
+                  'Use the detected phone number or address first, then tap Temp Save to choose the timer.',
+                ),
+                style: const TextStyle(
+                  color: AppTheme.onSurfaceVariant,
+                  height: 1.4,
+                ),
+              ),
+              if (result.phoneNumbers.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                _SectionTitle(title: l10n.tr('Phone numbers')),
+                const SizedBox(height: 10),
+                ...result.phoneNumbers.map(
+                  (phoneNumber) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _PhoneActionCard(
+                      phoneNumber: phoneNumber,
+                      onCall: () => onCallPhone(phoneNumber),
+                      onAddToContacts: () => onAddToContacts(phoneNumber),
+                    ),
+                  ),
+                ),
+              ],
+              if (result.addresses.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _SectionTitle(title: l10n.tr('Addresses')),
+                const SizedBox(height: 10),
+                ...result.addresses.map(
+                  (address) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _AddressActionCard(
+                      address: address,
+                      onOpen: () => onOpenAddress(address),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: const Color(0xFF003061),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(true),
+                  icon: const Icon(Icons.inventory_2_rounded),
+                  label: Text(
+                    l10n.tr('Temp Save'),
+                    style: const TextStyle(
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.tr('Discard')),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

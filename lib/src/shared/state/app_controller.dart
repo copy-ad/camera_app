@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/constants/premium_constants.dart';
 import '../../features/camera/presentation/document_action_sheet.dart';
@@ -1485,6 +1487,31 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await refreshPhotos();
   }
 
+  Future<String?> sharePhoto(PhotoRecord record, {Rect? origin}) async {
+    final file = File(record.filePath);
+    if (!await file.exists()) {
+      return l10n.tr('Media no longer exists.');
+    }
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile(
+              record.filePath,
+              mimeType: _mimeTypeForMedia(record),
+              name: p.basename(record.filePath),
+            ),
+          ],
+          title: l10n.tr(record.isVideo ? 'Share video' : 'Share photo'),
+          sharePositionOrigin: origin,
+        ),
+      );
+      return null;
+    } catch (_) {
+      return l10n.tr('Unable to share this item right now.');
+    }
+  }
+
   Future<void> ensurePhotoSmartScan(String photoId) async {
     final photo = byId(photoId);
     if (photo == null || photo.isVideo || photo.hasCompletedSmartScan) {
@@ -1935,6 +1962,26 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   String _normalizeLiveCandidate(String value) {
     return value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9+]+'), ' ').trim();
+  }
+
+  String _mimeTypeForMedia(PhotoRecord record) {
+    final extension = p.extension(record.filePath).toLowerCase();
+    if (record.isVideo) {
+      return switch (extension) {
+        '.mov' => 'video/quicktime',
+        '.m4v' => 'video/x-m4v',
+        '.webm' => 'video/webm',
+        '.3gp' => 'video/3gpp',
+        _ => 'video/mp4',
+      };
+    }
+    return switch (extension) {
+      '.png' => 'image/png',
+      '.webp' => 'image/webp',
+      '.heic' => 'image/heic',
+      '.heif' => 'image/heif',
+      _ => 'image/jpeg',
+    };
   }
 
   void _setLiveScanResult(LiveScanResult next) {

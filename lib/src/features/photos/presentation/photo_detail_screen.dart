@@ -121,6 +121,18 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                           ..hideCurrentSnackBar()
                           ..showSnackBar(SnackBar(content: Text(message)));
                       },
+                      onShare: () async {
+                        final message = await controller.sharePhoto(
+                          photo,
+                          origin: _shareOrigin(context),
+                        );
+                        if (!context.mounted || message == null) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(SnackBar(content: Text(message)));
+                      },
                       onDelete: () async {
                         final ok = await controller.unlockForSensitiveAccess();
                         if (!context.mounted || !ok) {
@@ -353,6 +365,15 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
   }
+
+  Rect _shareOrigin(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) {
+      final size = MediaQuery.sizeOf(context);
+      return Offset.zero & size;
+    }
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
 }
 
 class _PrivateMediaPreview extends StatelessWidget {
@@ -550,6 +571,7 @@ class _PhotoDetailChrome extends StatelessWidget {
     required this.onBack,
     required this.onExtend,
     required this.onKeepForever,
+    required this.onShare,
     required this.onDelete,
     required this.onPhoneTap,
     required this.onAddressTap,
@@ -560,6 +582,7 @@ class _PhotoDetailChrome extends StatelessWidget {
   final VoidCallback onBack;
   final Future<void> Function() onExtend;
   final Future<void> Function() onKeepForever;
+  final Future<void> Function() onShare;
   final Future<void> Function() onDelete;
   final ValueChanged<String> onPhoneTap;
   final ValueChanged<String> onAddressTap;
@@ -592,6 +615,13 @@ class _PhotoDetailChrome extends StatelessWidget {
                   children: [
                     _TopCircle(icon: Icons.arrow_back_rounded, onTap: onBack),
                     const Spacer(),
+                    _TopCircle(
+                      icon: Icons.ios_share_rounded,
+                      onTap: () {
+                        onShare();
+                      },
+                    ),
+                    const SizedBox(width: 10),
                     _TopCircle(
                       icon: photo.isVideo
                           ? Icons.videocam_rounded
